@@ -83,9 +83,12 @@ func main() {
 }
 
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "home.html", withCommonViewData(r, map[string]any{
-		"Title": "Quran Murojaah",
-	}))
+	data := map[string]any{
+		"Title":       "Quran Murojaah",
+		"SearchQuery": r.URL.Query().Get("q"),
+		"SearchError": searchErrorMessage(r.URL.Query().Get("error")),
+	}
+	s.render(w, "home.html", withCommonViewData(r, data))
 }
 
 func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
@@ -98,9 +101,11 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	surah, ayah, err := relations.ParseAyahRef(r.FormValue("ayah"))
+	raw := strings.TrimSpace(r.FormValue("ayah"))
+	surah, ayah, err := relations.ParseAyahRef(raw)
 	if err != nil {
-		http.Error(w, "invalid ayah format, use surah:ayah", http.StatusBadRequest)
+		lang := sanitizeLang(r.FormValue("lang"))
+		http.Redirect(w, r, fmt.Sprintf("/?error=invalid_ref&q=%s&lang=%s", raw, lang), http.StatusSeeOther)
 		return
 	}
 
@@ -116,13 +121,13 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 
 	surah, ayah, err := parsePathInts(r.URL.Path, "/ayah/")
 	if err != nil {
-		http.NotFound(w, r)
+		s.renderNotFound(w, r, "Ayah not found", "That ayah reference is not valid. Use the format surah:ayah (e.g. 60:8).")
 		return
 	}
 
 	a, ok := s.quran.Get(surah, ayah)
 	if !ok {
-		http.NotFound(w, r)
+		s.renderNotFound(w, r, fmt.Sprintf("Ayah %d:%d not found", surah, ayah), "This ayah does not exist in the dataset. Double-check the surah and ayah numbers.")
 		return
 	}
 
@@ -167,7 +172,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	ayah1, ok1 := s.quran.Get(s1, y1)
 	ayah2, ok2 := s.quran.Get(s2, y2)
 	if !ok1 || !ok2 {
-		http.NotFound(w, r)
+		s.renderNotFound(w, r, "Ayah not found", "One or both ayah references in this comparison do not exist in the dataset.")
 		return
 	}
 
@@ -469,6 +474,24 @@ func (s *server) withTranslations(lang string, related []relations.AyahView) []r
 		out[i].Translation = s.translationFor(lang, out[i].Surah, out[i].Ayah)
 	}
 	return out
+}
+
+func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading, message string) {
+	w.WriteHeader(http.StatusNotFound)
+	s.render(w, "not-found.html", withCommonViewData(r, map[string]any{
+		"Title":   "Not Found",
+		"Heading": heading,
+		"Message": message,
+	}))
+}
+
+func searchErrorMessage(code string) string {
+	switch code {
+	case "invalid_ref":
+		return "Invalid format — use surah:ayah (e.g. 60:8)."
+	default:
+		return ""
+	}
 }
 
 func resolveBaseDir() (string, error) {

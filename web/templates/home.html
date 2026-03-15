@@ -29,8 +29,9 @@
       <p class="lead">Search by ayah reference and jump into full Arabic text with relation links.</p>
       <form action="/search" method="post" class="search-form">
         <input type="hidden" name="lang" value="{{.Lang}}" />
-        <input type="text" name="ayah" placeholder="surah:ayah (example: 60:8)" required />
+        <input type="text" name="ayah" placeholder="surah:ayah (example: 60:8)" value="{{.SearchQuery}}" required autocomplete="off" />
         <button type="submit">Open Ayah</button>
+        {{if .SearchError}}<p class="error-msg" role="alert">{{.SearchError}}</p>{{end}}
       </form>
     </section>
 

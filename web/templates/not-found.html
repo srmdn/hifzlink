@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{.HomeURL}}">HifzLink</a>
+      <nav class="lang-toggle" aria-label="Language mode">
+        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
+        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
+        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <p class="back"><a href="{{.HomeURL}}">Home</a></p>
+    <div class="card not-found-card">
+      <p class="eyebrow">Not found</p>
+      <h1>{{.Heading}}</h1>
+      <p class="lead">{{.Message}}</p>
+      <a class="button-link" href="{{.HomeURL}}">Search another ayah</a>
+    </div>
+  </main>
+</body>
+</html>

@@ -14,6 +14,8 @@ The format is inspired by Keep a Changelog.
 
 ### Changed
 
+- invalid search input now redirects back to home with an inline error message and pre-filled input instead of a plain error page
+- missing or invalid ayah references now show a styled not-found page instead of a bare 404
 - updated all internal cross-references and `README.md` links to reflect new `docs/` paths
 - Open source governance docs (`CONTRIBUTING.md`, `VERSIONING.md`, `NOTICE.md`, `LICENSE`)
 - documentation requirements for Quran dataset integrity and attribution
