@@ -8,6 +8,13 @@ The format is inspired by Keep a Changelog.
 
 ### Added
 
+- unit tests for `internal/search` (Store, TranslationStore) and `internal/relations` (ParseAyahRef, Service)
+- handler tests for all API endpoints (`/api/ayah/`, `/api/relations`, `/api/surah/`, `/api/juz/`) covering `lang` modes, error paths, and duplicate handling
+- `docs/` folder; moved `PROJECT.md`, `ARCHITECTURE.md`, `STATUS.md`, `ROADMAP.md`, `DESIGN.md`, `TRANSLATIONS.md`, `VERSIONING.md` into it
+
+### Changed
+
+- updated all internal cross-references and `README.md` links to reflect new `docs/` paths
 - Open source governance docs (`CONTRIBUTING.md`, `VERSIONING.md`, `NOTICE.md`, `LICENSE`)
 - documentation requirements for Quran dataset integrity and attribution
 - full dataset pipeline scripts:

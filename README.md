@@ -62,14 +62,16 @@ curl -X POST http://localhost:8080/api/relations \
 ## Open Source Docs
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md)
-- [VERSIONING.md](./VERSIONING.md)
 - [CHANGELOG.md](./CHANGELOG.md)
 - [LICENSE](./LICENSE)
 - [NOTICE.md](./NOTICE.md)
-- [DESIGN.md](./DESIGN.md)
-- [TRANSLATIONS.md](./TRANSLATIONS.md)
-- [STATUS.md](./STATUS.md)
-- [ROADMAP.md](./ROADMAP.md)
+- [docs/VERSIONING.md](./docs/VERSIONING.md)
+- [docs/DESIGN.md](./docs/DESIGN.md)
+- [docs/TRANSLATIONS.md](./docs/TRANSLATIONS.md)
+- [docs/STATUS.md](./docs/STATUS.md)
+- [docs/ROADMAP.md](./docs/ROADMAP.md)
+- [docs/PROJECT.md](./docs/PROJECT.md)
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
 ## Project Structure
 

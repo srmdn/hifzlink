@@ -213,5 +213,5 @@ This project should be easy to run and easy to contribute to.
 
 - run locally with `go run ./cmd/server`
 - follow `CONTRIBUTING.md` for workflow
-- use Semantic Versioning as described in `VERSIONING.md`
+- use Semantic Versioning as described in `docs/VERSIONING.md`
 - keep `CHANGELOG.md` updated for user-visible changes
