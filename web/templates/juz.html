@@ -16,7 +16,7 @@
       <ul>
         {{range .Pairs}}
         <li>
-          <a href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}">{{.Ayah1}} ↔ {{.Ayah2}}</a>
+          <a href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}">{{.Ayah1}} ({{.Ayah1Name}}) ↔ {{.Ayah2}} ({{.Ayah2Name}})</a>
           {{if .Note}}<span class="meta">({{.Note}})</span>{{end}}
         </li>
         {{end}}

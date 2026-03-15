@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 )
 
 type Ayah struct {
-	Surah  int    `json:"surah"`
-	Ayah   int    `json:"ayah"`
-	Juz    int    `json:"juz"`
-	TextAR string `json:"text_ar"`
+	Surah     int    `json:"surah"`
+	SurahName string `json:"surah_name,omitempty"`
+	Ayah      int    `json:"ayah"`
+	Juz       int    `json:"juz"`
+	TextAR    string `json:"text_ar"`
 }
 
 type Store struct {
@@ -39,6 +41,9 @@ func Load(path string) (*Store, error) {
 	}
 
 	for _, a := range ayahs {
+		if strings.TrimSpace(a.SurahName) == "" {
+			a.SurahName = lookupSurahName(a.Surah)
+		}
 		k := key(a.Surah, a.Ayah)
 		s.byKey[k] = a
 		s.bySurah[a.Surah] = append(s.bySurah[a.Surah], a)
@@ -84,4 +89,8 @@ func (s *Store) ByJuz(juz int) []Ayah {
 
 func key(surah, ayah int) string {
 	return fmt.Sprintf("%d:%d", surah, ayah)
+}
+
+func (s *Store) SurahName(surah int) string {
+	return lookupSurahName(surah)
 }
