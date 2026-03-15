@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-03-16 (session 2)
+Last updated: 2026-03-16 (session 3)
 
 ## Current State
 
@@ -15,6 +15,8 @@ HifzLink is in MVP+ stage:
 - custom project favicon added
 - docs reorganised into `docs/` folder
 - unit and handler tests added (`go test ./...` passes)
+- friendly not-found page for invalid/missing ayah references
+- inline search validation message on home page (invalid format redirects back with error)
 
 ## Implemented Features
 
@@ -44,6 +46,7 @@ Local data files:
 ## Known Gaps
 
 - translation coverage checks are implicit (import count), not exposed in a report command
+- no admin UI for relation management (Milestone 2)
 - no admin UI for relation management (API-only create)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
