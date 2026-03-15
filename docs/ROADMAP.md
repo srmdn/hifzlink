@@ -6,7 +6,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 
 ## Milestone 1: Reliability (Near Term)
 
-1. add handler/unit tests for:
+1. [done] add handler/unit tests for:
 - ayah endpoints with `lang` modes
 - relation endpoints and duplicate handling
 - translation loader and fallback behavior
@@ -15,7 +15,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - translation file key-format validation command
 - optional translation coverage report per language
 
-3. improve error UX:
+3. [done] improve error UX:
 - friendly not-found page for invalid ayah references
 - clear form validation messages in search flow
 
