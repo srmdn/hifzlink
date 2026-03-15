@@ -4,98 +4,93 @@ This repository may be modified by AI coding tools.
 
 Follow these rules strictly.
 
----
-
-# Do Not Overengineer
+## Do Not Overengineer
 
 Avoid unnecessary complexity.
 
 Do not introduce frameworks unless explicitly required.
 
----
-
-# Backend Rules
+## Backend Rules
 
 Backend must use:
 
-* Go
-* Go standard library
-* net/http
-* SQLite
+- Go
+- Go standard library
+- `net/http`
+- SQLite
 
 Do not add:
 
-* Gin
-* Echo
-* Fiber
-* ORM libraries
+- Gin
+- Echo
+- Fiber
+- ORM libraries
 
----
-
-# Frontend Rules
+## Frontend Rules
 
 Frontend must remain simple.
 
 Allowed:
 
-* HTML
-* CSS
-* minimal JavaScript
+- HTML
+- CSS
+- minimal JavaScript
 
 Do not add:
 
-* React
-* Vue
-* Angular
-* Next.js
-* Node.js
-* npm
+- React
+- Vue
+- Angular
+- Next.js
+- Node.js
+- npm
 
----
+## Architecture Rules
 
-# Architecture Rules
-
-Follow the project structure defined in ARCHITECTURE.md.
+Follow the project structure defined in `ARCHITECTURE.md`.
 
 Do not change folder layout without good reason.
 
----
-
-# Code Quality
+## Code Quality
 
 Code must be:
 
-* readable
-* minimal
-* well structured
+- readable
+- minimal
+- well structured
 
 Avoid large abstractions.
 
 Prefer simple functions.
 
----
+## Data Handling Rules
 
-# Data Handling
+Quran text must be loaded from `data/quran.json`.
 
-Quran text must be loaded from:
+The database stores only verse relations.
 
-data/quran.json
+For Quran dataset updates:
 
-The database should store only verse relations.
+- do not alter Quran text content
+- preserve UTF-8 Arabic text and diacritics
+- keep attribution and source notes in `NOTICE.md`
+- validate dataset integrity before committing
 
----
+Required dataset checks:
 
-# UI Rules
+- exactly `6236` ayah records
+- unique `(surah, ayah)` pairs
+- non-empty `text_ar`
 
-Always display **full verses**.
+## UI Rules
+
+Always display full verses.
 
 Never truncate Quran text.
 
 Arabic text must be readable.
 
----
-
-# Development Strategy
+## Development Strategy
 
 Implement features incrementally:
 
@@ -106,11 +101,16 @@ Implement features incrementally:
 5. frontend pages
 6. compare view
 
----
+## Open Source Hygiene
 
-# Priority
+When making user-visible changes:
+
+- update relevant docs (`README.md`, `PROJECT.md`, `ARCHITECTURE.md`)
+- follow `CONTRIBUTING.md`
+- record user-visible changes in `CHANGELOG.md`
+
+## Priority
 
 The primary goal is usability for Quran memorization.
 
 Keep the interface simple and fast.
-
