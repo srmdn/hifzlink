@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <p><a href="/">Home</a></p>
+    <h1>Ayah {{.AyahRef}}</h1>
+
+    <article class="card verse">
+      <p class="arabic">{{.Ayah.TextAR}}</p>
+      <p class="meta">Surah {{.Ayah.Surah}} | Ayah {{.Ayah.Ayah}} | Juz {{.Ayah.Juz}}</p>
+    </article>
+
+    <section class="card">
+      <h2>Related Verses</h2>
+      {{if .Related}}
+      <ul class="related-list">
+        {{range .Related}}
+        <li>
+          <div class="line-head">
+            <a href="/ayah/{{.Surah}}/{{.Ayah}}">{{.Surah}}:{{.Ayah}}</a>
+            <a class="button-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}">Compare</a>
+          </div>
+          <p class="arabic">{{.Text}}</p>
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p>No relations yet.</p>
+      {{end}}
+    </section>
+  </main>
+</body>
+</html>

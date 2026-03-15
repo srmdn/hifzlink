@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Quran Murojaah</h1>
+    <p>Search by reference (example: <code>60:8</code>)</p>
+    <form action="/search" method="post" class="search-form">
+      <input type="text" name="ayah" placeholder="surah:ayah" required />
+      <button type="submit">Open Ayah</button>
+    </form>
+
+    <section class="card">
+      <h2>Quick Links</h2>
+      <ul>
+        <li><a href="/ayah/60/8">Ayah 60:8</a></li>
+        <li><a href="/surah/60/relations">Surah 60 Relations</a></li>
+        <li><a href="/juz/28/relations">Juz 28 Relations</a></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Add Relation</h2>
+      <p>Use API endpoint:</p>
+      <pre>POST /api/relations
+{"ayah1":"60:8","ayah2":"60:9","note":"mutashabihat"}</pre>
+    </section>
+  </main>
+</body>
+</html>

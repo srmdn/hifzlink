@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <p><a href="/">Home</a></p>
+    <h1>Juz {{.Juz}} Relations</h1>
+
+    <section class="card">
+      {{if .Pairs}}
+      <ul>
+        {{range .Pairs}}
+        <li>
+          <a href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}">{{.Ayah1}} ↔ {{.Ayah2}}</a>
+          {{if .Note}}<span class="meta">({{.Note}})</span>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p>No relations in this juz yet.</p>
+      {{end}}
+    </section>
+  </main>
+</body>
+</html>
