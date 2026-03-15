@@ -1,1 +1,8 @@
 data/relations.db
+data/raw/
+
+.DS_Store
+*.log
+tmp/
+bin/
+coverage.out
