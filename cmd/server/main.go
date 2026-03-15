@@ -123,10 +123,11 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "ayah.html", map[string]any{
-		"Title":   fmt.Sprintf("Ayah %d:%d", surah, ayah),
-		"AyahRef": relations.FormatAyahRef(surah, ayah),
-		"Ayah":    a,
-		"Related": related,
+		"Title":     fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
+		"AyahRef":   relations.FormatAyahRef(surah, ayah),
+		"Ayah":      a,
+		"Related":   related,
+		"SurahName": a.SurahName,
 	})
 }
 
@@ -183,9 +184,10 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "surah.html", map[string]any{
-		"Title": fmt.Sprintf("Surah %d Relations", surah),
-		"Surah": surah,
-		"Pairs": pairs,
+		"Title":     fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Surah":     surah,
+		"SurahName": s.quran.SurahName(surah),
+		"Pairs":     pairs,
 	})
 }
 
@@ -244,10 +246,11 @@ func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]any{
-			"surah": a.Surah,
-			"ayah":  a.Ayah,
-			"text":  a.TextAR,
-			"juz":   a.Juz,
+			"surah":      a.Surah,
+			"surah_name": a.SurahName,
+			"ayah":       a.Ayah,
+			"text":       a.TextAR,
+			"juz":        a.Juz,
 		})
 		return
 	}
@@ -309,8 +312,9 @@ func (s *server) handleAPISurah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"surah":     value,
-		"relations": pairs,
+		"surah":      value,
+		"surah_name": s.quran.SurahName(value),
+		"relations":  pairs,
 	})
 }
 

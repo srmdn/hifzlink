@@ -9,11 +9,11 @@
 <body>
   <main class="container">
     <p><a href="/">Home</a></p>
-    <h1>Ayah {{.AyahRef}}</h1>
+    <h1>Ayah {{.AyahRef}} ({{.SurahName}})</h1>
 
     <article class="card verse">
       <p class="arabic">{{.Ayah.TextAR}}</p>
-      <p class="meta">Surah {{.Ayah.Surah}} | Ayah {{.Ayah.Ayah}} | Juz {{.Ayah.Juz}}</p>
+      <p class="meta">Surah {{.Ayah.Surah}} ({{.Ayah.SurahName}}) | Ayah {{.Ayah.Ayah}} | Juz {{.Ayah.Juz}}</p>
     </article>
 
     <section class="card">
@@ -23,7 +23,7 @@
         {{range .Related}}
         <li>
           <div class="line-head">
-            <a href="/ayah/{{.Surah}}/{{.Ayah}}">{{.Surah}}:{{.Ayah}}</a>
+            <a href="/ayah/{{.Surah}}/{{.Ayah}}">{{.Surah}}:{{.Ayah}} ({{.SurahName}})</a>
             <a class="button-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}">Compare</a>
           </div>
           <p class="arabic">{{.Text}}</p>

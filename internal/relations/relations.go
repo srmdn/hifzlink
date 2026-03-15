@@ -10,16 +10,19 @@ import (
 )
 
 type AyahView struct {
-	Surah int    `json:"surah"`
-	Ayah  int    `json:"ayah"`
-	Juz   int    `json:"juz,omitempty"`
-	Text  string `json:"text"`
+	Surah     int    `json:"surah"`
+	SurahName string `json:"surah_name,omitempty"`
+	Ayah      int    `json:"ayah"`
+	Juz       int    `json:"juz,omitempty"`
+	Text      string `json:"text"`
 }
 
 type PairView struct {
-	Ayah1 string `json:"ayah1"`
-	Ayah2 string `json:"ayah2"`
-	Note  string `json:"note,omitempty"`
+	Ayah1     string `json:"ayah1"`
+	Ayah1Name string `json:"ayah1_name,omitempty"`
+	Ayah2     string `json:"ayah2"`
+	Ayah2Name string `json:"ayah2_name,omitempty"`
+	Note      string `json:"note,omitempty"`
 }
 
 type Service struct {
@@ -104,10 +107,11 @@ func (s *Service) RelatedAyahs(surah, ayah int) ([]AyahView, error) {
 			continue
 		}
 		out = append(out, AyahView{
-			Surah: target.Surah,
-			Ayah:  target.Ayah,
-			Juz:   target.Juz,
-			Text:  target.TextAR,
+			Surah:     target.Surah,
+			SurahName: target.SurahName,
+			Ayah:      target.Ayah,
+			Juz:       target.Juz,
+			Text:      target.TextAR,
 		})
 	}
 
@@ -130,9 +134,11 @@ func (s *Service) PairsBySurah(surah int) ([]PairView, error) {
 	out := make([]PairView, 0, len(rels))
 	for _, rel := range rels {
 		out = append(out, PairView{
-			Ayah1: FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
-			Ayah2: FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
-			Note:  rel.Note,
+			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
+			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
+			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
+			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
+			Note:      rel.Note,
 		})
 	}
 	return out, nil
@@ -157,9 +163,11 @@ func (s *Service) PairsByJuz(juz int) ([]PairView, error) {
 		}
 
 		out = append(out, PairView{
-			Ayah1: FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
-			Ayah2: FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
-			Note:  rel.Note,
+			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
+			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
+			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
+			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
+			Note:      rel.Note,
 		})
 	}
 
