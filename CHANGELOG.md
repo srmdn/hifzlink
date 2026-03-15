@@ -14,6 +14,12 @@ The format is inspired by Keep a Changelog.
 
 ### Changed
 
+- extract shared `head`, `topbar`, and `footer` into `_partials.html` — eliminates duplication across all page templates
+- add footer to all pages with Tanzil attribution and open source link
+- homepage: remove raw API card, rename Quick Links to Examples with a compare link added
+- compare page: back link now points to ayah1 instead of generic Home
+- surah and juz pair lists: add Compare button per pair for direct navigation
+- add `lang="ar"` attribute to Arabic text elements for screen reader accuracy
 - invalid search input now redirects back to home with an inline error message and pre-filled input instead of a plain error page
 - missing or invalid ayah references now show a styled not-found page instead of a bare 404
 - updated all internal cross-references and `README.md` links to reflect new `docs/` paths

@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-03-16 (session 3)
+Last updated: 2026-03-16 (session 4)
 
 ## Current State
 
@@ -17,6 +17,12 @@ HifzLink is in MVP+ stage:
 - unit and handler tests added (`go test ./...` passes)
 - friendly not-found page for invalid/missing ayah references
 - inline search validation message on home page (invalid format redirects back with error)
+- shared template partials extracted (`_partials.html`: head, topbar, footer)
+- `lang="ar"` added to Arabic text elements for screen reader accuracy
+- footer added to all pages with Tanzil attribution
+- homepage cleaned up: dead class removed, API card removed, Quick Links → Examples
+- compare page back link points to ayah1 instead of generic Home
+- surah/juz pair lists improved with Compare button per pair
 
 ## Implemented Features
 
