@@ -4,29 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Quran Murojaah</h1>
-    <p>Search by reference (example: <code>60:8</code>)</p>
-    <form action="/search" method="post" class="search-form">
-      <input type="text" name="ayah" placeholder="surah:ayah" required />
-      <button type="submit">Open Ayah</button>
-    </form>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{.HomeURL}}">HifzLink</a>
+      <nav class="lang-toggle" aria-label="Language mode">
+        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
+        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
+        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page-home">
+    <section class="hero card">
+      <p class="eyebrow">Quran Murojaah</p>
+      <h1>Find and compare mutashabihat verses quickly</h1>
+      <p class="lead">Search by ayah reference and jump into full Arabic text with relation links.</p>
+      <form action="/search" method="post" class="search-form">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="text" name="ayah" placeholder="surah:ayah (example: 60:8)" required />
+        <button type="submit">Open Ayah</button>
+      </form>
+    </section>
 
     <section class="card">
       <h2>Quick Links</h2>
-      <ul>
-        <li><a href="/ayah/60/8">Ayah 60:8</a></li>
-        <li><a href="/surah/60/relations">Surah 60 Relations</a></li>
-        <li><a href="/juz/28/relations">Juz 28 Relations</a></li>
+      <ul class="simple-list">
+        <li><a href="/ayah/60/8?lang={{.Lang}}">Ayah 60:8</a></li>
+        <li><a href="/surah/60/relations?lang={{.Lang}}">Surah 60 Relations</a></li>
+        <li><a href="/juz/28/relations?lang={{.Lang}}">Juz 28 Relations</a></li>
       </ul>
     </section>
 
     <section class="card">
       <h2>Add Relation</h2>
-      <p>Use API endpoint:</p>
+      <p class="meta">Use API endpoint:</p>
       <pre>POST /api/relations
 {"ayah1":"60:8","ayah2":"60:9","note":"mutashabihat"}</pre>
     </section>

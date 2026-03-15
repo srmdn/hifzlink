@@ -19,6 +19,7 @@ import (
 
 type server struct {
 	quran   *search.Store
+	trans   *search.TranslationStore
 	rels    *relations.Service
 	tmpl    *template.Template
 	baseDir string
@@ -35,6 +36,11 @@ func main() {
 		log.Fatalf("failed to load quran dataset: %v", err)
 	}
 
+	translations, err := search.LoadTranslations(filepath.Join(baseDir, "data", "translations"), "en", "id")
+	if err != nil {
+		log.Fatalf("failed to load translations: %v", err)
+	}
+
 	dbStore, err := db.Open(filepath.Join(baseDir, "data", "relations.db"))
 	if err != nil {
 		log.Fatalf("failed to open db: %v", err)
@@ -48,6 +54,7 @@ func main() {
 
 	s := &server{
 		quran:   quran,
+		trans:   translations,
 		rels:    relations.NewService(dbStore, quran),
 		tmpl:    tmpl,
 		baseDir: baseDir,
@@ -75,8 +82,10 @@ func main() {
 	}
 }
 
-func (s *server) handleHome(w http.ResponseWriter, _ *http.Request) {
-	s.render(w, "home.html", map[string]any{"Title": "Quran Murojaah"})
+func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "home.html", withCommonViewData(r, map[string]any{
+		"Title": "Quran Murojaah",
+	}))
 }
 
 func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +104,8 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/ayah/%d/%d", surah, ayah), http.StatusSeeOther)
+	lang := sanitizeLang(r.FormValue("lang"))
+	http.Redirect(w, r, withLang(fmt.Sprintf("/ayah/%d/%d", surah, ayah), lang), http.StatusSeeOther)
 }
 
 func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
@@ -121,14 +131,18 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	lang := pageLang(r)
+	related = s.withTranslations(lang, related)
+	ayahTranslation := s.translationFor(lang, surah, ayah)
 
-	s.render(w, "ayah.html", map[string]any{
-		"Title":     fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
-		"AyahRef":   relations.FormatAyahRef(surah, ayah),
-		"Ayah":      a,
-		"Related":   related,
-		"SurahName": a.SurahName,
-	})
+	s.render(w, "ayah.html", withCommonViewData(r, map[string]any{
+		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
+		"AyahRef":         relations.FormatAyahRef(surah, ayah),
+		"Ayah":            a,
+		"AyahTranslation": ayahTranslation,
+		"Related":         related,
+		"SurahName":       a.SurahName,
+	}))
 }
 
 func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
@@ -157,13 +171,15 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "compare.html", map[string]any{
-		"Title": "Compare",
-		"Ayah1": ayah1,
-		"Ayah2": ayah2,
-		"Ref1":  relations.FormatAyahRef(s1, y1),
-		"Ref2":  relations.FormatAyahRef(s2, y2),
-	})
+	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
+		"Title":            "Compare",
+		"Ayah1":            ayah1,
+		"Ayah1Translation": s.translationFor(pageLang(r), s1, y1),
+		"Ayah2":            ayah2,
+		"Ayah2Translation": s.translationFor(pageLang(r), s2, y2),
+		"Ref1":             relations.FormatAyahRef(s1, y1),
+		"Ref2":             relations.FormatAyahRef(s2, y2),
+	}))
 }
 
 func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
@@ -183,12 +199,12 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "surah.html", map[string]any{
+	s.render(w, "surah.html", withCommonViewData(r, map[string]any{
 		"Title":     fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
 		"Surah":     surah,
 		"SurahName": s.quran.SurahName(surah),
 		"Pairs":     pairs,
-	})
+	}))
 }
 
 func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
@@ -208,11 +224,11 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "juz.html", map[string]any{
+	s.render(w, "juz.html", withCommonViewData(r, map[string]any{
 		"Title": fmt.Sprintf("Juz %d Relations", juz),
 		"Juz":   juz,
 		"Pairs": pairs,
-	})
+	}))
 }
 
 func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
@@ -245,13 +261,19 @@ func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{
+		resp := map[string]any{
 			"surah":      a.Surah,
 			"surah_name": a.SurahName,
 			"ayah":       a.Ayah,
 			"text":       a.TextAR,
 			"juz":        a.Juz,
-		})
+		}
+		lang := pageLang(r)
+		if tr := s.translationFor(lang, surah, ayah); tr != "" {
+			resp["translation_lang"] = lang
+			resp["translation_text"] = tr
+		}
+		writeJSON(w, http.StatusOK, resp)
 		return
 	}
 
@@ -261,9 +283,10 @@ func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		lang := pageLang(r)
 		writeJSON(w, http.StatusOK, map[string]any{
 			"ayah":    relations.FormatAyahRef(surah, ayah),
-			"related": related,
+			"related": s.withTranslations(lang, related),
 		})
 		return
 	}
@@ -388,6 +411,64 @@ func logRequests(next http.Handler) http.Handler {
 		log.Printf("%s %s", r.Method, r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
+}
+
+func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
+	lang := pageLang(r)
+	data["Lang"] = lang
+	data["HomeURL"] = withLang("/", lang)
+	data["LangARURL"] = switchLang(r, "ar")
+	data["LangENURL"] = switchLang(r, "en")
+	data["LangIDURL"] = switchLang(r, "id")
+	return data
+}
+
+func pageLang(r *http.Request) string {
+	return sanitizeLang(r.URL.Query().Get("lang"))
+}
+
+func sanitizeLang(v string) string {
+	lang := strings.ToLower(strings.TrimSpace(v))
+	switch lang {
+	case "ar", "en", "id":
+		return lang
+	default:
+		return "ar"
+	}
+}
+
+func withLang(path, lang string) string {
+	lang = sanitizeLang(lang)
+	if strings.Contains(path, "?") {
+		return path + "&lang=" + lang
+	}
+	return path + "?lang=" + lang
+}
+
+func switchLang(r *http.Request, lang string) string {
+	query := r.URL.Query()
+	query.Set("lang", sanitizeLang(lang))
+	return r.URL.Path + "?" + query.Encode()
+}
+
+func (s *server) translationFor(lang string, surah, ayah int) string {
+	if s.trans == nil {
+		return ""
+	}
+	text, _ := s.trans.Get(lang, surah, ayah)
+	return text
+}
+
+func (s *server) withTranslations(lang string, related []relations.AyahView) []relations.AyahView {
+	if len(related) == 0 {
+		return related
+	}
+	out := make([]relations.AyahView, len(related))
+	copy(out, related)
+	for i := range out {
+		out[i].Translation = s.translationFor(lang, out[i].Surah, out[i].Ayah)
+	}
+	return out
 }
 
 func resolveBaseDir() (string, error) {

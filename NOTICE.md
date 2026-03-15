@@ -25,6 +25,20 @@ Repository policy derived from the above:
 - contributors must retain this notice when updating or redistributing dataset files
 - dataset update PRs should confirm source and date/version used
 
+## Translation Attribution And Terms
+
+This project also bundles translations downloaded from:
+
+- https://tanzil.net/trans/?transID=en.sahih&type=txt-2
+- https://tanzil.net/trans/?transID=id.indonesian&type=txt-2
+- Translation catalog and terms: https://tanzil.net/trans/
+
+Published translation terms on Tanzil include:
+
+- translations are provided for non-commercial use
+- users should obtain needed permissions for other usage
+- source link-back requirements may apply depending on usage scope
+
 ## Project Code License
 
 Project source code is licensed under the MIT License (see `LICENSE`).

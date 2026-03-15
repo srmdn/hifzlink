@@ -31,6 +31,12 @@ Validate dataset integrity:
 go run ./scripts/validate
 ```
 
+Import English and Indonesian translations:
+
+```bash
+go run ./scripts/import_translations
+```
+
 Seed starter relation pairs:
 
 ```bash
@@ -74,5 +80,6 @@ curl -X POST http://localhost:8080/api/relations \
 - `data/quran.json` local Quran dataset
 - `data/relations.seed.json` starter relation pairs
 - `scripts/import` imports full Quran text + metadata from Tanzil
+- `scripts/import_translations` imports full `en/id` translations from Tanzil
 - `scripts/validate` validates dataset contract
 - `scripts/seed_relations` seeds initial mutashabihat relation examples

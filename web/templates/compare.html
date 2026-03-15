@@ -4,21 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{.HomeURL}}">HifzLink</a>
+      <nav class="lang-toggle" aria-label="Language mode">
+        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
+        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
+        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
+      </nav>
+    </div>
+  </header>
+
   <main class="container">
-    <p><a href="/">Home</a></p>
+    <p class="back"><a href="{{.HomeURL}}">Home</a></p>
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
 
     <section class="compare-grid">
-      <article class="card verse">
+      <article class="card verse-card">
         <h2>{{.Ref1}} ({{.Ayah1.SurahName}})</h2>
         <p class="arabic">{{.Ayah1.TextAR}}</p>
+        {{if .Ayah1Translation}}
+        <p class="translation">{{.Ayah1Translation}}</p>
+        {{end}}
       </article>
-      <article class="card verse">
+      <article class="card verse-card">
         <h2>{{.Ref2}} ({{.Ayah2.SurahName}})</h2>
         <p class="arabic">{{.Ayah2.TextAR}}</p>
+        {{if .Ayah2Translation}}
+        <p class="translation">{{.Ayah2Translation}}</p>
+        {{end}}
       </article>
     </section>
   </main>
