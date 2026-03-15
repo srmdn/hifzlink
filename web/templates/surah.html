@@ -1,38 +1,24 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{.Title}}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
+{{template "head" .}}
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand" href="{{.HomeURL}}">HifzLink</a>
-      <nav class="lang-toggle" aria-label="Language mode">
-        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
-        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
-        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
-      </nav>
-    </div>
-  </header>
+{{template "topbar" .}}
 
   <main class="container">
     <p class="back"><a href="{{.HomeURL}}">Home</a></p>
-    <h1>Surah {{.Surah}} ({{.SurahName}}) Relations</h1>
+    <h1>Surah {{.Surah}} — {{.SurahName}}</h1>
 
     <section class="card">
+      <h2>Similar Verse Pairs</h2>
       {{if .Pairs}}
       <ul class="pairs-list">
         {{range .Pairs}}
-        <li>
-          <a href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">{{.Ayah1}} ({{.Ayah1Name}}) ↔ {{.Ayah2}} ({{.Ayah2Name}})</a>
-          {{if .Note}}<span class="meta">{{.Note}}</span>{{end}}
+        <li class="pair-item">
+          <div class="line-head">
+            <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+            <a class="button-link" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
+          </div>
+          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
         </li>
         {{end}}
       </ul>
@@ -41,5 +27,7 @@
       {{end}}
     </section>
   </main>
+
+{{template "footer" .}}
 </body>
 </html>
