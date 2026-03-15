@@ -10,6 +10,10 @@ The format is inspired by Keep a Changelog.
 
 - Open source governance docs (`CONTRIBUTING.md`, `VERSIONING.md`, `NOTICE.md`, `LICENSE`)
 - documentation requirements for Quran dataset integrity and attribution
+- full dataset pipeline scripts:
+  - `scripts/import` (Tanzil text + metadata -> `data/quran.json`)
+  - `scripts/validate` (`6236` count, uniqueness, field/range checks)
+  - `scripts/seed_relations` (starter mutashabihat examples)
 
 ## [0.1.0] - 2026-03-15
 

@@ -16,6 +16,14 @@ go run ./cmd/server
 ```bash
 gofmt -w ./cmd ./internal
 go test ./...
+go run ./scripts/validate
+```
+
+If your PR updates Quran text data, regenerate from source:
+
+```bash
+go run ./scripts/import
+go run ./scripts/validate
 ```
 
 ## Contribution Scope

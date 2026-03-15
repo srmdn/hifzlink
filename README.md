@@ -17,6 +17,26 @@ go run ./cmd/server
 
 Server listens on `http://localhost:8080`.
 
+## Quran Dataset Workflow
+
+Import full dataset from Tanzil into `data/quran.json`:
+
+```bash
+go run ./scripts/import
+```
+
+Validate dataset integrity:
+
+```bash
+go run ./scripts/validate
+```
+
+Seed starter relation pairs:
+
+```bash
+go run ./scripts/seed_relations
+```
+
 ## API
 
 - `GET /api/ayah/{surah}/{ayah}`
@@ -50,3 +70,7 @@ curl -X POST http://localhost:8080/api/relations \
 - `web/templates` server-rendered pages
 - `web/static` CSS
 - `data/quran.json` local Quran dataset
+- `data/relations.seed.json` starter relation pairs
+- `scripts/import` imports full Quran text + metadata from Tanzil
+- `scripts/validate` validates dataset contract
+- `scripts/seed_relations` seeds initial mutashabihat relation examples
