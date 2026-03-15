@@ -10,11 +10,12 @@ import (
 )
 
 type AyahView struct {
-	Surah     int    `json:"surah"`
-	SurahName string `json:"surah_name,omitempty"`
-	Ayah      int    `json:"ayah"`
-	Juz       int    `json:"juz,omitempty"`
-	Text      string `json:"text"`
+	Surah       int    `json:"surah"`
+	SurahName   string `json:"surah_name,omitempty"`
+	Ayah        int    `json:"ayah"`
+	Juz         int    `json:"juz,omitempty"`
+	Text        string `json:"text"`
+	Translation string `json:"translation_text,omitempty"`
 }
 
 type PairView struct {

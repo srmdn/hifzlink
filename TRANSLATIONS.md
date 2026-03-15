@@ -28,6 +28,11 @@ Translation sources (new):
 - `data/translations/en.json`
 - `data/translations/id.json`
 
+Current import source IDs:
+
+- `en.sahih` (English, Saheeh International)
+- `id.indonesian` (Indonesian, Ministry of Religious Affairs)
+
 Recommended translation record format:
 
 ```json
@@ -52,6 +57,12 @@ At server startup:
 1. load `data/quran.json` into memory
 2. load `en.json` and `id.json` into memory maps keyed by `surah:ayah`
 3. fail fast on invalid translation file format
+
+Import command:
+
+```bash
+go run ./scripts/import_translations
+```
 
 Missing translation entries should not crash the app.
 Fallback behavior:

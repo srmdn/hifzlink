@@ -4,34 +4,57 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{.HomeURL}}">HifzLink</a>
+      <nav class="lang-toggle" aria-label="Language mode">
+        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
+        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
+        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
+      </nav>
+    </div>
+  </header>
+
   <main class="container">
-    <p><a href="/">Home</a></p>
+    <p class="back"><a href="{{.HomeURL}}">Home</a></p>
     <h1>Ayah {{.AyahRef}} ({{.SurahName}})</h1>
 
-    <article class="card verse">
-      <p class="arabic">{{.Ayah.TextAR}}</p>
+    <article class="card verse-card">
       <p class="meta">Surah {{.Ayah.Surah}} ({{.Ayah.SurahName}}) | Ayah {{.Ayah.Ayah}} | Juz {{.Ayah.Juz}}</p>
+      <p class="arabic">{{.Ayah.TextAR}}</p>
+      {{if .AyahTranslation}}
+      <p class="translation">{{.AyahTranslation}}</p>
+      {{end}}
     </article>
 
     <section class="card">
-      <h2>Related Verses</h2>
+      <div class="section-title-row">
+        <h2>Related Verses</h2>
+      </div>
       {{if .Related}}
       <ul class="related-list">
         {{range .Related}}
-        <li>
+        <li class="related-item">
           <div class="line-head">
-            <a href="/ayah/{{.Surah}}/{{.Ayah}}">{{.Surah}}:{{.Ayah}} ({{.SurahName}})</a>
-            <a class="button-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}">Compare</a>
+            <a href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.Surah}}:{{.Ayah}} ({{.SurahName}})</a>
+            <a class="button-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">Compare</a>
           </div>
-          <p class="arabic">{{.Text}}</p>
+          <p class="arabic arabic-small">{{.Text}}</p>
+          {{if .Translation}}
+          <p class="translation">{{.Translation}}</p>
+          {{end}}
         </li>
         {{end}}
       </ul>
       {{else}}
-      <p>No relations yet.</p>
+      <p class="meta">No relations yet.</p>
       {{end}}
     </section>
   </main>
