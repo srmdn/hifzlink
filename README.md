@@ -68,6 +68,8 @@ curl -X POST http://localhost:8080/api/relations \
 - [NOTICE.md](./NOTICE.md)
 - [DESIGN.md](./DESIGN.md)
 - [TRANSLATIONS.md](./TRANSLATIONS.md)
+- [STATUS.md](./STATUS.md)
+- [ROADMAP.md](./ROADMAP.md)
 
 ## Project Structure
 
