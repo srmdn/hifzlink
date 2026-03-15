@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-03-16
+Last updated: 2026-03-16 (session 2)
 
 ## Current State
 
@@ -13,6 +13,8 @@ HifzLink is in MVP+ stage:
 - translation text renders below each ayah when enabled
 - redesigned UI foundation applied (tokens, typography, top bar, language toggle)
 - custom project favicon added
+- docs reorganised into `docs/` folder
+- unit and handler tests added (`go test ./...` passes)
 
 ## Implemented Features
 
@@ -41,7 +43,6 @@ Local data files:
 
 ## Known Gaps
 
-- no automated tests for handlers/translation paths yet
 - translation coverage checks are implicit (import count), not exposed in a report command
 - no admin UI for relation management (API-only create)
 - no pagination/filtering for large relation lists
@@ -74,11 +75,11 @@ Manual smoke URLs:
 
 Start with these files in order:
 
-1. `PROJECT.md`
-2. `ARCHITECTURE.md`
-3. `DESIGN.md`
-4. `TRANSLATIONS.md`
-5. `ROADMAP.md`
+1. `docs/PROJECT.md`
+2. `docs/ARCHITECTURE.md`
+3. `docs/DESIGN.md`
+4. `docs/TRANSLATIONS.md`
+5. `docs/ROADMAP.md`
 
 Then run:
 

@@ -47,7 +47,7 @@ Do not add:
 
 ## Architecture Rules
 
-Follow the project structure defined in `ARCHITECTURE.md`.
+Follow the project structure defined in `docs/ARCHITECTURE.md`.
 
 Do not change folder layout without good reason.
 
@@ -105,7 +105,7 @@ Implement features incrementally:
 
 When making user-visible changes:
 
-- update relevant docs (`README.md`, `PROJECT.md`, `ARCHITECTURE.md`)
+- update relevant docs (`README.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`)
 - follow `CONTRIBUTING.md`
 - record user-visible changes in `CHANGELOG.md`
 
