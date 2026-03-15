@@ -51,9 +51,8 @@ Local data files:
 
 ## Known Gaps
 
-- translation coverage checks are implicit (import count), not exposed in a report command
-- no admin UI for relation management (Milestone 2)
-- no admin UI for relation management (API-only create)
+- translation coverage checks not exposed as a report command (Milestone 1 item 2 — still pending)
+- no admin UI for relation management; API-only create (Milestone 2)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
 
