@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <p><a href="/">Home</a></p>
+    <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
+
+    <section class="compare-grid">
+      <article class="card verse">
+        <h2>{{.Ref1}}</h2>
+        <p class="arabic">{{.Ayah1.TextAR}}</p>
+      </article>
+      <article class="card verse">
+        <h2>{{.Ref2}}</h2>
+        <p class="arabic">{{.Ayah2.TextAR}}</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
