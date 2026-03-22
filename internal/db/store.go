@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -14,6 +15,7 @@ type Relation struct {
 	Ayah2Surah int
 	Ayah2Ayah  int
 	Note       string
+	Category   string
 }
 
 type Store struct {
@@ -43,6 +45,11 @@ func Open(path string) (*Store, error) {
 		return nil, fmt.Errorf("migrate relations table: %w", err)
 	}
 
+	if err := ensureColumn(db, "relations", "category", "ALTER TABLE relations ADD COLUMN category TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+
 	return &Store{db: db}, nil
 }
 
@@ -53,10 +60,10 @@ func (s *Store) Close() error {
 func (s *Store) Add(rel Relation) error {
 	_, err := s.db.Exec(`
 	INSERT OR IGNORE INTO relations
-		(ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, note)
+		(ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, note, category)
 	VALUES
-		(?, ?, ?, ?, ?)
-	`, rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah, rel.Note)
+		(?, ?, ?, ?, ?, ?)
+	`, rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah, rel.Note, rel.Category)
 	if err != nil {
 		return fmt.Errorf("insert relation: %w", err)
 	}
@@ -65,7 +72,7 @@ func (s *Store) Add(rel Relation) error {
 
 func (s *Store) ByAyah(surah, ayah int) ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, '')
 	FROM relations
 	WHERE (ayah1_surah = ? AND ayah1_ayah = ?)
 	   OR (ayah2_surah = ? AND ayah2_ayah = ?)
@@ -81,7 +88,7 @@ func (s *Store) ByAyah(surah, ayah int) ([]Relation, error) {
 
 func (s *Store) BySurah(surah int) ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, '')
 	FROM relations
 	WHERE ayah1_surah = ? OR ayah2_surah = ?
 	ORDER BY ayah1_ayah, ayah2_ayah
@@ -96,7 +103,7 @@ func (s *Store) BySurah(surah int) ([]Relation, error) {
 
 func (s *Store) All() ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, '')
 	FROM relations
 	ORDER BY ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah
 	`)
@@ -123,11 +130,30 @@ func (s *Store) DeleteByID(id int64) error {
 	return nil
 }
 
+func (s *Store) UpdateByID(rel Relation) error {
+	res, err := s.db.Exec(`
+	UPDATE relations
+	SET ayah1_surah = ?, ayah1_ayah = ?, ayah2_surah = ?, ayah2_ayah = ?, note = ?, category = ?
+	WHERE id = ?
+	`, rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah, rel.Note, rel.Category, rel.ID)
+	if err != nil {
+		return fmt.Errorf("update relation: %w", err)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("update relation rows affected: %w", err)
+	}
+	if affected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
 func scanRelations(rows *sql.Rows) ([]Relation, error) {
 	out := make([]Relation, 0)
 	for rows.Next() {
 		var rel Relation
-		if err := rows.Scan(&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah, &rel.Note); err != nil {
+		if err := rows.Scan(&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah, &rel.Note, &rel.Category); err != nil {
 			return nil, fmt.Errorf("scan relation: %w", err)
 		}
 		out = append(out, rel)
@@ -136,4 +162,34 @@ func scanRelations(rows *sql.Rows) ([]Relation, error) {
 		return nil, fmt.Errorf("iterate relations: %w", err)
 	}
 	return out, nil
+}
+
+func ensureColumn(db *sql.DB, table, column, alterSQL string) error {
+	rows, err := db.Query(fmt.Sprintf("PRAGMA table_info(%s)", table))
+	if err != nil {
+		return fmt.Errorf("check schema for %s.%s: %w", table, column, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cid int
+		var name, colType string
+		var notNull int
+		var defaultValue any
+		var pk int
+		if err := rows.Scan(&cid, &name, &colType, &notNull, &defaultValue, &pk); err != nil {
+			return fmt.Errorf("scan schema for %s.%s: %w", table, column, err)
+		}
+		if strings.EqualFold(name, column) {
+			return nil
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate schema for %s.%s: %w", table, column, err)
+	}
+
+	if _, err := db.Exec(alterSQL); err != nil {
+		return fmt.Errorf("migrate %s.%s: %w", table, column, err)
+	}
+	return nil
 }

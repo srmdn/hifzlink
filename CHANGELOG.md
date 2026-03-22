@@ -19,6 +19,7 @@ The format is inspired by Keep a Changelog.
 - tafsir-ready import output at `data/tafsir/en.ibn-kathir.json`
 - `scripts/validate_translations` command for translation key-format validation and optional coverage reporting (`-report`)
 - server-rendered admin relation management page at `/admin/relations` with add/list/delete actions
+- admin relation editing added (update ayah refs, note, category) with custom delete dialog modal
 
 ### Changed
 
@@ -34,6 +35,7 @@ The format is inspired by Keep a Changelog.
 - added migration log for translation source switch and importer hardening in `docs/TRANSLATION_MIGRATION_2026-03-22.md`
 - frontend responsive refinement: mobile topbar now uses compact `HifzLink` branding, translation toggle labels (`AR/EN/ID`), and a collapsible menu; page back links use compact `← Back` style
 - topbar navigation now includes Admin entry and the mobile drawer supports admin access
+- relation records now support optional `category` (`lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`) with admin-side filtering
 
 ## [0.1.0] - 2026-03-15
 

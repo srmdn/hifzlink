@@ -24,7 +24,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 1. [done] relation management UI:
 - simple add relation form page (server-rendered)
 - [done] optional delete relation action (safe confirmation)
-- edit relation action
+- [done] edit relation action
 
 2. compare enhancements:
 - visual diff emphasis for repeated/changed words (non-destructive highlighting)
@@ -33,6 +33,16 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 3. browsing improvements:
 - filter relation lists by surah range/juz
 - searchable relation index
+
+4. personal workflow:
+- user dashboard page (recently viewed, recently compared, quick resume)
+- bookmark/save ayah and relation pairs
+- optional notes attached to saved ayah entries
+
+5. account support:
+- login/auth for user-specific saved data
+- local-first fallback mode when auth is disabled
+- session and access control hardening
 
 ## Milestone 3: Data Quality And Curation
 

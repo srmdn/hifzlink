@@ -34,6 +34,7 @@ type AdminRelationView struct {
 	Ayah2     string
 	Ayah2Name string
 	Note      string
+	Category  string
 }
 
 type Service struct {
@@ -69,6 +70,10 @@ func FormatAyahRef(surah, ayah int) string {
 }
 
 func (s *Service) Add(ayah1Ref, ayah2Ref, note string) error {
+	return s.AddWithCategory(ayah1Ref, ayah2Ref, note, "")
+}
+
+func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category string) error {
 	s1, a1, err := ParseAyahRef(ayah1Ref)
 	if err != nil {
 		return fmt.Errorf("ayah1: %w", err)
@@ -98,6 +103,7 @@ func (s *Service) Add(ayah1Ref, ayah2Ref, note string) error {
 		Ayah2Surah: s2,
 		Ayah2Ayah:  a2,
 		Note:       strings.TrimSpace(note),
+		Category:   normalizeCategory(category),
 	})
 }
 
@@ -200,6 +206,7 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
 			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
 			Note:      rel.Note,
+			Category:  rel.Category,
 		})
 	}
 	return out, nil
@@ -216,4 +223,61 @@ func (s *Service) DeleteByID(id int64) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category string) error {
+	if id <= 0 {
+		return fmt.Errorf("invalid relation id")
+	}
+
+	s1, a1, err := ParseAyahRef(ayah1Ref)
+	if err != nil {
+		return fmt.Errorf("ayah1: %w", err)
+	}
+	s2, a2, err := ParseAyahRef(ayah2Ref)
+	if err != nil {
+		return fmt.Errorf("ayah2: %w", err)
+	}
+
+	if _, ok := s.quran.Get(s1, a1); !ok {
+		return fmt.Errorf("ayah1 not found in dataset")
+	}
+	if _, ok := s.quran.Get(s2, a2); !ok {
+		return fmt.Errorf("ayah2 not found in dataset")
+	}
+
+	if comesAfter(s1, a1, s2, a2) {
+		s1, s2 = s2, s1
+		a1, a2 = a2, a1
+	}
+
+	err = s.db.UpdateByID(db.Relation{
+		ID:         id,
+		Ayah1Surah: s1,
+		Ayah1Ayah:  a1,
+		Ayah2Surah: s2,
+		Ayah2Ayah:  a2,
+		Note:       strings.TrimSpace(note),
+		Category:   normalizeCategory(category),
+	})
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("relation not found")
+		}
+		if strings.Contains(strings.ToLower(err.Error()), "unique") {
+			return fmt.Errorf("relation already exists")
+		}
+		return err
+	}
+	return nil
+}
+
+func normalizeCategory(value string) string {
+	c := strings.ToLower(strings.TrimSpace(value))
+	switch c {
+	case "lafzi", "maana", "siyam", "aqidah", "adab", "other":
+		return c
+	default:
+		return ""
+	}
 }

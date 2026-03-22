@@ -23,7 +23,8 @@ HifzLink is in MVP+ stage:
 - homepage cleaned up: dead class removed, API card removed, Quick Links → Examples
 - compare page back link points to ayah1 instead of generic Home
 - surah/juz pair lists improved with Compare button per pair
-- admin relation management page added (`/admin/relations`) with add/list/delete flow
+- admin relation management page added (`/admin/relations`) with add/list/edit/delete flow
+- relation category tagging and category filter added in admin page
 
 ## Implemented Features
 
@@ -56,7 +57,6 @@ Local data files:
 
 ## Known Gaps
 
-- no edit action yet on admin relation management page (delete/add only)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
 
