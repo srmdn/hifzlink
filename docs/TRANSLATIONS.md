@@ -30,8 +30,14 @@ Translation sources (new):
 
 Current import source IDs:
 
-- `en.sahih` (English, Saheeh International)
-- `id.indonesian` (Indonesian, Ministry of Religious Affairs)
+- Quran.com verse-route Next data (`/_next/data/{build}/{surah}:{ayah}.json`) default English translation
+  (currently shown as Dr. Mustafa Khattab, The Clear Quran)
+- `rioastamal/quran-json` surah files for Indonesian translation text
+
+Tafsir-ready output:
+
+- `data/tafsir/id.kemenag.json` (ayah-keyed Indonesian tafsir text, imported from `rioastamal/quran-json`)
+- `data/tafsir/en.ibn-kathir.json` (ayah-keyed English tafsir text, imported from Quran.com API tafsir resource `169`)
 
 Recommended translation record format:
 

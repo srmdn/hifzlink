@@ -29,15 +29,20 @@ Repository policy derived from the above:
 
 This project also bundles translations downloaded from:
 
-- https://tanzil.net/trans/?transID=en.sahih&type=txt-2
-- https://tanzil.net/trans/?transID=id.indonesian&type=txt-2
-- Translation catalog and terms: https://tanzil.net/trans/
+- English (`en`): Quran.com verse-route Next data payload (default English translation currently shown as Dr. Mustafa Khattab, The Clear Quran)
+- Quran.com website: https://quran.com
+- Quran Foundation API docs: https://api-docs.quran.com
 
-Published translation terms on Tanzil include:
+Indonesian translation and tafsir data is imported from:
 
-- translations are provided for non-commercial use
-- users should obtain needed permissions for other usage
-- source link-back requirements may apply depending on usage scope
+- Repository: https://github.com/rioastamal/quran-json
+- Source basis noted by repository author: https://quran.kemenag.go.id
+- License (repository): MIT
+
+English tafsir data is imported from Quran Foundation API endpoint:
+
+- endpoint pattern: `https://api.quran.com/api/v4/tafsirs/{id}/by_chapter/{chapter}`
+- current resource id: `169` (Ibn Kathir (Abridged))
 
 ## Project Code License
 
