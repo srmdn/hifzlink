@@ -14,6 +14,27 @@
       {{if .AyahTranslation}}
       <p class="translation">{{.AyahTranslation}}</p>
       {{end}}
+
+      {{if .Collections}}
+      <form action="/collections/items" method="post" class="collection-save-form">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="hidden" name="item_type" value="ayah" />
+        <input type="hidden" name="ayah1" value="{{.AyahRef}}" />
+        <input type="hidden" name="return_to" value="/ayah/{{.Ayah.Surah}}/{{.Ayah.Ayah}}" />
+        <label for="collection-id-ayah">Save to collection</label>
+        <select id="collection-id-ayah" name="collection_id" required>
+          <option value="">Select collection</option>
+          {{range .Collections}}
+          <option value="{{.ID}}">{{.Name}}</option>
+          {{end}}
+        </select>
+        <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
+        <button type="submit">Save Ayah</button>
+      </form>
+      {{else}}
+      <p class="meta">No collections yet. <a href="/collections?lang={{.Lang}}">Create a collection</a> first.</p>
+      {{end}}
+      {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
     </article>
 
     <section class="card">

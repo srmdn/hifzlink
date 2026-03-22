@@ -57,8 +57,13 @@ func newTestServer(t *testing.T) *server {
 	return &server{
 		quran: quranStore,
 		trans: transStore,
+		db:    dbStore,
 		rels:  relations.NewService(dbStore, quranStore),
-		tmpl:  template.Must(template.New("admin-relations.html").Parse(`{{define "admin-relations.html"}}{{.AdminError}}{{end}}`)),
+		tmpl: template.Must(template.New("root").Parse(`
+			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
+			{{define "collections.html"}}{{.CollectionError}}{{end}}
+			{{define "collection-detail.html"}}{{.StatusNotice}}{{end}}
+		`)),
 	}
 }
 
@@ -543,6 +548,102 @@ func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
 	}
 	if !strings.Contains(rr.Body.String(), "That relation already exists.") {
 		t.Fatalf("expected clear duplicate error message, got body: %s", rr.Body.String())
+	}
+}
+
+func TestHandleCollectionsPage_PostCreateRedirect(t *testing.T) {
+	s := newTestServer(t)
+
+	form := url.Values{}
+	form.Set("name", "Weekly Review")
+	form.Set("description", "Juz 28 pairs")
+	form.Set("lang", "id")
+
+	req := httptest.NewRequest(http.MethodPost, "/collections", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleCollectionsPage(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+	location := rr.Header().Get("Location")
+	if !strings.Contains(location, "/collections/") || !strings.Contains(location, "status=created") {
+		t.Fatalf("unexpected redirect location: %s", location)
+	}
+}
+
+func TestHandleCollectionItemsPost_RelationRedirect(t *testing.T) {
+	s := newTestServer(t)
+	collectionID, err := s.db.CreateCollection("Daily", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	form := url.Values{}
+	form.Set("collection_id", strconv.FormatInt(collectionID, 10))
+	form.Set("item_type", "relation")
+	form.Set("ayah1", "60:8")
+	form.Set("ayah2", "60:9")
+	form.Set("note", "frequent confusion")
+	form.Set("return_to", "/compare?ayah1=60:8&ayah2=60:9")
+	form.Set("lang", "en")
+
+	req := httptest.NewRequest(http.MethodPost, "/collections/items", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleCollectionItemsPost(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+	location := rr.Header().Get("Location")
+	if !strings.Contains(location, "saved=saved") || !strings.Contains(location, "lang=en") {
+		t.Fatalf("unexpected redirect location: %s", location)
+	}
+
+	items, err := s.db.CollectionItems(collectionID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("expected 1 collection item, got %d", len(items))
+	}
+}
+
+func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
+	s := newTestServer(t)
+	collectionID, err := s.db.CreateCollection("Daily", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	postItem := func() string {
+		form := url.Values{}
+		form.Set("collection_id", strconv.FormatInt(collectionID, 10))
+		form.Set("item_type", "relation")
+		form.Set("ayah1", "60:8")
+		form.Set("ayah2", "60:9")
+		form.Set("return_to", "/compare?ayah1=60:8&ayah2=60:9")
+		form.Set("lang", "en")
+
+		req := httptest.NewRequest(http.MethodPost, "/collections/items", strings.NewReader(form.Encode()))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+		s.handleCollectionItemsPost(rr, req)
+		if rr.Code != http.StatusSeeOther {
+			t.Fatalf("expected 303, got %d", rr.Code)
+		}
+		return rr.Header().Get("Location")
+	}
+
+	first := postItem()
+	if !strings.Contains(first, "saved=saved") {
+		t.Fatalf("expected first add to be saved, got: %s", first)
+	}
+	second := postItem()
+	if !strings.Contains(second, "saved=duplicate") {
+		t.Fatalf("expected duplicate status on second add, got: %s", second)
 	}
 }
 

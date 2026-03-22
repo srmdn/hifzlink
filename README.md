@@ -68,6 +68,14 @@ go run ./scripts/seed_relations
 - category labels and usage hints are shown directly on the admin page
 - invalid category values are normalized to `Uncategorized`
 
+## Collections MVP
+
+- `GET /collections` list and create personal collections
+- `GET /collections/{id}` view saved items in a collection
+- save ayah from Ayah page and save pair from Compare page into a selected collection
+- duplicate saves show a clear status message (`Already saved in this collection`)
+- collection list/detail shows saved metadata (item type and timestamp)
+
 Add relation example:
 
 ```bash

@@ -112,15 +112,15 @@ func TestService_Add_AyahNotInDataset(t *testing.T) {
 	}
 }
 
-func TestService_Add_DuplicateIgnored(t *testing.T) {
+func TestService_Add_DuplicateReturnsError(t *testing.T) {
 	svc := NewService(testDB(t), testQuranStore(t))
 
 	if err := svc.Add("60:8", "60:9", "note1"); err != nil {
 		t.Fatalf("first Add: %v", err)
 	}
-	// Reversed order — normalised to same pair, should be silently ignored.
-	if err := svc.Add("60:9", "60:8", "note2"); err != nil {
-		t.Fatalf("duplicate Add should be ignored, got: %v", err)
+	// Reversed order — normalised to same pair, should return duplicate error.
+	if err := svc.Add("60:9", "60:8", "note2"); err == nil {
+		t.Fatal("expected duplicate relation error")
 	}
 }
 

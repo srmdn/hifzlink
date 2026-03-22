@@ -25,6 +25,8 @@ HifzLink is in MVP+ stage:
 - surah/juz pair lists improved with Compare button per pair
 - admin relation management page added (`/admin/relations`) with add/list/edit/delete flow
 - relation category tagging and category filter added in admin page
+- collections pages added (`/collections`, `/collections/{id}`) for personal grouping
+- save-to-collection flow added on ayah and compare pages
 
 ## Implemented Features
 
@@ -57,6 +59,7 @@ Local data files:
 
 ## Known Gaps
 
+- no user dashboard page yet (recent activity / quick resume still pending)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
 
@@ -85,6 +88,7 @@ Manual smoke URLs:
 - `/ayah/60/8?lang=id`
 - `/compare?ayah1=60:8&ayah2=60:9&lang=id`
 - `/admin/relations?lang=ar`
+- `/collections?lang=ar`
 
 ## Handoff Notes For Other Agents
 

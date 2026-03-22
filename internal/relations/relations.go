@@ -97,7 +97,7 @@ func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category string) err
 		a1, a2 = a2, a1
 	}
 
-	return s.db.Add(db.Relation{
+	inserted, err := s.db.Add(db.Relation{
 		Ayah1Surah: s1,
 		Ayah1Ayah:  a1,
 		Ayah2Surah: s2,
@@ -105,6 +105,13 @@ func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category string) err
 		Note:       strings.TrimSpace(note),
 		Category:   normalizeCategory(category),
 	})
+	if err != nil {
+		return err
+	}
+	if !inserted {
+		return fmt.Errorf("relation already exists")
+	}
+	return nil
 }
 
 func (s *Service) RelatedAyahs(surah, ayah int) ([]AyahView, error) {
