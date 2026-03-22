@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
+    <h1>Collections</h1>
+    <p class="meta">Create personal groups for your murojaah flow. Save ayahs and compare pairs into each collection.</p>
+
+    <section class="card">
+      <h2>New Collection</h2>
+      {{if .CollectionError}}<p class="error-msg admin-error" role="alert">{{.CollectionError}}</p>{{end}}
+      {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
+      <form action="/collections" method="post" class="collection-form">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <label for="collection-name">Name</label>
+        <input id="collection-name" name="name" value="{{.FormName}}" required autocomplete="off" placeholder="Weekly review" />
+
+        <label for="collection-description">Description (optional)</label>
+        <input id="collection-description" name="description" value="{{.FormDescription}}" autocomplete="off" placeholder="Pairs I often confuse in Juz 28" />
+
+        <button type="submit">Create</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Your Collections</h2>
+      {{if .Collections}}
+      <ul class="simple-list">
+        {{range .Collections}}
+        <li>
+          <a href="/collections/{{.ID}}?lang={{$.Lang}}">{{.Name}}</a>
+          <p class="meta">Created: {{.CreatedAt}} · Items: {{.ItemCount}}</p>
+          {{if .Description}}<p class="meta note">{{.Description}}</p>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p class="meta">No collections yet. Create your first one above.</p>
+      {{end}}
+    </section>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

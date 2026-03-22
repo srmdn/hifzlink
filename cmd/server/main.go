@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	neturl "net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -20,6 +21,7 @@ import (
 type server struct {
 	quran   *search.Store
 	trans   *search.TranslationStore
+	db      *db.Store
 	rels    *relations.Service
 	tmpl    *template.Template
 	baseDir string
@@ -61,6 +63,7 @@ func main() {
 	s := &server{
 		quran:   quran,
 		trans:   translations,
+		db:      dbStore,
 		rels:    relations.NewService(dbStore, quran),
 		tmpl:    tmpl,
 		baseDir: baseDir,
@@ -75,6 +78,10 @@ func main() {
 	mux.HandleFunc("/compare", s.handleComparePage)
 	mux.HandleFunc("/surah/", s.handleSurahPage)
 	mux.HandleFunc("/juz/", s.handleJuzPage)
+	mux.HandleFunc("/collections", s.handleCollectionsPage)
+	mux.HandleFunc("/collections/", s.handleCollectionDetailPage)
+	mux.HandleFunc("/collections/items", s.handleCollectionItemsPost)
+	mux.HandleFunc("/collections/items/delete", s.handleCollectionItemsDelete)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 
 	mux.HandleFunc("/api/ayah/", s.handleAPIAyah)
@@ -147,6 +154,12 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	related = s.withTranslations(lang, related)
 	ayahTranslation := s.translationFor(lang, surah, ayah)
 
+	collections, err := s.db.Collections()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	s.render(w, "ayah.html", withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
@@ -154,6 +167,8 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		"AyahTranslation": ayahTranslation,
 		"Related":         related,
 		"SurahName":       a.SurahName,
+		"Collections":     collections,
+		"SaveStatus":      collectionStatusMessage(r.URL.Query().Get("saved")),
 	}))
 }
 
@@ -183,6 +198,12 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	collections, err := s.db.Collections()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
 		"Ayah1":            ayah1,
@@ -191,7 +212,276 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"Ayah2Translation": s.translationFor(pageLang(r), s2, y2),
 		"Ref1":             relations.FormatAyahRef(s1, y1),
 		"Ref2":             relations.FormatAyahRef(s2, y2),
+		"Collections":      collections,
+		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
 	}))
+}
+
+func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		collections, err := s.db.Collections()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+			"Title":        "Collections",
+			"Collections":  collections,
+			"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
+		}))
+		return
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		name := strings.TrimSpace(r.FormValue("name"))
+		description := strings.TrimSpace(r.FormValue("description"))
+		lang := sanitizeLang(r.FormValue("lang"))
+		if name == "" {
+			collections, _ := s.db.Collections()
+			s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+				"Title":           "Collections",
+				"Collections":     collections,
+				"StatusNotice":    "",
+				"CollectionError": "Collection name is required.",
+				"FormName":        name,
+				"FormDescription": description,
+			}))
+			return
+		}
+
+		id, err := s.db.CreateCollection(name, description)
+		if err != nil {
+			collections, _ := s.db.Collections()
+			s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+				"Title":           "Collections",
+				"Collections":     collections,
+				"CollectionError": "Collection name already exists or is invalid.",
+				"FormName":        name,
+				"FormDescription": description,
+			}))
+			return
+		}
+		http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=created", id), lang), http.StatusSeeOther)
+		return
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+type collectionItemView struct {
+	ID            int64
+	ItemType      string
+	ItemTypeLabel string
+	Surah1        int
+	Ayah1         int
+	Surah2        int
+	Ayah2         int
+	Ref1          string
+	Ref2          string
+	Surah1Name    string
+	Surah2Name    string
+	Arabic1       string
+	Arabic2       string
+	Translation1  string
+	Translation2  string
+	CompareURL    string
+	Note          string
+	CreatedAt     string
+}
+
+func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	idPath := strings.Trim(strings.TrimPrefix(r.URL.Path, "/collections/"), "/")
+	if idPath == "" {
+		http.NotFound(w, r)
+		return
+	}
+	id, err := strconv.ParseInt(idPath, 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	collection, err := s.db.CollectionByID(id)
+	if err != nil {
+		s.renderNotFound(w, r, "Collection not found", "This collection does not exist.")
+		return
+	}
+	items, err := s.db.CollectionItems(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	lang := pageLang(r)
+	viewItems := make([]collectionItemView, 0, len(items))
+	for _, item := range items {
+		if item.ItemType == "ayah" {
+			a1, ok := s.quran.Get(item.Ayah1Surah, item.Ayah1Ayah)
+			if !ok {
+				continue
+			}
+			viewItems = append(viewItems, collectionItemView{
+				ID:            item.ID,
+				ItemType:      item.ItemType,
+				ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
+				Surah1:        item.Ayah1Surah,
+				Ayah1:         item.Ayah1Ayah,
+				Ref1:          relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah),
+				Surah1Name:    a1.SurahName,
+				Arabic1:       a1.TextAR,
+				Translation1:  s.translationFor(lang, item.Ayah1Surah, item.Ayah1Ayah),
+				Note:          item.Note,
+				CreatedAt:     item.CreatedAt,
+			})
+			continue
+		}
+		a1, ok1 := s.quran.Get(item.Ayah1Surah, item.Ayah1Ayah)
+		a2, ok2 := s.quran.Get(item.Ayah2Surah, item.Ayah2Ayah)
+		if !ok1 || !ok2 {
+			continue
+		}
+		ref1 := relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah)
+		ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
+		viewItems = append(viewItems, collectionItemView{
+			ID:            item.ID,
+			ItemType:      item.ItemType,
+			ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
+			Surah1:        item.Ayah1Surah,
+			Ayah1:         item.Ayah1Ayah,
+			Surah2:        item.Ayah2Surah,
+			Ayah2:         item.Ayah2Ayah,
+			Ref1:          ref1,
+			Ref2:          ref2,
+			Surah1Name:    a1.SurahName,
+			Surah2Name:    a2.SurahName,
+			Arabic1:       a1.TextAR,
+			Arabic2:       a2.TextAR,
+			Translation1:  s.translationFor(lang, item.Ayah1Surah, item.Ayah1Ayah),
+			Translation2:  s.translationFor(lang, item.Ayah2Surah, item.Ayah2Ayah),
+			CompareURL:    withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+			Note:          item.Note,
+			CreatedAt:     item.CreatedAt,
+		})
+	}
+
+	s.render(w, "collection-detail.html", withCommonViewData(r, map[string]any{
+		"Title":        collection.Name,
+		"Collection":   collection,
+		"Items":        viewItems,
+		"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
+	}))
+}
+
+func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+
+	collectionID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("collection_id")), 10, 64)
+	if err != nil || collectionID <= 0 {
+		http.Error(w, "invalid collection", http.StatusBadRequest)
+		return
+	}
+	itemType := strings.ToLower(strings.TrimSpace(r.FormValue("item_type")))
+	note := strings.TrimSpace(r.FormValue("note"))
+	lang := sanitizeLang(r.FormValue("lang"))
+
+	ayah1S, ayah1A, err := relations.ParseAyahRef(strings.TrimSpace(r.FormValue("ayah1")))
+	if err != nil {
+		http.Error(w, "invalid ayah1", http.StatusBadRequest)
+		return
+	}
+	if _, ok := s.quran.Get(ayah1S, ayah1A); !ok {
+		http.Error(w, "ayah1 not found", http.StatusBadRequest)
+		return
+	}
+
+	item := db.CollectionItem{
+		Collection: collectionID,
+		ItemType:   itemType,
+		Ayah1Surah: ayah1S,
+		Ayah1Ayah:  ayah1A,
+		Note:       note,
+	}
+	if itemType == "relation" {
+		ayah2S, ayah2A, err := relations.ParseAyahRef(strings.TrimSpace(r.FormValue("ayah2")))
+		if err != nil {
+			http.Error(w, "invalid ayah2", http.StatusBadRequest)
+			return
+		}
+		if _, ok := s.quran.Get(ayah2S, ayah2A); !ok {
+			http.Error(w, "ayah2 not found", http.StatusBadRequest)
+			return
+		}
+		if ayahComesAfter(ayah1S, ayah1A, ayah2S, ayah2A) {
+			ayah1S, ayah2S = ayah2S, ayah1S
+			ayah1A, ayah2A = ayah2A, ayah1A
+		}
+		item.Ayah1Surah = ayah1S
+		item.Ayah1Ayah = ayah1A
+		item.Ayah2Surah = ayah2S
+		item.Ayah2Ayah = ayah2A
+	} else if itemType != "ayah" {
+		http.Error(w, "invalid item type", http.StatusBadRequest)
+		return
+	}
+
+	inserted, err := s.db.AddCollectionItem(item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	returnTo := strings.TrimSpace(r.FormValue("return_to"))
+	if returnTo == "" {
+		returnTo = fmt.Sprintf("/collections/%d", collectionID)
+	}
+	statusCode := "saved"
+	if !inserted {
+		statusCode = "duplicate"
+	}
+	redirectWithSaved := addQueryParam(returnTo, "saved", statusCode)
+	http.Redirect(w, r, withLang(redirectWithSaved, lang), http.StatusSeeOther)
+}
+
+func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+
+	itemID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("item_id")), 10, 64)
+	if err != nil || itemID <= 0 {
+		http.Error(w, "invalid item", http.StatusBadRequest)
+		return
+	}
+	collectionID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("collection_id")), 10, 64)
+	if err != nil || collectionID <= 0 {
+		http.Error(w, "invalid collection", http.StatusBadRequest)
+		return
+	}
+	lang := sanitizeLang(r.FormValue("lang"))
+	if err := s.db.DeleteCollectionItem(itemID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=removed", collectionID), lang), http.StatusSeeOther)
 }
 
 func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
@@ -513,6 +803,7 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["LangARURL"] = switchLang(r, "ar")
 	data["LangENURL"] = switchLang(r, "en")
 	data["LangIDURL"] = switchLang(r, "id")
+	data["CollectionsURL"] = withLang("/collections", lang)
 	return data
 }
 
@@ -652,6 +943,50 @@ func resolveBaseDir() (string, error) {
 
 	wd, _ := os.Getwd()
 	return "", fmt.Errorf("could not find data/quran.json from working directory %q", wd)
+}
+
+func collectionStatusMessage(code string) string {
+	switch code {
+	case "created":
+		return "Collection created."
+	case "saved":
+		return "Saved to collection."
+	case "duplicate":
+		return "Already saved in this collection."
+	case "removed":
+		return "Item removed from collection."
+	default:
+		return ""
+	}
+}
+
+func collectionItemTypeLabel(itemType string) string {
+	switch itemType {
+	case "ayah":
+		return "Ayah"
+	case "relation":
+		return "Relation Pair"
+	default:
+		return "Item"
+	}
+}
+
+func ayahComesAfter(s1, a1, s2, a2 int) bool {
+	if s1 != s2 {
+		return s1 > s2
+	}
+	return a1 > a2
+}
+
+func addQueryParam(path, key, value string) string {
+	u, err := neturl.Parse(path)
+	if err != nil {
+		return path
+	}
+	q := u.Query()
+	q.Set(key, value)
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
 func adminCategoryOptions() []adminCategoryOption {

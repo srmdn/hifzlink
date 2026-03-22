@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <p class="back"><a href="/collections?lang={{.Lang}}">← Back</a></p>
+    <h1>{{.Collection.Name}}</h1>
+    {{if .Collection.Description}}<p class="lead">{{.Collection.Description}}</p>{{end}}
+    <p class="meta">Created: {{.Collection.CreatedAt}}</p>
+    {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
+
+    <section class="card">
+      <h2>Saved Items</h2>
+      {{if .Items}}
+      <ul class="admin-relations-list">
+        {{range .Items}}
+        <li class="admin-relation-item">
+          <div class="line-head">
+            {{if eq .ItemType "ayah"}}
+            <a href="/ayah/{{.Surah1}}/{{.Ayah1}}?lang={{$.Lang}}">{{.Ref1}} ({{.Surah1Name}})</a>
+            {{else}}
+            <span class="pair-refs">{{.Ref1}} <span class="meta">↔</span> {{.Ref2}}</span>
+            <a class="button-link" href="{{.CompareURL}}">Compare</a>
+            {{end}}
+            <button
+              class="button-danger js-open-remove"
+              type="button"
+              data-item-id="{{.ID}}"
+              data-item-label="{{.ItemTypeLabel}} {{.Ref1}}{{if .Ref2}} ↔ {{.Ref2}}{{end}}"
+            >Remove</button>
+          </div>
+          <p class="meta">{{.ItemTypeLabel}} · Saved: {{.CreatedAt}}</p>
+
+          <p class="arabic arabic-small" lang="ar">{{.Arabic1}}</p>
+          {{if .Translation1}}<p class="translation">{{.Translation1}}</p>{{end}}
+
+          {{if eq .ItemType "relation"}}
+          <p class="meta">{{.Surah1Name}} ↔ {{.Surah2Name}}</p>
+          <p class="arabic arabic-small" lang="ar">{{.Arabic2}}</p>
+          {{if .Translation2}}<p class="translation">{{.Translation2}}</p>{{end}}
+          {{end}}
+
+          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p class="meta">No items in this collection yet.</p>
+      <p class="meta">
+        <a class="button-link" href="{{.HomeURL}}#search">Go to Search</a>
+        <a class="button-link" href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Open Compare</a>
+      </p>
+      {{end}}
+    </section>
+  </main>
+
+  <dialog id="remove-dialog" class="delete-dialog">
+    <div class="delete-dialog-body">
+      <h3>Remove Item</h3>
+      <p id="remove-dialog-text" class="meta">Are you sure you want to remove this item from collection?</p>
+      <div class="delete-dialog-actions">
+        <button type="button" class="button-secondary" id="remove-cancel">Cancel</button>
+        <form id="remove-form" action="/collections/items/delete" method="post" class="inline-form">
+          <input type="hidden" name="lang" value="{{.Lang}}" />
+          <input type="hidden" name="collection_id" value="{{.Collection.ID}}" />
+          <input type="hidden" name="item_id" id="remove-item-id" value="" />
+          <button type="submit" class="button-danger">Remove</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+{{template "footer" .}}
+<script>
+  (() => {
+    const dialog = document.getElementById("remove-dialog");
+    const removeText = document.getElementById("remove-dialog-text");
+    const removeItemID = document.getElementById("remove-item-id");
+    const cancelBtn = document.getElementById("remove-cancel");
+
+    document.querySelectorAll(".js-open-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!dialog || !removeText || !removeItemID) return;
+        const id = btn.getAttribute("data-item-id") || "";
+        const label = btn.getAttribute("data-item-label") || "this item";
+        removeItemID.value = id;
+        removeText.textContent = `Remove ${label} from this collection?`;
+        dialog.showModal();
+      });
+    });
+
+    if (cancelBtn && dialog) {
+      cancelBtn.addEventListener("click", () => dialog.close());
+    }
+  })();
+</script>
+</body>
+</html>

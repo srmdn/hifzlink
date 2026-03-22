@@ -467,6 +467,32 @@ button:hover,
   align-items: end;
 }
 
+.collection-form,
+.collection-save-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.7rem;
+  align-items: end;
+}
+
+.collection-form label,
+.collection-save-form label {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.collection-form input[id="collection-description"],
+.collection-save-form input[name="note"] {
+  grid-column: 1 / -1;
+}
+
+.collection-form button,
+.collection-save-form button {
+  width: fit-content;
+}
+
 .admin-form label {
   font-size: 0.82rem;
   font-weight: 600;
@@ -794,6 +820,11 @@ pre {
   }
 
   .admin-form {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-form,
+  .collection-save-form {
     grid-template-columns: 1fr;
   }
 

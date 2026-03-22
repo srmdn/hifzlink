@@ -35,8 +35,8 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - searchable relation index
 
 4. personal workflow:
-- bookmark/save ayah and relation pairs
-- saved collections (custom groups) for murojaah sessions
+- [done] bookmark/save ayah and relation pairs
+- [done] saved collections (custom groups) for murojaah sessions
 - user dashboard page (recently viewed, recently compared, quick resume)
 - optional notes attached to saved ayah entries
 

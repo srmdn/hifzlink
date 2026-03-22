@@ -10,6 +10,30 @@
     </p>
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
 
+    <section class="card">
+      {{if .Collections}}
+      <form action="/collections/items" method="post" class="collection-save-form">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="hidden" name="item_type" value="relation" />
+        <input type="hidden" name="ayah1" value="{{.Ref1}}" />
+        <input type="hidden" name="ayah2" value="{{.Ref2}}" />
+        <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
+        <label for="collection-id-compare">Save pair to collection</label>
+        <select id="collection-id-compare" name="collection_id" required>
+          <option value="">Select collection</option>
+          {{range .Collections}}
+          <option value="{{.ID}}">{{.Name}}</option>
+          {{end}}
+        </select>
+        <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
+        <button type="submit">Save Pair</button>
+      </form>
+      {{else}}
+      <p class="meta">No collections yet. <a href="/collections?lang={{.Lang}}">Create a collection</a> first.</p>
+      {{end}}
+      {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
+    </section>
+
     <section class="compare-grid">
       <article class="card verse-card">
         <p class="meta">{{.Ref1}} · {{.Ayah1.SurahName}} · Juz {{.Ayah1.Juz}}</p>
