@@ -15,6 +15,8 @@ The format is inspired by Keep a Changelog.
 - full dataset pipeline scripts: `scripts/import`, `scripts/validate`, `scripts/seed_relations`
 - friendly not-found page for invalid or missing ayah references
 - footer on all pages with Tanzil attribution
+- tafsir-ready import output at `data/tafsir/id.kemenag.json`
+- tafsir-ready import output at `data/tafsir/en.ibn-kathir.json`
 
 ### Changed
 
@@ -25,6 +27,9 @@ The format is inspired by Keep a Changelog.
 - add `lang="ar"` attribute to Arabic text elements for screen reader accuracy
 - invalid search input redirects back to home with an inline error message and pre-filled input
 - updated all internal cross-references and `README.md` links to reflect new `docs/` paths
+- `scripts/import_translations` now imports Indonesian translation from `rioastamal/quran-json`, English translation from Quran.com default chapter translation, and English tafsir from Quran API resource `169`
+- `scripts/import_translations` now imports Indonesian translation from `rioastamal/quran-json`, English translation from Quran.com default verse-route data, and English tafsir from Quran API resource `169`
+- added migration log for translation source switch and importer hardening in `docs/TRANSLATION_MIGRATION_2026-03-22.md`
 
 ## [0.1.0] - 2026-03-15
 

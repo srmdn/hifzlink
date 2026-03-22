@@ -37,6 +37,9 @@ Import English and Indonesian translations:
 go run ./scripts/import_translations
 ```
 
+This also generates Indonesian tafsir data at `data/tafsir/id.kemenag.json`.
+It also generates English tafsir data at `data/tafsir/en.ibn-kathir.json`.
+
 Seed starter relation pairs:
 
 ```bash
@@ -70,6 +73,7 @@ curl -X POST http://localhost:8080/api/relations \
 - [docs/TRANSLATIONS.md](./docs/TRANSLATIONS.md)
 - [docs/STATUS.md](./docs/STATUS.md)
 - [docs/ROADMAP.md](./docs/ROADMAP.md)
+- [docs/TRANSLATION_MIGRATION_2026-03-22.md](./docs/TRANSLATION_MIGRATION_2026-03-22.md)
 - [docs/PROJECT.md](./docs/PROJECT.md)
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
@@ -84,6 +88,6 @@ curl -X POST http://localhost:8080/api/relations \
 - `data/quran.json` local Quran dataset
 - `data/relations.seed.json` starter relation pairs
 - `scripts/import` imports full Quran text + metadata from Tanzil
-- `scripts/import_translations` imports full `en/id` translations from Tanzil
+- `scripts/import_translations` imports `en` from Quran.com verse-route data (Clear Quran text shown on site), `id` from `rioastamal/quran-json`, and prepares Indonesian + English tafsir data
 - `scripts/validate` validates dataset contract
 - `scripts/seed_relations` seeds initial mutashabihat relation examples

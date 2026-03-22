@@ -38,6 +38,7 @@ HifzLink is in MVP+ stage:
 
 - Arabic import: `go run ./scripts/import`
 - Translation import: `go run ./scripts/import_translations`
+- Tafsir import outputs (prepared): `data/tafsir/id.kemenag.json`, `data/tafsir/en.ibn-kathir.json`
 - Dataset validation: `go run ./scripts/validate`
 - Relation seed: `go run ./scripts/seed_relations`
 
@@ -46,6 +47,8 @@ Local data files:
 - `data/quran.json`
 - `data/translations/en.json`
 - `data/translations/id.json`
+- `data/tafsir/id.kemenag.json`
+- `data/tafsir/en.ibn-kathir.json`
 - `data/relations.seed.json`
 - `data/relations.db` (generated locally)
 
@@ -60,7 +63,9 @@ Local data files:
 
 - local-first architecture (no runtime external API dependency)
 - Quran text source: Tanzil
-- translation source currently imported from Tanzil endpoints (`en.sahih`, `id.indonesian`)
+- translation source currently imported from:
+  - English: Quran.com default verse-route translation (currently Clear Quran / Dr. Mustafa Khattab)
+  - Indonesian: `rioastamal/quran-json` (Kemenag-based source)
 - Arabic text is always primary; translations are secondary and shown beneath ayah text
 - minimal dependencies; Go standard library + SQLite driver only
 
