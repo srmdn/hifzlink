@@ -1,6 +1,7 @@
 package relations
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -24,6 +25,15 @@ type PairView struct {
 	Ayah2     string `json:"ayah2"`
 	Ayah2Name string `json:"ayah2_name,omitempty"`
 	Note      string `json:"note,omitempty"`
+}
+
+type AdminRelationView struct {
+	ID        int64
+	Ayah1     string
+	Ayah1Name string
+	Ayah2     string
+	Ayah2Name string
+	Note      string
 }
 
 type Service struct {
@@ -173,4 +183,37 @@ func (s *Service) PairsByJuz(juz int) ([]PairView, error) {
 	}
 
 	return out, nil
+}
+
+func (s *Service) AllRelations() ([]AdminRelationView, error) {
+	rels, err := s.db.All()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]AdminRelationView, 0, len(rels))
+	for _, rel := range rels {
+		out = append(out, AdminRelationView{
+			ID:        rel.ID,
+			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
+			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
+			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
+			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
+			Note:      rel.Note,
+		})
+	}
+	return out, nil
+}
+
+func (s *Service) DeleteByID(id int64) error {
+	if id <= 0 {
+		return fmt.Errorf("invalid relation id")
+	}
+	if err := s.db.DeleteByID(id); err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("relation not found")
+		}
+		return err
+	}
+	return nil
 }

@@ -21,9 +21,10 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 
 ## Milestone 2: Memorization UX
 
-1. relation management UI:
+1. [done] relation management UI:
 - simple add relation form page (server-rendered)
-- optional delete/edit relation actions (safe confirmation)
+- [done] optional delete relation action (safe confirmation)
+- edit relation action
 
 2. compare enhancements:
 - visual diff emphasis for repeated/changed words (non-destructive highlighting)

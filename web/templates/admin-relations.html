@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
+    <h1>Admin Relations</h1>
+    <p class="meta">Manage mutashabihat relations with a simple form. Use ayah reference format like <code>60:8</code>.</p>
+
+    <section class="card">
+      <h2>Add Relation</h2>
+      {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
+      {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
+
+      <form action="/admin/relations" method="post" class="admin-form">
+        <input type="hidden" name="action" value="add" />
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+
+        <label for="ayah1">Ayah 1</label>
+        <input id="ayah1" type="text" name="ayah1" value="{{.FormAyah1}}" placeholder="60:8" required autocomplete="off" />
+
+        <label for="ayah2">Ayah 2</label>
+        <input id="ayah2" type="text" name="ayah2" value="{{.FormAyah2}}" placeholder="60:9" required autocomplete="off" />
+
+        <label for="note">Note (optional)</label>
+        <input id="note" type="text" name="note" value="{{.FormNote}}" placeholder="mutashabihat" autocomplete="off" />
+
+        <button type="submit">Add Relation</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Existing Relations</h2>
+      {{if .Relations}}
+      <ul class="admin-relations-list">
+        {{range .Relations}}
+        <li class="admin-relation-item">
+          <div class="line-head">
+            <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+            <div class="admin-row-actions">
+              <a class="button-link" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
+              <form action="/admin/relations" method="post" class="inline-form" onsubmit="return confirm('Delete this relation?');">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="lang" value="{{$.Lang}}" />
+                <input type="hidden" name="id" value="{{.ID}}" />
+                <button type="submit" class="button-danger">Delete</button>
+              </form>
+            </div>
+          </div>
+          <p class="meta">{{.Ayah1Name}} ↔ {{.Ayah2Name}}</p>
+          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p class="meta">No relations yet.</p>
+      {{end}}
+    </section>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

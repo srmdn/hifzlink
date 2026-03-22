@@ -69,6 +69,7 @@ func main() {
 	mux.HandleFunc("/compare", s.handleComparePage)
 	mux.HandleFunc("/surah/", s.handleSurahPage)
 	mux.HandleFunc("/juz/", s.handleJuzPage)
+	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 
 	mux.HandleFunc("/api/ayah/", s.handleAPIAyah)
 	mux.HandleFunc("/api/relations", s.handleAPIRelations)
@@ -234,6 +235,64 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		"Juz":   juz,
 		"Pairs": pairs,
 	}))
+}
+
+func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		s.renderAdminRelationsPage(w, r, nil)
+		return
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+
+		lang := sanitizeLang(r.FormValue("lang"))
+		action := strings.ToLower(strings.TrimSpace(r.FormValue("action")))
+
+		switch action {
+		case "add":
+			ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+			note := strings.TrimSpace(r.FormValue("note"))
+			if err := s.rels.Add(ayah1, ayah2, note); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": err.Error(),
+					"FormAyah1":  ayah1,
+					"FormAyah2":  ayah2,
+					"FormNote":   note,
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=added", lang), http.StatusSeeOther)
+			return
+		case "delete":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": "invalid relation id",
+				})
+				return
+			}
+			if err := s.rels.DeleteByID(id); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": err.Error(),
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=deleted", lang), http.StatusSeeOther)
+			return
+		default:
+			s.renderAdminRelationsPage(w, r, map[string]any{
+				"AdminError": "invalid action",
+			})
+			return
+		}
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
 }
 
 func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
@@ -492,6 +551,40 @@ func searchErrorMessage(code string) string {
 	default:
 		return ""
 	}
+}
+
+func adminStatusMessage(code string) string {
+	switch code {
+	case "added":
+		return "Relation added."
+	case "deleted":
+		return "Relation deleted."
+	default:
+		return ""
+	}
+}
+
+func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request, overrides map[string]any) {
+	rows, err := s.rels.AllRelations()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := map[string]any{
+		"Title":        "Admin Relations",
+		"Relations":    rows,
+		"StatusNotice": adminStatusMessage(r.URL.Query().Get("status")),
+		"FormAyah1":    "",
+		"FormAyah2":    "",
+		"FormNote":     "",
+		"AdminError":   "",
+	}
+	for k, v := range overrides {
+		data[k] = v
+	}
+
+	s.render(w, "admin-relations.html", withCommonViewData(r, data))
 }
 
 func resolveBaseDir() (string, error) {
