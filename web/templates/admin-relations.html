@@ -31,9 +31,16 @@
         <select id="category" name="category">
           <option value="">Uncategorized</option>
           {{range .CategoryOptions}}
-          <option value="{{.}}" {{if eq $.FormCategory .}}selected{{end}}>{{.}}</option>
+          <option value="{{.Key}}" {{if eq $.FormCategory .Key}}selected{{end}}>{{.Label}}</option>
           {{end}}
         </select>
+        <p class="meta admin-category-note">Choose the closest category. If unsure, use <code>Other</code> temporarily and refine later.</p>
+
+        <ul class="admin-category-guide">
+          {{range .CategoryOptions}}
+          <li><strong>{{.Label}}:</strong> {{.Hint}}</li>
+          {{end}}
+        </ul>
 
         <button type="submit">Add Relation</button>
       </form>
@@ -47,7 +54,7 @@
         <select id="category-filter" name="category">
           <option value="">All</option>
           {{range .CategoryOptions}}
-          <option value="{{.}}" {{if eq $.CategoryFilter .}}selected{{end}}>{{.}}</option>
+          <option value="{{.Key}}" {{if eq $.CategoryFilter .Key}}selected{{end}}>{{.Label}}</option>
           {{end}}
         </select>
         <button type="submit">Apply</button>
@@ -71,7 +78,7 @@
             </div>
           </div>
           <p class="meta">{{.Ayah1Name}} ↔ {{.Ayah2Name}}</p>
-          {{if .Category}}<p class="category-badge">{{.Category}}</p>{{end}}
+          {{if .Category}}<p class="category-badge">{{index $.CategoryLabelMap .Category}}</p>{{end}}
           {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
           <form id="edit-{{.ID}}" action="/admin/relations" method="post" class="admin-edit-form" hidden>
             <input type="hidden" name="action" value="edit" />
@@ -91,7 +98,7 @@
             <select id="category-{{.ID}}" name="category">
               <option value="">Uncategorized</option>
               {{range $.CategoryOptions}}
-              <option value="{{.}}" {{if eq $rel.Category .}}selected{{end}}>{{.}}</option>
+              <option value="{{.Key}}" {{if eq $rel.Category .Key}}selected{{end}}>{{.Label}}</option>
               {{end}}
             </select>
 

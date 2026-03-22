@@ -486,6 +486,23 @@ button:hover,
   grid-column: 1 / -1;
 }
 
+.admin-category-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.admin-category-guide {
+  grid-column: 1 / -1;
+  margin: 0.18rem 0 0;
+  padding-left: 1rem;
+  color: #516576;
+  font-size: 0.86rem;
+}
+
+.admin-category-guide li {
+  margin: 0.2rem 0;
+}
+
 .admin-form button {
   grid-column: 1 / -1;
   width: fit-content;
