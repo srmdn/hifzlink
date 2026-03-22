@@ -14,7 +14,10 @@
 {{define "topbar"}}
 <header class="topbar">
   <div class="container topbar-inner">
-    <a class="brand" href="{{.HomeURL}}">HifzLink</a>
+    <a class="brand" href="{{.HomeURL}}">
+      <span class="brand-main">HifzLink</span>
+      <span class="brand-sub">Quran Murojaah</span>
+    </a>
     <nav class="lang-toggle" aria-label="Language mode">
       <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
       <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>

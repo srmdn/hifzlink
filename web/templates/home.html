@@ -9,6 +9,11 @@
       <p class="eyebrow">Quran Murojaah</p>
       <h1>Find and compare mutashabihat verses</h1>
       <p class="lead">Search by ayah reference to view the full verse and its similar verses side by side.</p>
+      <div class="hero-meta">
+        <span class="stat-pill">Arabic first</span>
+        <span class="stat-pill">6236 ayahs local</span>
+        <span class="stat-pill">EN/ID toggle</span>
+      </div>
       <form action="/search" method="post" class="search-form">
         <input type="hidden" name="lang" value="{{.Lang}}" />
         <input type="text" name="ayah" placeholder="surah:ayah — e.g. 60:8" value="{{.SearchQuery}}" required autocomplete="off" />
