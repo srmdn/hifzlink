@@ -55,10 +55,12 @@ func newTestServer(t *testing.T) *server {
 	t.Cleanup(func() { dbStore.Close() })
 
 	return &server{
-		quran: quranStore,
-		trans: transStore,
-		db:    dbStore,
-		rels:  relations.NewService(dbStore, quranStore),
+		quran:     quranStore,
+		trans:     transStore,
+		db:        dbStore,
+		rels:      relations.NewService(dbStore, quranStore),
+		adminUser: "admin",
+		adminPass: "secret",
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
@@ -241,6 +243,7 @@ func TestHandleAPIRelations_Post(t *testing.T) {
 	body := `{"ayah1":"60:8","ayah2":"60:9","note":"mutashabihat"}`
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -253,6 +256,7 @@ func TestHandleAPIRelations_InvalidJSON(t *testing.T) {
 	s := newTestServer(t)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader("not json"))
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -267,6 +271,7 @@ func TestHandleAPIRelations_UnknownAyah(t *testing.T) {
 	body := `{"ayah1":"999:999","ayah2":"60:9","note":""}`
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -284,6 +289,20 @@ func TestHandleAPIRelations_MethodNotAllowed(t *testing.T) {
 
 	if rr.Code != http.StatusMethodNotAllowed {
 		t.Errorf("expected 405, got %d", rr.Code)
+	}
+}
+
+func TestHandleAPIRelations_Unauthorized(t *testing.T) {
+	s := newTestServer(t)
+
+	body := `{"ayah1":"60:8","ayah2":"60:9","note":"mutashabihat"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	s.handleAPIRelations(rr, req)
+
+	if rr.Code != http.StatusUnauthorized {
+		t.Errorf("expected 401, got %d", rr.Code)
 	}
 }
 
@@ -375,6 +394,7 @@ func TestHandleAdminRelations_PostAddRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -408,6 +428,7 @@ func TestHandleAdminRelations_PostDeleteRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -445,6 +466,7 @@ func TestHandleAdminRelations_PostEditRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -482,6 +504,7 @@ func TestHandleAdminRelations_PostEdit_InvalidCategoryBecomesUncategorized(t *te
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -540,6 +563,7 @@ func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth("admin", "secret")
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -548,6 +572,17 @@ func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
 	}
 	if !strings.Contains(rr.Body.String(), "That relation already exists.") {
 		t.Fatalf("expected clear duplicate error message, got body: %s", rr.Body.String())
+	}
+}
+
+func TestHandleAdminRelations_Unauthorized(t *testing.T) {
+	s := newTestServer(t)
+	req := httptest.NewRequest(http.MethodGet, "/admin/relations", nil)
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401, got %d", rr.Code)
 	}
 }
 

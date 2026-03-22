@@ -6,3 +6,4 @@ data/raw/
 tmp/
 bin/
 coverage.out
+.env
