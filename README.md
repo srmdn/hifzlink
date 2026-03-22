@@ -67,6 +67,10 @@ go run ./scripts/seed_relations
 - optional relation categories for grouping: `lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`
 - category labels and usage hints are shown directly on the admin page
 - invalid category values are normalized to `Uncategorized`
+- admin routes and `POST /api/relations` require HTTP Basic Auth
+- set credentials via env:
+  - `HIFZLINK_ADMIN_USER`
+  - `HIFZLINK_ADMIN_PASS`
 
 ## Collections MVP
 

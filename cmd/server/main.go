@@ -25,6 +25,9 @@ type server struct {
 	rels    *relations.Service
 	tmpl    *template.Template
 	baseDir string
+
+	adminUser string
+	adminPass string
 }
 
 type adminCategoryOption struct {
@@ -61,12 +64,14 @@ func main() {
 	}
 
 	s := &server{
-		quran:   quran,
-		trans:   translations,
-		db:      dbStore,
-		rels:    relations.NewService(dbStore, quran),
-		tmpl:    tmpl,
-		baseDir: baseDir,
+		quran:     quran,
+		trans:     translations,
+		db:        dbStore,
+		rels:      relations.NewService(dbStore, quran),
+		tmpl:      tmpl,
+		baseDir:   baseDir,
+		adminUser: strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
+		adminPass: strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
 	}
 
 	mux := http.NewServeMux()
@@ -534,6 +539,10 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
+	if !s.requireAdmin(w, r) {
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
 		s.renderAdminRelationsPage(w, r, nil)
@@ -680,6 +689,9 @@ func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
 func (s *server) handleAPIRelations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if !s.requireAdmin(w, r) {
 		return
 	}
 
@@ -943,6 +955,22 @@ func resolveBaseDir() (string, error) {
 
 	wd, _ := os.Getwd()
 	return "", fmt.Errorf("could not find data/quran.json from working directory %q", wd)
+}
+
+func (s *server) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
+	if s == nil || strings.TrimSpace(s.adminUser) == "" || strings.TrimSpace(s.adminPass) == "" {
+		http.Error(w, "admin auth not configured (set HIFZLINK_ADMIN_USER and HIFZLINK_ADMIN_PASS)", http.StatusServiceUnavailable)
+		return false
+	}
+
+	user, pass, ok := r.BasicAuth()
+	if ok && user == s.adminUser && pass == s.adminPass {
+		return true
+	}
+
+	w.Header().Set("WWW-Authenticate", `Basic realm="HifzLink Admin", charset="UTF-8"`)
+	http.Error(w, "admin authentication required", http.StatusUnauthorized)
+	return false
 }
 
 func collectionStatusMessage(code string) string {

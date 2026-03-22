@@ -27,6 +27,7 @@ HifzLink is in MVP+ stage:
 - relation category tagging and category filter added in admin page
 - collections pages added (`/collections`, `/collections/{id}`) for personal grouping
 - save-to-collection flow added on ayah and compare pages
+- admin relation routes now protected by HTTP Basic Auth (`HIFZLINK_ADMIN_USER` / `HIFZLINK_ADMIN_PASS`)
 
 ## Implemented Features
 
