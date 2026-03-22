@@ -108,6 +108,21 @@ func (s *Store) All() ([]Relation, error) {
 	return scanRelations(rows)
 }
 
+func (s *Store) DeleteByID(id int64) error {
+	res, err := s.db.Exec(`DELETE FROM relations WHERE id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("delete relation: %w", err)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("delete relation rows affected: %w", err)
+	}
+	if affected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
 func scanRelations(rows *sql.Rows) ([]Relation, error) {
 	out := make([]Relation, 0)
 	for rows.Next() {

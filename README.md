@@ -61,6 +61,10 @@ go run ./scripts/seed_relations
 - `GET /api/surah/{surah}/relations`
 - `GET /api/juz/{juz}/relations`
 
+## Admin UI
+
+- `GET /admin/relations` relation management page (add/list/delete)
+
 Add relation example:
 
 ```bash

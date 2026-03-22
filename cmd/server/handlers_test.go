@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -349,6 +351,65 @@ func TestHandleAPIJuz_InvalidPath(t *testing.T) {
 
 	if rr.Code != http.StatusNotFound {
 		t.Errorf("expected 404, got %d", rr.Code)
+	}
+}
+
+// --- /admin/relations ---
+
+func TestHandleAdminRelations_PostAddRedirect(t *testing.T) {
+	s := newTestServer(t)
+
+	form := url.Values{}
+	form.Set("action", "add")
+	form.Set("ayah1", "60:8")
+	form.Set("ayah2", "60:9")
+	form.Set("note", "test relation")
+	form.Set("lang", "id")
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+	location := rr.Header().Get("Location")
+	if !strings.Contains(location, "/admin/relations?status=added&lang=id") {
+		t.Fatalf("unexpected redirect location: %s", location)
+	}
+}
+
+func TestHandleAdminRelations_PostDeleteRedirect(t *testing.T) {
+	s := newTestServer(t)
+
+	if err := s.rels.Add("60:8", "60:9", "to delete"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := s.rels.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("expected 1 relation, got %d", len(rows))
+	}
+
+	form := url.Values{}
+	form.Set("action", "delete")
+	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
+	form.Set("lang", "en")
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+	location := rr.Header().Get("Location")
+	if !strings.Contains(location, "/admin/relations?status=deleted&lang=en") {
+		t.Fatalf("unexpected redirect location: %s", location)
 	}
 }
 

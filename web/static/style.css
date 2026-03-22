@@ -407,11 +407,90 @@ button:hover,
   font-size: 0.9rem;
 }
 
+.button-danger {
+  border: 0;
+  background: #be123c;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0.4rem 0.74rem;
+  cursor: pointer;
+}
+
+.button-danger:hover {
+  background: #9f1239;
+}
+
 .error-msg {
   grid-column: 1 / -1;
   margin: 0.06rem 0 0;
   color: #b91c1c;
   font-size: 0.9rem;
+}
+
+.admin-error {
+  margin-bottom: 0.75rem;
+}
+
+.admin-success {
+  margin: 0 0 0.75rem;
+  color: #0f5b4f;
+  background: #e7f5f2;
+  border: 1px solid #c8e8e2;
+  border-radius: 10px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.7rem;
+  align-items: end;
+}
+
+.admin-form label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.admin-form label[for="note"] {
+  grid-column: 1 / -1;
+}
+
+.admin-form #note {
+  grid-column: 1 / -1;
+}
+
+.admin-form button {
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+
+.admin-relations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-relation-item {
+  border-top: 1px solid var(--border);
+  padding: 0.82rem 0;
+}
+
+.admin-relation-item:first-child {
+  border-top: 0;
+}
+
+.admin-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.inline-form {
+  margin: 0;
 }
 
 .meta {
@@ -583,6 +662,10 @@ pre {
   }
 
   .search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form {
     grid-template-columns: 1fr;
   }
 
