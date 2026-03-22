@@ -83,6 +83,7 @@ curl -X POST http://localhost:8080/api/relations \
 - [docs/VERSIONING.md](./docs/VERSIONING.md)
 - [docs/DESIGN.md](./docs/DESIGN.md)
 - [docs/TRANSLATIONS.md](./docs/TRANSLATIONS.md)
+- [docs/MUTASHABIHAT_STRATEGY.md](./docs/MUTASHABIHAT_STRATEGY.md)
 - [docs/STATUS.md](./docs/STATUS.md)
 - [docs/ROADMAP.md](./docs/ROADMAP.md)
 - [docs/TRANSLATION_MIGRATION_2026-03-22.md](./docs/TRANSLATION_MIGRATION_2026-03-22.md)

@@ -35,8 +35,9 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - searchable relation index
 
 4. personal workflow:
-- user dashboard page (recently viewed, recently compared, quick resume)
 - bookmark/save ayah and relation pairs
+- saved collections (custom groups) for murojaah sessions
+- user dashboard page (recently viewed, recently compared, quick resume)
 - optional notes attached to saved ayah entries
 
 5. account support:
@@ -47,7 +48,18 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 ## Milestone 3: Data Quality And Curation
 
 1. expand `relations.seed.json` into curated starter set
-2. define relation category taxonomy (mutashabihat type tags)
+2. [in progress] define relation taxonomy for mutashabihat curation:
+- primary murojaah tags (confusion pattern):
+  - `lafzi_near_identical`
+  - `word_swap`
+  - `addition_omission`
+  - `order_change`
+  - `ending_variation`
+  - `pronoun_shift`
+- secondary thematic tags (optional):
+  - `aqidah`, `ahkam`, `adab`, `qasas`, `dua`, `targhib_tarhib`, `other`
+- relation records should support multiple tags over time (not single category only)
+- add category/tag manager page in admin UI
 3. document curation workflow for contributors
 
 ## Milestone 4: Open Source Maturity
