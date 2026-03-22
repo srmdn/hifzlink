@@ -70,6 +70,13 @@ Import command:
 go run ./scripts/import_translations
 ```
 
+Validation command:
+
+```bash
+go run ./scripts/validate_translations
+go run ./scripts/validate_translations -report
+```
+
 Missing translation entries should not crash the app.
 Fallback behavior:
 

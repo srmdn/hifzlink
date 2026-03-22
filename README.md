@@ -31,6 +31,13 @@ Validate dataset integrity:
 go run ./scripts/validate
 ```
 
+Validate translation key format and coverage:
+
+```bash
+go run ./scripts/validate_translations
+go run ./scripts/validate_translations -report
+```
+
 Import English and Indonesian translations:
 
 ```bash
@@ -90,4 +97,5 @@ curl -X POST http://localhost:8080/api/relations \
 - `scripts/import` imports full Quran text + metadata from Tanzil
 - `scripts/import_translations` imports `en` from Quran.com verse-route data (Clear Quran text shown on site), `id` from `rioastamal/quran-json`, and prepares Indonesian + English tafsir data
 - `scripts/validate` validates dataset contract
+- `scripts/validate_translations` validates translation key format and coverage against `data/quran.json`
 - `scripts/seed_relations` seeds initial mutashabihat relation examples

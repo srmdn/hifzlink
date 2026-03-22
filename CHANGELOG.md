@@ -17,6 +17,7 @@ The format is inspired by Keep a Changelog.
 - footer on all pages with Tanzil attribution
 - tafsir-ready import output at `data/tafsir/id.kemenag.json`
 - tafsir-ready import output at `data/tafsir/en.ibn-kathir.json`
+- `scripts/validate_translations` command for translation key-format validation and optional coverage reporting (`-report`)
 
 ### Changed
 

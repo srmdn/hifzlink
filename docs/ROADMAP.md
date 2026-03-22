@@ -11,7 +11,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - relation endpoints and duplicate handling
 - translation loader and fallback behavior
 
-2. add data checks:
+2. [done] add data checks:
 - translation file key-format validation command
 - optional translation coverage report per language
 
