@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-03-16 (session 4)
+Last updated: 2026-03-23 (session 5)
 
 ## Current State
 
@@ -38,6 +38,7 @@ HifzLink is in MVP+ stage:
 
 - Arabic import: `go run ./scripts/import`
 - Translation import: `go run ./scripts/import_translations`
+- Translation validation: `go run ./scripts/validate_translations` (use `-report` for per-language coverage summary)
 - Tafsir import outputs (prepared): `data/tafsir/id.kemenag.json`, `data/tafsir/en.ibn-kathir.json`
 - Dataset validation: `go run ./scripts/validate`
 - Relation seed: `go run ./scripts/seed_relations`
@@ -54,7 +55,6 @@ Local data files:
 
 ## Known Gaps
 
-- translation coverage checks not exposed as a report command (Milestone 1 item 2 — still pending)
 - no admin UI for relation management; API-only create (Milestone 2)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
