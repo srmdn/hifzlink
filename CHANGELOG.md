@@ -30,6 +30,7 @@ The format is inspired by Keep a Changelog.
 - `scripts/import_translations` now imports Indonesian translation from `rioastamal/quran-json`, English translation from Quran.com default chapter translation, and English tafsir from Quran API resource `169`
 - `scripts/import_translations` now imports Indonesian translation from `rioastamal/quran-json`, English translation from Quran.com default verse-route data, and English tafsir from Quran API resource `169`
 - added migration log for translation source switch and importer hardening in `docs/TRANSLATION_MIGRATION_2026-03-22.md`
+- frontend responsive refinement: mobile topbar now uses compact `HifzLink` branding, translation toggle labels (`AR/EN/ID`), and a collapsible menu; page back links use compact `← Back` style
 
 ## [0.1.0] - 2026-03-15
 

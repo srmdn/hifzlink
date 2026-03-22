@@ -12,19 +12,90 @@
 {{end}}
 
 {{define "topbar"}}
-<header class="topbar">
+<header class="topbar" data-mobile-nav-root>
   <div class="container topbar-inner">
-    <a class="brand" href="{{.HomeURL}}">
-      <span class="brand-main">HifzLink</span>
-      <span class="brand-sub">Quran Murojaah</span>
-    </a>
-    <nav class="lang-toggle" aria-label="Language mode">
-      <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
-      <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">AR + EN</a>
-      <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">AR + ID</a>
-    </nav>
+    <div class="topbar-left">
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-toggle>Menu</button>
+      <a class="brand" href="{{.HomeURL}}"><span class="brand-main">HifzLink</span></a>
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="{{.HomeURL}}">Home</a>
+        <a href="{{.HomeURL}}#search">Search</a>
+        <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Compare</a>
+        <a href="/surah/60/relations?lang={{.Lang}}">Surah Relations</a>
+        <a href="/juz/28/relations?lang={{.Lang}}">Juz Relations</a>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <a class="search-link" href="{{.HomeURL}}#search">Search</a>
+      <nav class="lang-switch" aria-label="Language mode">
+        <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
+        <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">EN</a>
+        <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">ID</a>
+      </nav>
+      <a class="github-link" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
   </div>
 </header>
+
+<div class="mobile-backdrop" hidden data-menu-backdrop></div>
+<aside class="mobile-drawer" hidden data-menu-drawer aria-label="Mobile navigation">
+  <div class="mobile-drawer-head">
+    <span>Menu</span>
+    <button class="drawer-close" type="button" aria-label="Close navigation" data-menu-close>Close</button>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile primary">
+    <a href="{{.HomeURL}}">Home</a>
+    <a href="{{.HomeURL}}#search">Search</a>
+    <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Compare</a>
+    <a href="/surah/60/relations?lang={{.Lang}}">Surah relations</a>
+    <a href="/juz/28/relations?lang={{.Lang}}">Juz relations</a>
+  </nav>
+  <div class="mobile-lang">
+    <p>Language</p>
+    <nav aria-label="Mobile language mode">
+      <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">Arabic</a>
+      <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">Arabic + English</a>
+      <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">Arabic + Indonesian</a>
+    </nav>
+  </div>
+  <a class="mobile-github" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">GitHub</a>
+</aside>
+
+<script>
+  (() => {
+    const setOpen = (open) => {
+      const toggle = document.querySelector("[data-menu-toggle]");
+      const drawer = document.querySelector("[data-menu-drawer]");
+      const backdrop = document.querySelector("[data-menu-backdrop]");
+      if (!toggle || !drawer || !backdrop) return;
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      drawer.hidden = !open;
+      backdrop.hidden = !open;
+      document.body.classList.toggle("menu-open", open);
+    };
+
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-menu-toggle]")) {
+        const drawer = document.querySelector("[data-menu-drawer]");
+        setOpen(drawer ? drawer.hidden : true);
+        return;
+      }
+
+      if (event.target.closest("[data-menu-close], [data-menu-backdrop], .mobile-drawer a")) {
+        setOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 980) setOpen(false);
+    });
+  })();
+</script>
 {{end}}
 
 {{define "footer"}}
