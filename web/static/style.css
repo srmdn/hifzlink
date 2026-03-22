@@ -555,6 +555,10 @@ button:hover,
   gap: 0.44rem 0.6rem;
 }
 
+.admin-edit-form[hidden] {
+  display: none !important;
+}
+
 .admin-edit-form label {
   font-size: 0.79rem;
   font-weight: 600;
