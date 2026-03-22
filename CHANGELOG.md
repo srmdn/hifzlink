@@ -21,6 +21,7 @@ The format is inspired by Keep a Changelog.
 - server-rendered admin relation management page at `/admin/relations` with add/list/delete actions
 - admin relation editing added (update ayah refs, note, category) with custom delete dialog modal
 - server-rendered collections MVP (`/collections`, `/collections/{id}`) with create/save/remove flows
+- dashboard MVP (`/dashboard`) with quick resume links and recent activity cards
 
 ### Changed
 
@@ -38,6 +39,7 @@ The format is inspired by Keep a Changelog.
 - topbar navigation now includes Admin entry and the mobile drawer supports admin access
 - relation records now support optional `category` (`lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`) with admin-side filtering
 - ayah and compare pages now support saving items directly into collections
+- top navigation now includes Dashboard entry for direct access
 
 ## [0.1.0] - 2026-03-15
 

@@ -65,6 +65,7 @@ func newTestServer(t *testing.T) *server {
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
 			{{define "collection-detail.html"}}{{.StatusNotice}}{{end}}
+			{{define "dashboard.html"}}ok{{end}}
 		`)),
 	}
 }
@@ -679,6 +680,16 @@ func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
 	second := postItem()
 	if !strings.Contains(second, "saved=duplicate") {
 		t.Fatalf("expected duplicate status on second add, got: %s", second)
+	}
+}
+
+func TestHandleDashboardPage(t *testing.T) {
+	s := newTestServer(t)
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/dashboard?lang=en", nil)
+	s.handleDashboardPage(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
 	}
 }
 

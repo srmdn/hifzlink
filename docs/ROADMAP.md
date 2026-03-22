@@ -33,11 +33,18 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 3. browsing improvements:
 - filter relation lists by surah range/juz
 - searchable relation index
+- scalable relation indexing for large datasets:
+  - surah index page with relation counts
+  - juz index page with relation counts
+  - ayah-relation search page (search-first, not full dump)
+  - server-side pagination (`page`, `per_page`) and sorting (`recent`, `surah`, `juz`)
+  - faceted filters (`surah`, `juz`, `category`, `has_note`, date range)
+  - default recent-first ordering with quick-resume links
 
 4. personal workflow:
 - [done] bookmark/save ayah and relation pairs
 - [done] saved collections (custom groups) for murojaah sessions
-- user dashboard page (recently viewed, recently compared, quick resume)
+- [done] user dashboard page (recently viewed, recently compared, quick resume)
 - optional notes attached to saved ayah entries
 
 5. account support:

@@ -20,16 +20,19 @@
         <button type="submit">Open Ayah</button>
         {{if .SearchError}}<p class="error-msg" role="alert">{{.SearchError}}</p>{{end}}
       </form>
+
+      <div class="home-quick-links">
+        <a class="button-link" href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Compare 60:8 ↔ 60:9</a>
+        <a class="button-link" href="/surah/60/relations?lang={{.Lang}}">Surah 60 Relations</a>
+        <a class="button-link" href="/juz/28/relations?lang={{.Lang}}">Juz 28 Relations</a>
+      </div>
     </section>
 
     <section class="card">
-      <h2>Examples</h2>
+      <h2>Start Points</h2>
       <ul class="simple-list">
         <li><a href="/ayah/60/8?lang={{.Lang}}">Ayah 60:8 — Al-Mumtahanah</a></li>
         <li><a href="/ayah/60/9?lang={{.Lang}}">Ayah 60:9 — Al-Mumtahanah</a></li>
-        <li><a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Compare 60:8 and 60:9</a></li>
-        <li><a href="/surah/60/relations?lang={{.Lang}}">Surah 60 relations</a></li>
-        <li><a href="/juz/28/relations?lang={{.Lang}}">Juz 28 relations</a></li>
       </ul>
     </section>
   </main>

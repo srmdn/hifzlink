@@ -38,6 +38,11 @@ type CollectionItem struct {
 	CreatedAt  string
 }
 
+type RecentCollectionItem struct {
+	CollectionItem
+	CollectionName string
+}
+
 type Store struct {
 	db *sql.DB
 }
@@ -325,6 +330,88 @@ func (s *Store) DeleteCollectionItem(itemID int64) error {
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+func (s *Store) RecentCollections(limit int) ([]Collection, error) {
+	if limit <= 0 {
+		limit = 5
+	}
+	rows, err := s.db.Query(`
+	SELECT c.id, c.name, COALESCE(c.description, ''), COALESCE(c.created_at, ''), COUNT(i.id)
+	FROM collections AS c
+	LEFT JOIN collection_items i ON i.collection_id = c.id
+	GROUP BY c.id, c.name, c.description, c.created_at
+	ORDER BY datetime(c.created_at) DESC, c.id DESC
+	LIMIT ?
+	`, limit)
+	if err != nil {
+		return nil, fmt.Errorf("query recent collections: %w", err)
+	}
+	defer rows.Close()
+
+	out := make([]Collection, 0)
+	for rows.Next() {
+		var c Collection
+		if err := rows.Scan(&c.ID, &c.Name, &c.Description, &c.CreatedAt, &c.ItemCount); err != nil {
+			return nil, fmt.Errorf("scan recent collection: %w", err)
+		}
+		out = append(out, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate recent collections: %w", err)
+	}
+	return out, nil
+}
+
+func (s *Store) RecentCollectionItems(limit int) ([]RecentCollectionItem, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+	rows, err := s.db.Query(`
+	SELECT
+		ci.id,
+		ci.collection_id,
+		ci.item_type,
+		ci.ayah1_surah,
+		ci.ayah1_ayah,
+		ci.ayah2_surah,
+		ci.ayah2_ayah,
+		COALESCE(ci.note, ''),
+		COALESCE(ci.created_at, ''),
+		c.name
+	FROM collection_items ci
+	INNER JOIN collections c ON c.id = ci.collection_id
+	ORDER BY datetime(ci.created_at) DESC, ci.id DESC
+	LIMIT ?
+	`, limit)
+	if err != nil {
+		return nil, fmt.Errorf("query recent collection items: %w", err)
+	}
+	defer rows.Close()
+
+	out := make([]RecentCollectionItem, 0)
+	for rows.Next() {
+		var item RecentCollectionItem
+		if err := rows.Scan(
+			&item.ID,
+			&item.Collection,
+			&item.ItemType,
+			&item.Ayah1Surah,
+			&item.Ayah1Ayah,
+			&item.Ayah2Surah,
+			&item.Ayah2Ayah,
+			&item.Note,
+			&item.CreatedAt,
+			&item.CollectionName,
+		); err != nil {
+			return nil, fmt.Errorf("scan recent collection item: %w", err)
+		}
+		out = append(out, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate recent collection items: %w", err)
+	}
+	return out, nil
 }
 
 func scanRelations(rows *sql.Rows) ([]Relation, error) {
