@@ -28,6 +28,7 @@ HifzLink is in MVP+ stage:
 - collections pages added (`/collections`, `/collections/{id}`) for personal grouping
 - save-to-collection flow added on ayah and compare pages
 - admin relation routes now protected by HTTP Basic Auth (`HIFZLINK_ADMIN_USER` / `HIFZLINK_ADMIN_PASS`)
+- dashboard page added (`/dashboard`) with quick resume + recent collections + recent saved items
 
 ## Implemented Features
 
@@ -60,7 +61,6 @@ Local data files:
 
 ## Known Gaps
 
-- no user dashboard page yet (recent activity / quick resume still pending)
 - no pagination/filtering for large relation lists
 - no production deployment docs yet
 
@@ -90,6 +90,7 @@ Manual smoke URLs:
 - `/compare?ayah1=60:8&ayah2=60:9&lang=id`
 - `/admin/relations?lang=ar`
 - `/collections?lang=ar`
+- `/dashboard?lang=ar`
 
 ## Handoff Notes For Other Agents
 

@@ -375,6 +375,13 @@ h2 {
   margin-top: 1rem;
 }
 
+.home-quick-links {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
 input,
 select,
 button {
@@ -817,6 +824,10 @@ pre {
 
   .search-form {
     grid-template-columns: 1fr;
+  }
+
+  .home-quick-links {
+    gap: 0.38rem;
   }
 
   .admin-form {

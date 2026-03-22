@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <h1>Dashboard</h1>
+    <p class="lead">Resume your murojaah quickly from recent saves and collections.</p>
+
+    <section class="card">
+      <h2>Quick Resume</h2>
+      <div class="hero-meta">
+        {{if .ResumeAyahURL}}
+        <a class="button-link" href="{{.ResumeAyahURL}}">Resume Last Ayah</a>
+        {{else}}
+        <span class="meta">No ayah saved yet.</span>
+        {{end}}
+        {{if .ResumePairURL}}
+        <a class="button-link" href="{{.ResumePairURL}}">Resume Last Pair</a>
+        {{else}}
+        <span class="meta">No relation pair saved yet.</span>
+        {{end}}
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Recent Collections</h2>
+      {{if .RecentCollections}}
+      <ul class="simple-list">
+        {{range .RecentCollections}}
+        <li>
+          <a href="/collections/{{.ID}}?lang={{$.Lang}}">{{.Name}}</a>
+          <p class="meta">Created: {{.CreatedAt}} · Items: {{.ItemCount}}</p>
+          {{if .Description}}<p class="meta note">{{.Description}}</p>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p class="meta">No collections yet. <a href="{{.CollectionsURL}}">Create a collection</a>.</p>
+      {{end}}
+    </section>
+
+    <section class="card">
+      <h2>Recent Saved Items</h2>
+      {{if .RecentItems}}
+      <ul class="admin-relations-list">
+        {{range .RecentItems}}
+        <li class="admin-relation-item">
+          <div class="line-head">
+            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}</span>
+            <div class="admin-row-actions">
+              <a class="button-link" href="{{.PrimaryURL}}">Open Ayah</a>
+              {{if .SecondaryURL}}<a class="button-link" href="{{.SecondaryURL}}">Open Compare</a>{{end}}
+            </div>
+          </div>
+          <p class="meta">{{.ItemTypeLabel}} · Collection: <a href="/collections/{{.CollectionID}}?lang={{$.Lang}}">{{.Collection}}</a> · Saved: {{.CreatedAt}}</p>
+          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+        </li>
+        {{end}}
+      </ul>
+      {{else}}
+      <p class="meta">No saved items yet. Start from <a href="{{.HomeURL}}#search">Search</a> or <a href="{{.CollectionsURL}}">Collections</a>.</p>
+      {{end}}
+    </section>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

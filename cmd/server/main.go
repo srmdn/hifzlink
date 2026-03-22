@@ -83,6 +83,7 @@ func main() {
 	mux.HandleFunc("/compare", s.handleComparePage)
 	mux.HandleFunc("/surah/", s.handleSurahPage)
 	mux.HandleFunc("/juz/", s.handleJuzPage)
+	mux.HandleFunc("/dashboard", s.handleDashboardPage)
 	mux.HandleFunc("/collections", s.handleCollectionsPage)
 	mux.HandleFunc("/collections/", s.handleCollectionDetailPage)
 	mux.HandleFunc("/collections/items", s.handleCollectionItemsPost)
@@ -219,6 +220,76 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"Ref2":             relations.FormatAyahRef(s2, y2),
 		"Collections":      collections,
 		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
+	}))
+}
+
+type dashboardItemView struct {
+	ItemType      string
+	ItemTypeLabel string
+	CollectionID  int64
+	Collection    string
+	Ref1          string
+	Ref2          string
+	PrimaryURL    string
+	SecondaryURL  string
+	CreatedAt     string
+	Note          string
+}
+
+func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	collections, err := s.db.RecentCollections(6)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	recentItems, err := s.db.RecentCollectionItems(12)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	lang := pageLang(r)
+	items := make([]dashboardItemView, 0, len(recentItems))
+	var resumeAyahURL string
+	var resumeRelationURL string
+
+	for _, item := range recentItems {
+		ref1 := relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah)
+		view := dashboardItemView{
+			ItemType:      item.ItemType,
+			ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
+			CollectionID:  item.Collection,
+			Collection:    item.CollectionName,
+			Ref1:          ref1,
+			CreatedAt:     item.CreatedAt,
+			Note:          item.Note,
+			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
+		}
+		if item.ItemType == "relation" {
+			ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
+			view.Ref2 = ref2
+			view.SecondaryURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang)
+			if resumeRelationURL == "" {
+				resumeRelationURL = view.SecondaryURL
+			}
+		}
+		if resumeAyahURL == "" {
+			resumeAyahURL = view.PrimaryURL
+		}
+		items = append(items, view)
+	}
+
+	s.render(w, "dashboard.html", withCommonViewData(r, map[string]any{
+		"Title":             "Dashboard",
+		"RecentCollections": collections,
+		"RecentItems":       items,
+		"ResumeAyahURL":     resumeAyahURL,
+		"ResumePairURL":     resumeRelationURL,
 	}))
 }
 
@@ -815,6 +886,7 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["LangARURL"] = switchLang(r, "ar")
 	data["LangENURL"] = switchLang(r, "en")
 	data["LangIDURL"] = switchLang(r, "id")
+	data["DashboardURL"] = withLang("/dashboard", lang)
 	data["CollectionsURL"] = withLang("/collections", lang)
 	return data
 }
