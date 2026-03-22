@@ -65,6 +65,8 @@ go run ./scripts/seed_relations
 
 - `GET /admin/relations` relation management page (add/list/edit/delete)
 - optional relation categories for grouping: `lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`
+- category labels and usage hints are shown directly on the admin page
+- invalid category values are normalized to `Uncategorized`
 
 Add relation example:
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -57,6 +58,7 @@ func newTestServer(t *testing.T) *server {
 		quran: quranStore,
 		trans: transStore,
 		rels:  relations.NewService(dbStore, quranStore),
+		tmpl:  template.Must(template.New("admin-relations.html").Parse(`{{define "admin-relations.html"}}{{.AdminError}}{{end}}`)),
 	}
 }
 
@@ -447,6 +449,100 @@ func TestHandleAdminRelations_PostEditRedirect(t *testing.T) {
 	location := rr.Header().Get("Location")
 	if !strings.Contains(location, "/admin/relations?status=edited&lang=id") {
 		t.Fatalf("unexpected redirect location: %s", location)
+	}
+}
+
+func TestHandleAdminRelations_PostEdit_InvalidCategoryBecomesUncategorized(t *testing.T) {
+	s := newTestServer(t)
+
+	if err := s.rels.Add("60:8", "60:9", "before"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := s.rels.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("expected 1 relation, got %d", len(rows))
+	}
+
+	form := url.Values{}
+	form.Set("action", "edit")
+	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
+	form.Set("ayah1", "60:8")
+	form.Set("ayah2", "60:9")
+	form.Set("note", "after")
+	form.Set("category", "invalid-custom-category")
+	form.Set("lang", "en")
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+
+	updated, err := s.rels.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(updated) != 1 {
+		t.Fatalf("expected 1 relation, got %d", len(updated))
+	}
+	if updated[0].Category != "" {
+		t.Fatalf("expected category to normalize to empty, got %q", updated[0].Category)
+	}
+}
+
+func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
+	s := newTestServer(t)
+
+	if err := s.rels.Add("60:8", "60:9", "r1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.rels.Add("1:1", "60:8", "r2"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := s.rels.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 {
+		t.Fatalf("expected 2 relations, got %d", len(rows))
+	}
+
+	targetID := int64(0)
+	for _, row := range rows {
+		if row.Ayah1 == "60:8" && row.Ayah2 == "60:9" {
+			continue
+		}
+		targetID = row.ID
+		break
+	}
+	if targetID == 0 {
+		t.Fatal("failed to locate non-duplicate target relation row")
+	}
+	form := url.Values{}
+	form.Set("action", "edit")
+	form.Set("id", strconv.FormatInt(targetID, 10))
+	form.Set("ayah1", "60:8")
+	form.Set("ayah2", "60:9")
+	form.Set("note", "dup")
+	form.Set("category", "lafzi")
+	form.Set("lang", "en")
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 with rendered error page, got %d", rr.Code)
+	}
+	if !strings.Contains(rr.Body.String(), "That relation already exists.") {
+		t.Fatalf("expected clear duplicate error message, got body: %s", rr.Body.String())
 	}
 }
 

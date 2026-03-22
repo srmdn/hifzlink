@@ -25,6 +25,12 @@ type server struct {
 	baseDir string
 }
 
+type adminCategoryOption struct {
+	Key   string
+	Label string
+	Hint  string
+}
+
 func main() {
 	baseDir, err := resolveBaseDir()
 	if err != nil {
@@ -259,7 +265,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			category := strings.TrimSpace(r.FormValue("category"))
 			if err := s.rels.AddWithCategory(ayah1, ayah2, note, category); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
-					"AdminError":   err.Error(),
+					"AdminError":   adminErrorMessage(err),
 					"FormAyah1":    ayah1,
 					"FormAyah2":    ayah2,
 					"FormNote":     note,
@@ -284,7 +290,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			category := strings.TrimSpace(r.FormValue("category"))
 			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
-					"AdminError": err.Error(),
+					"AdminError": adminErrorMessage(err),
 				})
 				return
 			}
@@ -301,7 +307,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			}
 			if err := s.rels.DeleteByID(id); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
-					"AdminError": err.Error(),
+					"AdminError": adminErrorMessage(err),
 				})
 				return
 			}
@@ -606,24 +612,24 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		rows = filtered
 	}
 
+	categoryOptions := adminCategoryOptions()
+	categoryLabelMap := make(map[string]string, len(categoryOptions))
+	for _, option := range categoryOptions {
+		categoryLabelMap[option.Key] = option.Label
+	}
+
 	data := map[string]any{
-		"Title":          "Admin Relations",
-		"Relations":      rows,
-		"StatusNotice":   adminStatusMessage(r.URL.Query().Get("status")),
-		"FormAyah1":      "",
-		"FormAyah2":      "",
-		"FormNote":       "",
-		"FormCategory":   "",
-		"CategoryFilter": categoryFilter,
-		"CategoryOptions": []string{
-			"lafzi",
-			"maana",
-			"siyam",
-			"aqidah",
-			"adab",
-			"other",
-		},
-		"AdminError": "",
+		"Title":            "Admin Relations",
+		"Relations":        rows,
+		"StatusNotice":     adminStatusMessage(r.URL.Query().Get("status")),
+		"FormAyah1":        "",
+		"FormAyah2":        "",
+		"FormNote":         "",
+		"FormCategory":     "",
+		"CategoryFilter":   categoryFilter,
+		"CategoryOptions":  categoryOptions,
+		"CategoryLabelMap": categoryLabelMap,
+		"AdminError":       "",
 	}
 	for k, v := range overrides {
 		data[k] = v
@@ -646,4 +652,40 @@ func resolveBaseDir() (string, error) {
 
 	wd, _ := os.Getwd()
 	return "", fmt.Errorf("could not find data/quran.json from working directory %q", wd)
+}
+
+func adminCategoryOptions() []adminCategoryOption {
+	return []adminCategoryOption{
+		{Key: "lafzi", Label: "Lafzi (near-identical wording)", Hint: "Use when verses are very similar in wording with small wording changes."},
+		{Key: "maana", Label: "Maana (similar meaning)", Hint: "Use when wording differs more, but meaning/theme overlaps."},
+		{Key: "siyam", Label: "Siyam (fasting)", Hint: "Use for verses related to fasting rulings or guidance."},
+		{Key: "aqidah", Label: "Aqidah (belief)", Hint: "Use for belief, tawhid, iman, and related theology."},
+		{Key: "adab", Label: "Adab (manners/ethics)", Hint: "Use for etiquette and character guidance."},
+		{Key: "other", Label: "Other", Hint: "Use only when none of the categories fit clearly."},
+	}
+}
+
+func adminErrorMessage(err error) string {
+	if err == nil {
+		return ""
+	}
+	message := strings.ToLower(strings.TrimSpace(err.Error()))
+	switch {
+	case strings.Contains(message, "ayah1: ayah must be in surah:ayah format"):
+		return "Ayah 1 must use surah:ayah format (example: 60:8)."
+	case strings.Contains(message, "ayah2: ayah must be in surah:ayah format"):
+		return "Ayah 2 must use surah:ayah format (example: 60:9)."
+	case strings.Contains(message, "ayah1 not found in dataset"):
+		return "Ayah 1 was not found in the local Quran dataset."
+	case strings.Contains(message, "ayah2 not found in dataset"):
+		return "Ayah 2 was not found in the local Quran dataset."
+	case strings.Contains(message, "relation already exists"):
+		return "That relation already exists."
+	case strings.Contains(message, "invalid relation id"):
+		return "Invalid relation ID."
+	case strings.Contains(message, "relation not found"):
+		return "Relation not found."
+	default:
+		return err.Error()
+	}
 }
