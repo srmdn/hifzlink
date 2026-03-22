@@ -27,30 +27,79 @@
         <label for="note">Note (optional)</label>
         <input id="note" type="text" name="note" value="{{.FormNote}}" placeholder="mutashabihat" autocomplete="off" />
 
+        <label for="category">Category (optional)</label>
+        <select id="category" name="category">
+          <option value="">Uncategorized</option>
+          {{range .CategoryOptions}}
+          <option value="{{.}}" {{if eq $.FormCategory .}}selected{{end}}>{{.}}</option>
+          {{end}}
+        </select>
+
         <button type="submit">Add Relation</button>
       </form>
     </section>
 
     <section class="card">
       <h2>Existing Relations</h2>
+      <form class="admin-filter-form" action="/admin/relations" method="get">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <label for="category-filter">Category filter</label>
+        <select id="category-filter" name="category">
+          <option value="">All</option>
+          {{range .CategoryOptions}}
+          <option value="{{.}}" {{if eq $.CategoryFilter .}}selected{{end}}>{{.}}</option>
+          {{end}}
+        </select>
+        <button type="submit">Apply</button>
+      </form>
       {{if .Relations}}
       <ul class="admin-relations-list">
         {{range .Relations}}
+        {{$rel := .}}
         <li class="admin-relation-item">
           <div class="line-head">
             <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
             <div class="admin-row-actions">
               <a class="button-link" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
-              <form action="/admin/relations" method="post" class="inline-form" onsubmit="return confirm('Delete this relation?');">
-                <input type="hidden" name="action" value="delete" />
-                <input type="hidden" name="lang" value="{{$.Lang}}" />
-                <input type="hidden" name="id" value="{{.ID}}" />
-                <button type="submit" class="button-danger">Delete</button>
-              </form>
+              <button class="button-secondary" type="button" data-edit-toggle="edit-{{.ID}}">Edit</button>
+              <button
+                class="button-danger js-open-delete"
+                type="button"
+                data-id="{{.ID}}"
+                data-label="{{.Ayah1}} ↔ {{.Ayah2}}"
+              >Delete</button>
             </div>
           </div>
           <p class="meta">{{.Ayah1Name}} ↔ {{.Ayah2Name}}</p>
+          {{if .Category}}<p class="category-badge">{{.Category}}</p>{{end}}
           {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+          <form id="edit-{{.ID}}" action="/admin/relations" method="post" class="admin-edit-form" hidden>
+            <input type="hidden" name="action" value="edit" />
+            <input type="hidden" name="lang" value="{{$.Lang}}" />
+            <input type="hidden" name="id" value="{{.ID}}" />
+
+            <label for="ayah1-{{.ID}}">Ayah 1</label>
+            <input id="ayah1-{{.ID}}" type="text" name="ayah1" value="{{.Ayah1}}" required autocomplete="off" />
+
+            <label for="ayah2-{{.ID}}">Ayah 2</label>
+            <input id="ayah2-{{.ID}}" type="text" name="ayah2" value="{{.Ayah2}}" required autocomplete="off" />
+
+            <label for="note-{{.ID}}">Note</label>
+            <input id="note-{{.ID}}" type="text" name="note" value="{{.Note}}" autocomplete="off" />
+
+            <label for="category-{{.ID}}">Category</label>
+            <select id="category-{{.ID}}" name="category">
+              <option value="">Uncategorized</option>
+              {{range $.CategoryOptions}}
+              <option value="{{.}}" {{if eq $rel.Category .}}selected{{end}}>{{.}}</option>
+              {{end}}
+            </select>
+
+            <div class="admin-edit-actions">
+              <button type="submit">Save</button>
+              <button class="button-secondary" type="button" data-edit-cancel="edit-{{.ID}}">Cancel</button>
+            </div>
+          </form>
         </li>
         {{end}}
       </ul>
@@ -60,6 +109,65 @@
     </section>
   </main>
 
+  <dialog id="delete-dialog" class="delete-dialog">
+    <div class="delete-dialog-body">
+      <h3>Delete Relation</h3>
+      <p id="delete-dialog-text" class="meta">Are you sure you want to delete this relation?</p>
+      <div class="delete-dialog-actions">
+        <button type="button" class="button-secondary" id="delete-cancel">Cancel</button>
+        <form id="delete-form" action="/admin/relations" method="post" class="inline-form">
+          <input type="hidden" name="action" value="delete" />
+          <input type="hidden" name="lang" value="{{.Lang}}" />
+          <input type="hidden" name="id" id="delete-id" value="" />
+          <button type="submit" class="button-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
 {{template "footer" .}}
+<script>
+  (() => {
+    const dialog = document.getElementById("delete-dialog");
+    const deleteText = document.getElementById("delete-dialog-text");
+    const deleteID = document.getElementById("delete-id");
+    const cancelBtn = document.getElementById("delete-cancel");
+
+    document.querySelectorAll(".js-open-delete").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!dialog || !deleteText || !deleteID) return;
+        const id = btn.getAttribute("data-id") || "";
+        const label = btn.getAttribute("data-label") || "this relation";
+        deleteID.value = id;
+        deleteText.textContent = `Delete relation ${label}?`;
+        dialog.showModal();
+      });
+    });
+
+    if (cancelBtn && dialog) {
+      cancelBtn.addEventListener("click", () => dialog.close());
+    }
+
+    document.querySelectorAll("[data-edit-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const formID = btn.getAttribute("data-edit-toggle");
+        if (!formID) return;
+        const form = document.getElementById(formID);
+        if (!form) return;
+        form.hidden = !form.hidden;
+      });
+    });
+
+    document.querySelectorAll("[data-edit-cancel]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const formID = btn.getAttribute("data-edit-cancel");
+        if (!formID) return;
+        const form = document.getElementById(formID);
+        if (!form) return;
+        form.hidden = true;
+      });
+    });
+  })();
+</script>
 </body>
 </html>

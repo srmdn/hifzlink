@@ -413,6 +413,43 @@ func TestHandleAdminRelations_PostDeleteRedirect(t *testing.T) {
 	}
 }
 
+func TestHandleAdminRelations_PostEditRedirect(t *testing.T) {
+	s := newTestServer(t)
+
+	if err := s.rels.Add("60:8", "60:9", "before"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := s.rels.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("expected 1 relation, got %d", len(rows))
+	}
+
+	form := url.Values{}
+	form.Set("action", "edit")
+	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
+	form.Set("ayah1", "60:9")
+	form.Set("ayah2", "60:8")
+	form.Set("note", "after")
+	form.Set("category", "lafzi")
+	form.Set("lang", "id")
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+	s.handleAdminRelations(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303, got %d", rr.Code)
+	}
+	location := rr.Header().Get("Location")
+	if !strings.Contains(location, "/admin/relations?status=edited&lang=id") {
+		t.Fatalf("unexpected redirect location: %s", location)
+	}
+}
+
 // --- helpers ---
 
 func TestSanitizeLang(t *testing.T) {

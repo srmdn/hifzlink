@@ -256,16 +256,39 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
 			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
 			note := strings.TrimSpace(r.FormValue("note"))
-			if err := s.rels.Add(ayah1, ayah2, note); err != nil {
+			category := strings.TrimSpace(r.FormValue("category"))
+			if err := s.rels.AddWithCategory(ayah1, ayah2, note, category); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
-					"AdminError": err.Error(),
-					"FormAyah1":  ayah1,
-					"FormAyah2":  ayah2,
-					"FormNote":   note,
+					"AdminError":   err.Error(),
+					"FormAyah1":    ayah1,
+					"FormAyah2":    ayah2,
+					"FormNote":     note,
+					"FormCategory": category,
 				})
 				return
 			}
 			http.Redirect(w, r, withLang("/admin/relations?status=added", lang), http.StatusSeeOther)
+			return
+		case "edit":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": "invalid relation id",
+				})
+				return
+			}
+			ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+			note := strings.TrimSpace(r.FormValue("note"))
+			category := strings.TrimSpace(r.FormValue("category"))
+			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": err.Error(),
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=edited", lang), http.StatusSeeOther)
 			return
 		case "delete":
 			idValue := strings.TrimSpace(r.FormValue("id"))
@@ -557,6 +580,8 @@ func adminStatusMessage(code string) string {
 	switch code {
 	case "added":
 		return "Relation added."
+	case "edited":
+		return "Relation updated."
 	case "deleted":
 		return "Relation deleted."
 	default:
@@ -570,15 +595,35 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	categoryFilter := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("category")))
+	if categoryFilter != "" {
+		filtered := make([]relations.AdminRelationView, 0, len(rows))
+		for _, row := range rows {
+			if strings.EqualFold(row.Category, categoryFilter) {
+				filtered = append(filtered, row)
+			}
+		}
+		rows = filtered
+	}
 
 	data := map[string]any{
-		"Title":        "Admin Relations",
-		"Relations":    rows,
-		"StatusNotice": adminStatusMessage(r.URL.Query().Get("status")),
-		"FormAyah1":    "",
-		"FormAyah2":    "",
-		"FormNote":     "",
-		"AdminError":   "",
+		"Title":          "Admin Relations",
+		"Relations":      rows,
+		"StatusNotice":   adminStatusMessage(r.URL.Query().Get("status")),
+		"FormAyah1":      "",
+		"FormAyah2":      "",
+		"FormNote":       "",
+		"FormCategory":   "",
+		"CategoryFilter": categoryFilter,
+		"CategoryOptions": []string{
+			"lafzi",
+			"maana",
+			"siyam",
+			"aqidah",
+			"adab",
+			"other",
+		},
+		"AdminError": "",
 	}
 	for k, v := range overrides {
 		data[k] = v

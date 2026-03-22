@@ -173,3 +173,33 @@ func TestService_RelatedAyahs_Empty(t *testing.T) {
 		t.Error("expected empty related list for ayah with no relations")
 	}
 }
+
+func TestService_UpdateByID(t *testing.T) {
+	svc := NewService(testDB(t), testQuranStore(t))
+
+	if err := svc.Add("60:8", "60:9", "before"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := svc.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("expected 1 row, got %d", len(rows))
+	}
+
+	if err := svc.UpdateByID(rows[0].ID, "60:9", "60:8", "after", "LAFZI"); err != nil {
+		t.Fatalf("UpdateByID: %v", err)
+	}
+
+	updated, err := svc.AllRelations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated[0].Note != "after" {
+		t.Fatalf("expected updated note, got %q", updated[0].Note)
+	}
+	if updated[0].Category != "lafzi" {
+		t.Fatalf("expected normalized category lafzi, got %q", updated[0].Category)
+	}
+}

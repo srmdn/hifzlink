@@ -63,7 +63,8 @@ go run ./scripts/seed_relations
 
 ## Admin UI
 
-- `GET /admin/relations` relation management page (add/list/delete)
+- `GET /admin/relations` relation management page (add/list/edit/delete)
+- optional relation categories for grouping: `lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`
 
 Add relation example:
 
