@@ -105,12 +105,9 @@ func main() {
 }
 
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
-	data := map[string]any{
-		"Title":       "Quran Murojaah",
-		"SearchQuery": r.URL.Query().Get("q"),
-		"SearchError": searchErrorMessage(r.URL.Query().Get("error")),
-	}
-	s.render(w, "home.html", withCommonViewData(r, data))
+	s.render(w, "home.html", withCommonViewData(r, map[string]any{
+		"Title": "hifzlink — Quran mutashabihat review",
+	}))
 }
 
 func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
@@ -1164,15 +1161,6 @@ func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading,
 		"Heading": heading,
 		"Message": message,
 	}))
-}
-
-func searchErrorMessage(code string) string {
-	switch code {
-	case "invalid_ref":
-		return "Invalid format — use surah:ayah (e.g. 60:8)."
-	default:
-		return ""
-	}
 }
 
 func adminStatusMessage(code string) string {

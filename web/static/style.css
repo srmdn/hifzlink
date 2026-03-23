@@ -1171,3 +1171,243 @@ pre {
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
 }
+
+/* ── Landing page ─────────────────────────────────────────────── */
+
+.lp-hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-hero-inner {
+  max-width: 720px;
+}
+
+.lp-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 1.1rem;
+}
+
+.lp-headline {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 1.2rem;
+}
+
+.lp-sub {
+  font-size: 1.08rem;
+  color: var(--text-muted);
+  max-width: 580px;
+  margin: 0 0 2rem;
+  line-height: 1.7;
+}
+
+.lp-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.lp-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.65em 1.3em;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.lp-cta-primary:hover {
+  background: var(--accent-strong);
+}
+
+.lp-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.62em 1.1em;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.lp-cta-secondary:hover {
+  border-color: var(--accent);
+  background: rgba(0,0,0,0.02);
+}
+
+.lp-section {
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-section-inner {
+  max-width: 820px;
+}
+
+.lp-section-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+}
+
+.lp-section-title {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 2rem;
+}
+
+.lp-quote {
+  font-size: 1.08rem;
+  font-style: italic;
+  color: var(--text);
+  border-left: 3px solid var(--accent);
+  margin: 0 0 1.25rem;
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  line-height: 1.75;
+}
+
+.lp-story-body {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin: 0;
+  max-width: 620px;
+}
+
+.lp-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.lp-feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.25rem;
+}
+
+.lp-feature-icon {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.lp-feature-card h3 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  margin: 0 0 0.45rem;
+  color: var(--text);
+}
+
+.lp-feature-card p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.65;
+}
+
+.lp-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lp-step {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.lp-step-num {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.88rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.15rem;
+}
+
+.lp-step h3 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  color: var(--text);
+}
+
+.lp-step p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.65;
+}
+
+.lp-browse-cta {
+  border-bottom: none;
+  padding-bottom: 5rem;
+}
+
+.lp-browse-inner {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.lp-browse-inner .lp-sub {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lp-browse-inner .lp-cta-group {
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .lp-hero {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .lp-section {
+    padding: 2.5rem 0;
+  }
+
+  .lp-cta-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lp-browse-inner .lp-cta-group {
+    align-items: center;
+  }
+}
