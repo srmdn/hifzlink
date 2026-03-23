@@ -40,6 +40,7 @@ The format is inspired by Keep a Changelog.
 - relation records now support optional `category` (`lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`) with admin-side filtering
 - ayah and compare pages now support saving items directly into collections
 - top navigation now includes Dashboard entry for direct access
+- compare page now shows a "Related pairs" section — all other saved pairs sharing either ayah in the current comparison, replacing the previous next/prev sequential navigation
 
 ## [0.1.0] - 2026-03-15
 

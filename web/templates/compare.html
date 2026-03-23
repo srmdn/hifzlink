@@ -36,13 +36,6 @@
 
     <div class="compare-toolbar">
       <button type="button" class="button-secondary" id="toggle-highlights">Hide highlights</button>
-      {{if .PairPosition}}
-      <nav class="pair-nav" aria-label="Pair navigation">
-        {{if .PrevURL}}<a class="pair-nav-btn" href="{{.PrevURL}}">← Prev</a>{{else}}<span class="pair-nav-btn disabled">← Prev</span>{{end}}
-        <span class="pair-nav-pos">{{.PairPosition}}</span>
-        {{if .NextURL}}<a class="pair-nav-btn" href="{{.NextURL}}">Next →</a>{{else}}<span class="pair-nav-btn disabled">Next →</span>{{end}}
-      </nav>
-      {{end}}
     </div>
 
     <section class="compare-grid">
@@ -61,6 +54,21 @@
         {{end}}
       </article>
     </section>
+    {{if .RelatedPairs}}
+    <section class="related-pairs">
+      <h2 class="related-pairs-title">Related pairs</h2>
+      <ul class="related-pairs-list">
+        {{range .RelatedPairs}}
+        <li>
+          <a href="{{.CompareURL}}" class="related-pair-link">
+            <span class="related-pair-refs">{{.Ref1}} ↔ {{.Ref2}}</span>
+            {{if .Category}}<span class="related-pair-cat">{{.Category}}</span>{{end}}
+          </a>
+        </li>
+        {{end}}
+      </ul>
+    </section>
+    {{end}}
   </main>
 
 {{template "footer" .}}

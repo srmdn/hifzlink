@@ -28,7 +28,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 
 2. compare enhancements:
 - [done] visual diff emphasis for repeated/changed words (non-destructive highlighting)
-- quick next/previous related ayah navigation
+- [done] related pairs section on compare page — shows all pairs sharing either ayah, replaces next/prev sequential navigation
 
 3. browsing improvements:
 - filter relation lists by surah range/juz
