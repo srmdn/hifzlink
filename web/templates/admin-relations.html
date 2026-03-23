@@ -80,6 +80,12 @@
           <p class="meta">{{.Ayah1Name}} ↔ {{.Ayah2Name}}</p>
           {{if .Category}}<p class="category-badge">{{index $.CategoryLabelMap .Category}}</p>{{end}}
           {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+          {{if .DiffText1}}
+          <div class="admin-diff">
+            <p class="arabic arabic-small" lang="ar">{{.DiffText1}}</p>
+            <p class="arabic arabic-small" lang="ar">{{.DiffText2}}</p>
+          </div>
+          {{end}}
           <form id="edit-{{.ID}}" action="/admin/relations" method="post" class="admin-edit-form" hidden>
             <input type="hidden" name="action" value="edit" />
             <input type="hidden" name="lang" value="{{$.Lang}}" />

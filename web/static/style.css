@@ -594,6 +594,19 @@ button:hover,
   letter-spacing: 0.04em;
 }
 
+.admin-diff {
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-diff .arabic {
+  margin: 0;
+}
+
 .admin-edit-form {
   margin-top: 0.55rem;
   border: 1px dashed #c8d6e0;
