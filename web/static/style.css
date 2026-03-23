@@ -801,42 +801,6 @@ mark.word-unique {
   gap: 0.75rem;
 }
 
-.pair-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.pair-nav-btn {
-  font-size: 0.82rem;
-  font-weight: 500;
-  padding: 0.3em 0.7em;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-decoration: none;
-  color: var(--text);
-  background: var(--surface);
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.pair-nav-btn:hover {
-  border-color: var(--accent);
-  background: rgba(0,0,0,0.02);
-}
-
-.pair-nav-btn.disabled {
-  color: var(--text-muted);
-  cursor: default;
-  opacity: 0.45;
-}
-
-.pair-nav-pos {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  min-width: 3rem;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
 
 .compare-grid {
   display: grid;
@@ -847,6 +811,57 @@ mark.word-unique {
 .compare-grid.no-highlights mark.word-unique {
   background: none;
   font-weight: inherit;
+}
+
+.related-pairs {
+  margin-top: 1.5rem;
+}
+
+.related-pairs-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.related-pairs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.related-pair-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45em 0.75em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 0.88rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.related-pair-link:hover {
+  border-color: var(--accent);
+  background: rgba(0,0,0,0.02);
+}
+
+.related-pair-refs {
+  font-weight: 500;
+}
+
+.related-pair-cat {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: auto;
 }
 
 pre {

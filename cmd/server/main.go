@@ -222,29 +222,41 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		diff1, diff2 = diffHighlight(ayah1.TextAR, ayah2.TextAR)
 	}
 
-	var prevURL, nextURL, pairPosition string
-	if relFound {
-		if allRels, err := s.db.All(); err == nil {
-			lang := pageLang(r)
-			for i, r := range allRels {
-				if r.Ayah1Surah == s1 && r.Ayah1Ayah == y1 && r.Ayah2Surah == s2 && r.Ayah2Ayah == y2 {
-					pairPosition = fmt.Sprintf("%d / %d", i+1, len(allRels))
-					if i > 0 {
-						p := allRels[i-1]
-						prevURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s",
-							relations.FormatAyahRef(p.Ayah1Surah, p.Ayah1Ayah),
-							relations.FormatAyahRef(p.Ayah2Surah, p.Ayah2Ayah)), lang)
-					}
-					if i < len(allRels)-1 {
-						n := allRels[i+1]
-						nextURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s",
-							relations.FormatAyahRef(n.Ayah1Surah, n.Ayah1Ayah),
-							relations.FormatAyahRef(n.Ayah2Surah, n.Ayah2Ayah)), lang)
-					}
-					break
-				}
+	type relatedPairView struct {
+		Ref1       string
+		Ref2       string
+		CompareURL string
+		Category   string
+	}
+
+	var relatedPairs []relatedPairView
+	lang := pageLang(r)
+	seen := map[string]bool{
+		fmt.Sprintf("%d:%d-%d:%d", s1, y1, s2, y2): true,
+		fmt.Sprintf("%d:%d-%d:%d", s2, y2, s1, y1): true,
+	}
+	addRelated := func(rels []db.Relation) {
+		for _, rel := range rels {
+			key := fmt.Sprintf("%d:%d-%d:%d", rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah)
+			if seen[key] {
+				continue
 			}
+			seen[key] = true
+			ref1 := relations.FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah)
+			ref2 := relations.FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah)
+			relatedPairs = append(relatedPairs, relatedPairView{
+				Ref1:       ref1,
+				Ref2:       ref2,
+				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+				Category:   rel.Category,
+			})
 		}
+	}
+	if rels1, err := s.db.ByAyah(s1, y1); err == nil {
+		addRelated(rels1)
+	}
+	if rels2, err := s.db.ByAyah(s2, y2); err == nil {
+		addRelated(rels2)
 	}
 
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
@@ -259,9 +271,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"DiffText2":        diff2,
 		"Collections":      collections,
 		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
-		"PrevURL":          prevURL,
-		"NextURL":          nextURL,
-		"PairPosition":     pairPosition,
+		"RelatedPairs":     relatedPairs,
 	}))
 }
 
