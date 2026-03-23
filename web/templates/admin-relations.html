@@ -110,6 +110,8 @@
 
             {{if .Ayah1Words}}
             <div class="word-picker-section">
+              <input type="hidden" name="highlights_current" value="{{.Highlights}}" />
+              <input type="hidden" name="highlights_modified" value="0" class="highlights-modified" />
               <p class="word-picker-label">Click words to highlight (shown on compare page)</p>
               <div class="word-picker" data-ayah="1" data-highlights="{{.Highlights}}">
                 {{range $i, $w := .Ayah1Words}}<span class="word-picker-word" data-idx="{{$i}}">{{$w}}</span> {{end}}
@@ -119,6 +121,7 @@
                 {{range $i, $w := .Ayah2Words}}<span class="word-picker-word" data-idx="{{$i}}">{{$w}}</span> {{end}}
               </div>
               <input type="hidden" name="highlights_ayah2" class="highlights-input" />
+              <button type="button" class="button-secondary clear-highlights-btn">Clear all highlights</button>
             </div>
             {{end}}
 
@@ -205,9 +208,11 @@
 
       const form = picker.closest("form");
       const inputs = form.querySelectorAll(".highlights-input");
-      // inputs[0] = highlights_ayah1, inputs[1] = highlights_ayah2
       const inputIndex = ayah === "1" ? 0 : 1;
       const hiddenInput = inputs[inputIndex];
+      const modifiedInput = form.querySelector(".highlights-modified");
+
+      const markModified = () => { if (modifiedInput) modifiedInput.value = "1"; };
 
       const updateInput = () => {
         const selected = [...picker.querySelectorAll(".word-picker-word.selected")]
@@ -222,10 +227,23 @@
         word.addEventListener("click", () => {
           word.classList.toggle("selected");
           updateInput();
+          markModified();
         });
       });
 
       updateInput();
+    });
+
+    // Clear all highlights button
+    document.querySelectorAll(".clear-highlights-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const section = btn.closest(".word-picker-section");
+        if (!section) return;
+        section.querySelectorAll(".word-picker-word.selected").forEach((w) => w.classList.remove("selected"));
+        section.querySelectorAll(".highlights-input").forEach((inp) => { inp.value = ""; });
+        const modifiedInput = section.querySelector(".highlights-modified");
+        if (modifiedInput) modifiedInput.value = "1";
+      });
     });
   })();
 </script>
