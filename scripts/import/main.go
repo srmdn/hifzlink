@@ -166,6 +166,12 @@ func extractArray(meta, marker string) (string, error) {
 	return "", fmt.Errorf("array end not found for: %s", marker)
 }
 
+// basmala is the Tanzil uthmani text of the opening phrase.
+// Tanzil prepends it to ayah 1 of every surah except Al-Fatiha (surah 1, where it is
+// the verse itself) and At-Tawbah (surah 9, which has no basmala).
+// We strip it here so each ayah contains only its own text.
+const basmala = "\u0628\u0650\u0633\u0652\u0645\u0650 \u0671\u0644\u0644\u0651\u064e\u0647\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650"
+
 func parseAyahLines(text string, names map[int]string, juzStarts []point) ([]ayah, error) {
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	scanner.Buffer(make([]byte, 0, 64*1024), 2*1024*1024)
@@ -198,12 +204,17 @@ func parseAyahLines(text string, names map[int]string, juzStarts []point) ([]aya
 			return nil, fmt.Errorf("missing surah name for surah %d", surah)
 		}
 
+		textAR := parts[2]
+		if surah != 1 && ayahNum == 1 {
+			textAR = strings.TrimSpace(strings.TrimPrefix(textAR, basmala))
+		}
+
 		out = append(out, ayah{
 			Surah:     surah,
 			SurahName: name,
 			Ayah:      ayahNum,
 			Juz:       determineJuz(surah, ayahNum, juzStarts),
-			TextAR:    parts[2],
+			TextAR:    textAR,
 		})
 	}
 
