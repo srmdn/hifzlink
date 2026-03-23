@@ -5,8 +5,8 @@
 {{template "topbar" .}}
 
   <main class="container">
-    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
-    <h1>Juz {{.Juz}} — Similar Verse Pairs</h1>
+    <p class="back"><a href="{{.JuzIndexURL}}">← All Juz</a></p>
+    <h1>Juz {{.Juz}} — Mutashabihat Pairs</h1>
 
     <section class="card">
       {{if .Pairs}}
@@ -14,15 +14,18 @@
         {{range .Pairs}}
         <li class="pair-item">
           <div class="line-head">
-            <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+            <span class="pair-refs">
+              {{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}
+            </span>
             <a class="button-link" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
           </div>
+          <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}</p>
           {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
         </li>
         {{end}}
       </ul>
       {{else}}
-      <p class="meta">No relations in this juz yet.</p>
+      <p class="meta">No mutashabihat pairs in this juz yet.</p>
       {{end}}
     </section>
   </main>

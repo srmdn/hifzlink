@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <h1>Browse by Juz</h1>
+    <p class="meta">30 juz — select one to see its mutashabihat pairs.</p>
+
+    <div class="juz-index-grid">
+      {{range .Juzs}}
+      <a class="juz-index-card{{if gt .RelationCount 0}} has-pairs{{end}}" href="/juz/{{.Number}}?lang={{$.Lang}}">
+        <span class="juz-index-num">{{.Number}}</span>
+        {{if gt .RelationCount 0}}
+        <span class="juz-index-badge">{{.RelationCount}} pair{{if gt .RelationCount 1}}s{{end}}</span>
+        {{else}}
+        <span class="juz-index-empty">No pairs yet</span>
+        {{end}}
+      </a>
+      {{end}}
+    </div>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

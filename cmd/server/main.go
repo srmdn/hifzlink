@@ -81,7 +81,9 @@ func main() {
 	mux.HandleFunc("/search", s.handleSearch)
 	mux.HandleFunc("/ayah/", s.handleAyahPage)
 	mux.HandleFunc("/compare", s.handleComparePage)
+	mux.HandleFunc("/surah", s.handleSurahIndexPage)
 	mux.HandleFunc("/surah/", s.handleSurahPage)
+	mux.HandleFunc("/juz", s.handleJuzIndexPage)
 	mux.HandleFunc("/juz/", s.handleJuzPage)
 	mux.HandleFunc("/dashboard", s.handleDashboardPage)
 	mux.HandleFunc("/collections", s.handleCollectionsPage)
@@ -294,12 +296,20 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		items = append(items, view)
 	}
 
+	allCollections, err := s.db.Collections()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	s.render(w, "dashboard.html", withCommonViewData(r, map[string]any{
 		"Title":             "Dashboard",
 		"RecentCollections": collections,
+		"AllCollections":    allCollections,
 		"RecentItems":       items,
 		"ResumeAyahURL":     resumeAyahURL,
 		"ResumePairURL":     resumeRelationURL,
+		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
 	}))
 }
 
@@ -338,7 +348,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		id, err := s.db.CreateCollection(name, description)
+		_, err := s.db.CreateCollection(name, description)
 		if err != nil {
 			collections, _ := s.db.Collections()
 			s.render(w, "collections.html", withCommonViewData(r, map[string]any{
@@ -350,7 +360,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			}))
 			return
 		}
-		http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=created", id), lang), http.StatusSeeOther)
+		http.Redirect(w, r, withLang("/dashboard?status=created", lang), http.StatusSeeOther)
 		return
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -570,12 +580,94 @@ func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Requ
 	http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=removed", collectionID), lang), http.StatusSeeOther)
 }
 
+type surahIndexItem struct {
+	Number        int
+	Name          string
+	RelationCount int
+}
+
+type juzIndexItem struct {
+	Number        int
+	RelationCount int
+}
+
+func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	counts, err := s.db.RelationCountBySurah()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	items := make([]surahIndexItem, 114)
+	for i := 1; i <= 114; i++ {
+		items[i-1] = surahIndexItem{
+			Number:        i,
+			Name:          s.quran.SurahName(i),
+			RelationCount: counts[i],
+		}
+	}
+
+	s.render(w, "surah-index.html", withCommonViewData(r, map[string]any{
+		"Title":  "Browse by Surah",
+		"Surahs": items,
+	}))
+}
+
+func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Compute juz relation counts from all relations via quran store.
+	allRels, err := s.db.All()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	counts := make(map[int]int)
+	seen := make(map[string]bool)
+	for _, rel := range allRels {
+		a1, ok1 := s.quran.Get(rel.Ayah1Surah, rel.Ayah1Ayah)
+		a2, ok2 := s.quran.Get(rel.Ayah2Surah, rel.Ayah2Ayah)
+		if !ok1 || !ok2 {
+			continue
+		}
+		key1 := fmt.Sprintf("%d:%d", rel.ID, a1.Juz)
+		if !seen[key1] {
+			counts[a1.Juz]++
+			seen[key1] = true
+		}
+		key2 := fmt.Sprintf("%d:%d", rel.ID, a2.Juz)
+		if !seen[key2] {
+			counts[a2.Juz]++
+			seen[key2] = true
+		}
+	}
+
+	items := make([]juzIndexItem, 30)
+	for i := 1; i <= 30; i++ {
+		items[i-1] = juzIndexItem{Number: i, RelationCount: counts[i]}
+	}
+
+	s.render(w, "juz-index.html", withCommonViewData(r, map[string]any{
+		"Title": "Browse by Juz",
+		"Juzs":  items,
+	}))
+}
+
 func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	surah, err := parseSingleIntPath(r.URL.Path, "/surah/", "/relations")
+	surah, err := parseSingleIntPath(r.URL.Path, "/surah/", "")
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -600,7 +692,7 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	juz, err := parseSingleIntPath(r.URL.Path, "/juz/", "/relations")
+	juz, err := parseSingleIntPath(r.URL.Path, "/juz/", "")
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -904,6 +996,8 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["LangIDURL"] = switchLang(r, "id")
 	data["DashboardURL"] = withLang("/dashboard", lang)
 	data["CollectionsURL"] = withLang("/collections", lang)
+	data["SurahIndexURL"] = withLang("/surah", lang)
+	data["JuzIndexURL"] = withLang("/juz", lang)
 	return data
 }
 

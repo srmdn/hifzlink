@@ -25,10 +25,19 @@
     </section>
 
     <section class="card">
-      <h2>Recent Collections</h2>
-      {{if .RecentCollections}}
-      <ul class="simple-list">
-        {{range .RecentCollections}}
+      <h2>Collections</h2>
+      {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
+      {{if .CollectionError}}<p class="error-msg admin-error" role="alert">{{.CollectionError}}</p>{{end}}
+      <form action="/collections" method="post" class="collection-form">
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <label for="collection-name">New collection</label>
+        <input id="collection-name" name="name" value="{{.FormName}}" required autocomplete="off" placeholder="Weekly review" />
+        <button type="submit">Create</button>
+        <input name="description" value="{{.FormDescription}}" autocomplete="off" placeholder="Description (optional)" />
+      </form>
+      {{if .AllCollections}}
+      <ul class="simple-list" style="margin-top:1rem">
+        {{range .AllCollections}}
         <li>
           <a href="/collections/{{.ID}}?lang={{$.Lang}}">{{.Name}}</a>
           <p class="meta">Created: {{.CreatedAt}} · Items: {{.ItemCount}}</p>
@@ -37,7 +46,7 @@
         {{end}}
       </ul>
       {{else}}
-      <p class="meta">No collections yet. <a href="{{.CollectionsURL}}">Create a collection</a>.</p>
+      <p class="meta" style="margin-top:0.75rem">No collections yet. Create your first one above.</p>
       {{end}}
     </section>
 
@@ -60,7 +69,7 @@
         {{end}}
       </ul>
       {{else}}
-      <p class="meta">No saved items yet. Start from <a href="{{.HomeURL}}#search">Search</a> or <a href="{{.CollectionsURL}}">Collections</a>.</p>
+      <p class="meta">No saved items yet. Start from <a href="{{.HomeURL}}#search">Search</a>.</p>
       {{end}}
     </section>
   </main>

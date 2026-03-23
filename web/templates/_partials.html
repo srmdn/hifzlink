@@ -19,8 +19,9 @@
       <a class="brand" href="{{.HomeURL}}"><span class="brand-main">HifzLink</span></a>
       <nav class="primary-nav" aria-label="Primary">
         <a href="{{.HomeURL}}">Home</a>
+        <a href="{{.SurahIndexURL}}">Surah</a>
+        <a href="{{.JuzIndexURL}}">Juz</a>
         <a href="{{.DashboardURL}}">Dashboard</a>
-        <a href="{{.CollectionsURL}}">Collections</a>
       </nav>
     </div>
 
@@ -44,8 +45,9 @@
   </div>
   <nav class="mobile-nav" aria-label="Mobile primary">
     <a href="{{.HomeURL}}">Home</a>
+    <a href="{{.SurahIndexURL}}">Surah</a>
+    <a href="{{.JuzIndexURL}}">Juz</a>
     <a href="{{.DashboardURL}}">Dashboard</a>
-    <a href="{{.CollectionsURL}}">Collections</a>
   </nav>
   <div class="mobile-lang">
     <p>Language</p>
@@ -55,7 +57,6 @@
       <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">Arabic + Indonesian</a>
     </nav>
   </div>
-  <a class="mobile-github" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">GitHub</a>
 </aside>
 
 <script>
