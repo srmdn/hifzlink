@@ -21,12 +21,12 @@
         <a href="{{.HomeURL}}">Home</a>
         <a href="{{.SurahIndexURL}}">Surah</a>
         <a href="{{.JuzIndexURL}}">Juz</a>
+        <a href="{{.SearchURL}}">Search</a>
         <a href="{{.DashboardURL}}">Dashboard</a>
       </nav>
     </div>
 
     <div class="topbar-right">
-      <a class="search-link" href="{{.HomeURL}}#search">Search</a>
       <nav class="lang-switch" aria-label="Language mode">
         <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
         <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">EN</a>
@@ -47,6 +47,7 @@
     <a href="{{.HomeURL}}">Home</a>
     <a href="{{.SurahIndexURL}}">Surah</a>
     <a href="{{.JuzIndexURL}}">Juz</a>
+    <a href="{{.SearchURL}}">Search</a>
     <a href="{{.DashboardURL}}">Dashboard</a>
   </nav>
   <div class="mobile-lang">

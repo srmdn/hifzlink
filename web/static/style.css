@@ -813,6 +813,51 @@ mark.word-unique {
   font-weight: inherit;
 }
 
+.search-pairs-form {
+  margin: 1.25rem 0;
+}
+
+.search-pairs-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-pairs-input {
+  flex: 1;
+  padding: 0.55em 0.85em;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+}
+
+.search-pairs-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.search-pairs-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.search-pairs-error {
+  color: var(--error, #c0392b);
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+}
+
+.category-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
 .related-pairs {
   margin-top: 1.5rem;
 }

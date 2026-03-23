@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <h1>Search pairs</h1>
+    <p class="meta">Find mutashabihat pairs by ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).</p>
+
+    <form action="/search" method="get" class="search-pairs-form">
+      <input type="hidden" name="lang" value="{{.Lang}}" />
+      <div class="search-pairs-row">
+        <input
+          type="text"
+          name="q"
+          value="{{.Query}}"
+          placeholder="e.g. 60:8 or 60 or Al-Mumtahanah"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          autofocus
+          class="search-pairs-input"
+        />
+        <button type="submit" class="button-primary">Search</button>
+      </div>
+    </form>
+
+    {{if .ErrMsg}}
+    <p class="search-pairs-error">{{.ErrMsg}}</p>
+    {{end}}
+
+    {{if .Query}}
+      {{if .Results}}
+      <section class="card">
+        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} — {{.QueryLabel}}</h2>
+        <ul class="pairs-list">
+          {{range .Results}}
+          <li class="pair-item">
+            <div class="line-head">
+              <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+              <a class="button-link" href="{{.CompareURL}}">Compare</a>
+            </div>
+            <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .Category}} · <span class="category-tag">{{.Category}}</span>{{end}}</p>
+            {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+          </li>
+          {{end}}
+        </ul>
+      </section>
+      {{else if not .ErrMsg}}
+      <p class="meta">No pairs found for <strong>{{.Query}}</strong>.</p>
+      {{end}}
+    {{end}}
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>
