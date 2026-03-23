@@ -973,6 +973,12 @@ func adminStatusMessage(code string) string {
 	}
 }
 
+type adminRelationWithDiff struct {
+	relations.AdminRelationView
+	DiffText1 template.HTML
+	DiffText2 template.HTML
+}
+
 func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request, overrides map[string]any) {
 	rows, err := s.rels.AllRelations()
 	if err != nil {
@@ -990,6 +996,21 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		rows = filtered
 	}
 
+	rowsWithDiff := make([]adminRelationWithDiff, 0, len(rows))
+	for _, row := range rows {
+		s1, y1, err1 := relations.ParseAyahRef(row.Ayah1)
+		s2, y2, err2 := relations.ParseAyahRef(row.Ayah2)
+		var d1, d2 template.HTML
+		if err1 == nil && err2 == nil {
+			a1, ok1 := s.quran.Get(s1, y1)
+			a2, ok2 := s.quran.Get(s2, y2)
+			if ok1 && ok2 {
+				d1, d2 = diffHighlight(a1.TextAR, a2.TextAR)
+			}
+		}
+		rowsWithDiff = append(rowsWithDiff, adminRelationWithDiff{row, d1, d2})
+	}
+
 	categoryOptions := adminCategoryOptions()
 	categoryLabelMap := make(map[string]string, len(categoryOptions))
 	for _, option := range categoryOptions {
@@ -998,7 +1019,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 
 	data := map[string]any{
 		"Title":            "Admin Relations",
-		"Relations":        rows,
+		"Relations":        rowsWithDiff,
 		"StatusNotice":     adminStatusMessage(r.URL.Query().Get("status")),
 		"FormAyah1":        "",
 		"FormAyah2":        "",
