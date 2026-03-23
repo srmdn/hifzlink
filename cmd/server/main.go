@@ -1023,8 +1023,8 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 			if ok1 && ok2 {
 				w1 = strings.Fields(a1.TextAR)
 				w2 = strings.Fields(a2.TextAR)
-				h := parseHighlights(row.Highlights)
-				if len(h.Ayah1) > 0 || len(h.Ayah2) > 0 {
+				if row.Highlights != "" {
+					h := parseHighlights(row.Highlights)
 					d1 = applyHighlights(a1.TextAR, h.Ayah1)
 					d2 = applyHighlights(a2.TextAR, h.Ayah2)
 				} else {
