@@ -795,8 +795,47 @@ mark.word-unique {
 
 .compare-toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 0.5rem;
+  gap: 0.75rem;
+}
+
+.pair-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pair-nav-btn {
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.3em 0.7em;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pair-nav-btn:hover {
+  border-color: var(--accent);
+  background: rgba(0,0,0,0.02);
+}
+
+.pair-nav-btn.disabled {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.45;
+}
+
+.pair-nav-pos {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 3rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .compare-grid {

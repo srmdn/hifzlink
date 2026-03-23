@@ -29,13 +29,20 @@
         <button type="submit">Save Pair</button>
       </form>
       {{else}}
-      <p class="meta">No collections yet. <a href="/collections?lang={{.Lang}}">Create a collection</a> first.</p>
+      <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
       {{end}}
       {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
     </section>
 
     <div class="compare-toolbar">
       <button type="button" class="button-secondary" id="toggle-highlights">Hide highlights</button>
+      {{if .PairPosition}}
+      <nav class="pair-nav" aria-label="Pair navigation">
+        {{if .PrevURL}}<a class="pair-nav-btn" href="{{.PrevURL}}">← Prev</a>{{else}}<span class="pair-nav-btn disabled">← Prev</span>{{end}}
+        <span class="pair-nav-pos">{{.PairPosition}}</span>
+        {{if .NextURL}}<a class="pair-nav-btn" href="{{.NextURL}}">Next →</a>{{else}}<span class="pair-nav-btn disabled">Next →</span>{{end}}
+      </nav>
+      {{end}}
     </div>
 
     <section class="compare-grid">

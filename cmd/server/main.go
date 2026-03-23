@@ -213,13 +213,40 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var diff1, diff2 template.HTML
-	if rel, ok, err := s.db.ByPair(s1, y1, s2, y2); err == nil && ok && rel.Highlights != "" {
+	rel, relFound, _ := s.db.ByPair(s1, y1, s2, y2)
+	if relFound && rel.Highlights != "" {
 		h := parseHighlights(rel.Highlights)
 		diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
 		diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
 	} else {
 		diff1, diff2 = diffHighlight(ayah1.TextAR, ayah2.TextAR)
 	}
+
+	var prevURL, nextURL, pairPosition string
+	if relFound {
+		if allRels, err := s.db.All(); err == nil {
+			lang := pageLang(r)
+			for i, r := range allRels {
+				if r.Ayah1Surah == s1 && r.Ayah1Ayah == y1 && r.Ayah2Surah == s2 && r.Ayah2Ayah == y2 {
+					pairPosition = fmt.Sprintf("%d / %d", i+1, len(allRels))
+					if i > 0 {
+						p := allRels[i-1]
+						prevURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s",
+							relations.FormatAyahRef(p.Ayah1Surah, p.Ayah1Ayah),
+							relations.FormatAyahRef(p.Ayah2Surah, p.Ayah2Ayah)), lang)
+					}
+					if i < len(allRels)-1 {
+						n := allRels[i+1]
+						nextURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s",
+							relations.FormatAyahRef(n.Ayah1Surah, n.Ayah1Ayah),
+							relations.FormatAyahRef(n.Ayah2Surah, n.Ayah2Ayah)), lang)
+					}
+					break
+				}
+			}
+		}
+	}
+
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
 		"Ayah1":            ayah1,
@@ -232,6 +259,9 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"DiffText2":        diff2,
 		"Collections":      collections,
 		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
+		"PrevURL":          prevURL,
+		"NextURL":          nextURL,
+		"PairPosition":     pairPosition,
 	}))
 }
 
