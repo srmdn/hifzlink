@@ -210,6 +210,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	diff1, diff2 := diffHighlight(ayah1.TextAR, ayah2.TextAR)
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
 		"Ayah1":            ayah1,
@@ -218,6 +219,8 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"Ayah2Translation": s.translationFor(pageLang(r), s2, y2),
 		"Ref1":             relations.FormatAyahRef(s1, y1),
 		"Ref2":             relations.FormatAyahRef(s2, y2),
+		"DiffText1":        diff1,
+		"DiffText2":        diff2,
 		"Collections":      collections,
 		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
 	}))

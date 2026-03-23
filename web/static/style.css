@@ -714,6 +714,13 @@ button:hover,
   font-size: 0.99rem;
 }
 
+mark.word-unique {
+  background: #ffe066;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
