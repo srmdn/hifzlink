@@ -35,6 +35,7 @@ type AdminRelationView struct {
 	Ayah2Name string
 	Note      string
 	Category  string
+	Highlights string
 }
 
 type Service struct {
@@ -207,13 +208,14 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 	out := make([]AdminRelationView, 0, len(rels))
 	for _, rel := range rels {
 		out = append(out, AdminRelationView{
-			ID:        rel.ID,
-			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
-			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
-			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
-			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
-			Note:      rel.Note,
-			Category:  rel.Category,
+			ID:         rel.ID,
+			Ayah1:      FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
+			Ayah1Name:  s.quran.SurahName(rel.Ayah1Surah),
+			Ayah2:      FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
+			Ayah2Name:  s.quran.SurahName(rel.Ayah2Surah),
+			Note:       rel.Note,
+			Category:   rel.Category,
+			Highlights: rel.Highlights,
 		})
 	}
 	return out, nil
@@ -232,7 +234,7 @@ func (s *Service) DeleteByID(id int64) error {
 	return nil
 }
 
-func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category string) error {
+func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highlights string) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid relation id")
 	}
@@ -266,6 +268,7 @@ func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category string
 		Ayah2Ayah:  a2,
 		Note:       strings.TrimSpace(note),
 		Category:   normalizeCategory(category),
+		Highlights: strings.TrimSpace(highlights),
 	})
 	if err != nil {
 		if err == sql.ErrNoRows {

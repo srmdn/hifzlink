@@ -594,6 +594,47 @@ button:hover,
   letter-spacing: 0.04em;
 }
 
+.word-picker-section {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+}
+
+.word-picker-label {
+  font-size: 0.78rem;
+  color: #526679;
+  margin: 0 0 0.35rem;
+}
+
+.word-picker {
+  direction: rtl;
+  text-align: right;
+  background: #f0f6fa;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  line-height: 2.4;
+  font-family: "Amiri Quran", serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+}
+
+.word-picker-word {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 1px 3px;
+  transition: background 0.12s;
+  user-select: none;
+}
+
+.word-picker-word:hover {
+  background: #fde68a;
+}
+
+.word-picker-word.selected {
+  background: #ffe066;
+  font-weight: 600;
+}
+
 .admin-diff {
   margin-top: 0.5rem;
   border-top: 1px dashed var(--border);
