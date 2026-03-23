@@ -48,13 +48,11 @@ func applyHighlights(text string, indices []int) template.HTML {
 }
 
 // buildHighlightsJSON converts comma-separated index strings from form inputs into a JSON highlights string.
+// Always encodes — empty arrays mean "explicitly no highlights" (different from "" which means "not set").
 func buildHighlightsJSON(ayah1Indices, ayah2Indices string) string {
 	h := HighlightData{
 		Ayah1: parseIndexList(ayah1Indices),
 		Ayah2: parseIndexList(ayah2Indices),
-	}
-	if len(h.Ayah1) == 0 && len(h.Ayah2) == 0 {
-		return ""
 	}
 	b, err := json.Marshal(h)
 	if err != nil {

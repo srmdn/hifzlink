@@ -775,10 +775,21 @@ mark.word-unique {
   padding: 0 2px;
 }
 
+.compare-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.92rem;
+}
+
+.compare-grid.no-highlights mark.word-unique {
+  background: none;
+  font-weight: inherit;
 }
 
 pre {

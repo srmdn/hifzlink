@@ -211,14 +211,11 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var diff1, diff2 template.HTML
-	if rel, ok, err := s.db.ByPair(s1, y1, s2, y2); err == nil && ok {
+	if rel, ok, err := s.db.ByPair(s1, y1, s2, y2); err == nil && ok && rel.Highlights != "" {
 		h := parseHighlights(rel.Highlights)
-		if len(h.Ayah1) > 0 || len(h.Ayah2) > 0 {
-			diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
-			diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
-		}
-	}
-	if diff1 == "" {
+		diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
+		diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
+	} else {
 		diff1, diff2 = diffHighlight(ayah1.TextAR, ayah2.TextAR)
 	}
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
@@ -671,7 +668,12 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
 			note := strings.TrimSpace(r.FormValue("note"))
 			category := strings.TrimSpace(r.FormValue("category"))
-			highlights := buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+			// Only update highlights if the user interacted with the word picker.
+			// highlights_current carries the existing value as a fallback.
+			highlights := r.FormValue("highlights_current")
+			if r.FormValue("highlights_modified") == "1" {
+				highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+			}
 			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
 					"AdminError": adminErrorMessage(err),
