@@ -12,9 +12,10 @@ import (
 )
 
 type seedRelation struct {
-	Ayah1 string `json:"ayah1"`
-	Ayah2 string `json:"ayah2"`
-	Note  string `json:"note"`
+	Ayah1    string `json:"ayah1"`
+	Ayah2    string `json:"ayah2"`
+	Note     string `json:"note"`
+	Category string `json:"category"`
 }
 
 func main() {
@@ -48,12 +49,19 @@ func run() error {
 		return fmt.Errorf("decode seed file: %w", err)
 	}
 
+	added, skipped := 0, 0
 	for i, rel := range seeds {
-		if err := svc.Add(rel.Ayah1, rel.Ayah2, rel.Note); err != nil {
+		err := svc.AddWithCategory(rel.Ayah1, rel.Ayah2, rel.Note, rel.Category)
+		if err != nil {
+			if err.Error() == "relation already exists" {
+				skipped++
+				continue
+			}
 			return fmt.Errorf("seed entry %d (%s <-> %s): %w", i+1, rel.Ayah1, rel.Ayah2, err)
 		}
+		added++
 	}
 
-	fmt.Printf("Seeded %d relation entries into data/relations.db\n", len(seeds))
+	fmt.Printf("Seeded %d new relations (%d already existed) into data/relations.db\n", added, skipped)
 	return nil
 }

@@ -541,6 +541,24 @@ button:hover,
   width: fit-content;
 }
 
+.admin-relation-group {
+  margin-bottom: 1.2rem;
+}
+
+.admin-group-anchor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2d4a5a;
+  background: #e8f2f7;
+  border-left: 3px solid #6ab0c8;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0 6px 6px 0;
+  margin: 0 0 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .admin-relations-list {
   list-style: none;
   padding: 0;

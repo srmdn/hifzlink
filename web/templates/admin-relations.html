@@ -59,8 +59,14 @@
         </select>
         <button type="submit">Apply</button>
       </form>
-      {{if .Relations}}
-      <ul class="admin-relations-list">
+      {{if .RelationGroups}}
+      {{range .RelationGroups}}
+      <div class="admin-relation-group">
+        <h3 class="admin-group-anchor">
+          <span class="pair-refs">{{.AnchorRef}}</span>
+          <span class="meta">{{.AnchorName}}</span>
+        </h3>
+        <ul class="admin-relations-list">
         {{range .Relations}}
         {{$rel := .}}
         <li class="admin-relation-item">
@@ -132,7 +138,9 @@
           </form>
         </li>
         {{end}}
-      </ul>
+        </ul>
+      </div>
+      {{end}}
       {{else}}
       <p class="meta">No relations yet.</p>
       {{end}}

@@ -986,6 +986,12 @@ func adminStatusMessage(code string) string {
 	}
 }
 
+type adminRelationGroup struct {
+	AnchorRef  string
+	AnchorName string
+	Relations  []adminRelationWithDiff
+}
+
 type adminRelationWithDiff struct {
 	relations.AdminRelationView
 	DiffText1  template.HTML
@@ -1035,6 +1041,18 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		rowsWithDiff = append(rowsWithDiff, adminRelationWithDiff{row, d1, d2, w1, w2})
 	}
 
+	// Group rows by anchor ayah (ayah1).
+	var groups []adminRelationGroup
+	for _, row := range rowsWithDiff {
+		if len(groups) == 0 || groups[len(groups)-1].AnchorRef != row.Ayah1 {
+			groups = append(groups, adminRelationGroup{
+				AnchorRef:  row.Ayah1,
+				AnchorName: row.Ayah1Name,
+			})
+		}
+		groups[len(groups)-1].Relations = append(groups[len(groups)-1].Relations, row)
+	}
+
 	categoryOptions := adminCategoryOptions()
 	categoryLabelMap := make(map[string]string, len(categoryOptions))
 	for _, option := range categoryOptions {
@@ -1043,7 +1061,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 
 	data := map[string]any{
 		"Title":            "Admin Relations",
-		"Relations":        rowsWithDiff,
+		"RelationGroups":   groups,
 		"StatusNotice":     adminStatusMessage(r.URL.Query().Get("status")),
 		"FormAyah1":        "",
 		"FormAyah2":        "",
