@@ -419,6 +419,31 @@ func (s *Store) RecentCollectionItems(limit int) ([]RecentCollectionItem, error)
 	return out, nil
 }
 
+// RelationCountBySurah returns a map of surah number → distinct relation count.
+// A relation is counted for a surah if either ayah belongs to it.
+func (s *Store) RelationCountBySurah() (map[int]int, error) {
+	rows, err := s.db.Query(`
+	SELECT surah, COUNT(DISTINCT id) FROM (
+		SELECT id, ayah1_surah AS surah FROM relations
+		UNION ALL
+		SELECT id, ayah2_surah AS surah FROM relations
+	) t GROUP BY surah
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("relation count by surah: %w", err)
+	}
+	defer rows.Close()
+	out := make(map[int]int)
+	for rows.Next() {
+		var surah, count int
+		if err := rows.Scan(&surah, &count); err != nil {
+			return nil, fmt.Errorf("scan surah count: %w", err)
+		}
+		out[surah] = count
+	}
+	return out, rows.Err()
+}
+
 func (s *Store) ByPair(s1, y1, s2, y2 int) (Relation, bool, error) {
 	var rel Relation
 	err := s.db.QueryRow(`

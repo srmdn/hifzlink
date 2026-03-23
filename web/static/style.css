@@ -847,6 +847,7 @@ pre {
 .footer-inner {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
   font-size: 0.88rem;
   color: var(--text-muted);
@@ -940,5 +941,134 @@ pre {
   .footer-inner {
     flex-wrap: wrap;
     gap: 0.4rem;
+  }
+}
+
+/* Surah index list */
+.surah-index-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.surah-index-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.62rem 1rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+  font-size: 0.9rem;
+}
+
+.surah-index-row:last-child {
+  border-bottom: none;
+}
+
+.surah-index-row:hover {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.surah-index-row.has-pairs {
+  color: var(--text);
+}
+
+.surah-index-num {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.surah-index-name {
+  font-weight: 500;
+}
+
+.surah-index-row.has-pairs .surah-index-name {
+  font-weight: 600;
+}
+
+.surah-index-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.1em 0.55em;
+  min-width: 1.4em;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.surah-index-empty {
+  font-size: 0.78rem;
+  color: var(--border);
+  text-align: right;
+}
+
+/* Juz index grid */
+.juz-index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.juz-index-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text-muted);
+  gap: 0.3rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.juz-index-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.juz-index-card.has-pairs {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.juz-index-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.juz-index-card.has-pairs .juz-index-num {
+  color: var(--accent);
+}
+
+.juz-index-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.juz-index-empty {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+  .juz-index-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
 }
