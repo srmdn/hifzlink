@@ -36,7 +36,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - scalable relation indexing for large datasets:
   - [done] surah index page with relation counts
   - [done] juz index page with relation counts
-  - ayah-relation search page (search-first, not full dump)
+  - [done] ayah-relation search page (search-first, not full dump) — supports ayah ref, surah number, surah name
   - server-side pagination — **deferred**: dataset is manually curated and unlikely to grow large enough to need it; revisit if relation count exceeds ~500
   - faceted filters (`surah`, `juz`, `category`, `has_note`, date range)
   - default recent-first ordering with quick-resume links

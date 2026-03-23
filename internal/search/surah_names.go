@@ -1,5 +1,7 @@
 package search
 
+import "strings"
+
 var surahNames = [...]string{
 	"",
 	"Al-Fatihah",
@@ -123,4 +125,19 @@ func lookupSurahName(surah int) string {
 		return surahNames[surah]
 	}
 	return ""
+}
+
+// SurahByName returns the surah number for a given name (case-insensitive,
+// partial prefix match). Returns 0 if not found.
+func SurahByName(name string) int {
+	name = strings.ToLower(strings.TrimSpace(name))
+	if name == "" {
+		return 0
+	}
+	for i := 1; i < len(surahNames); i++ {
+		if strings.HasPrefix(strings.ToLower(surahNames[i]), name) {
+			return i
+		}
+	}
+	return 0
 }

@@ -114,25 +114,92 @@ func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		raw := strings.TrimSpace(r.FormValue("ayah"))
+		surah, ayah, err := relations.ParseAyahRef(raw)
+		if err != nil {
+			lang := sanitizeLang(r.FormValue("lang"))
+			http.Redirect(w, r, fmt.Sprintf("/?error=invalid_ref&q=%s&lang=%s", raw, lang), http.StatusSeeOther)
+			return
+		}
+		lang := sanitizeLang(r.FormValue("lang"))
+		http.Redirect(w, r, withLang(fmt.Sprintf("/ayah/%d/%d", surah, ayah), lang), http.StatusSeeOther)
+		return
+	}
+
+	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "invalid form", http.StatusBadRequest)
-		return
+
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+
+	type pairResult struct {
+		Ayah1      string
+		Ayah1Name  string
+		Ayah2      string
+		Ayah2Name  string
+		Category   string
+		Note       string
+		CompareURL string
 	}
 
-	raw := strings.TrimSpace(r.FormValue("ayah"))
-	surah, ayah, err := relations.ParseAyahRef(raw)
-	if err != nil {
-		lang := sanitizeLang(r.FormValue("lang"))
-		http.Redirect(w, r, fmt.Sprintf("/?error=invalid_ref&q=%s&lang=%s", raw, lang), http.StatusSeeOther)
-		return
+	var results []pairResult
+	var queryLabel string
+	var errMsg string
+
+	if q != "" {
+		var dbRels []db.Relation
+		var err error
+
+		if surahNum, ayahNum, parseErr := relations.ParseAyahRef(q); parseErr == nil {
+			// exact ayah ref: e.g. 60:8
+			queryLabel = fmt.Sprintf("pairs involving %s", relations.FormatAyahRef(surahNum, ayahNum))
+			dbRels, err = s.db.ByAyah(surahNum, ayahNum)
+		} else if n, atoiErr := strconv.Atoi(q); atoiErr == nil && n >= 1 && n <= 114 {
+			// surah number: e.g. 60
+			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
+			dbRels, err = s.db.BySurah(n)
+		} else if n := search.SurahByName(q); n > 0 {
+			// surah name: e.g. "mumtahanah"
+			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
+			dbRels, err = s.db.BySurah(n)
+		} else {
+			errMsg = fmt.Sprintf("Could not interpret %q — try an ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).", q)
+		}
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		lang := pageLang(r)
+		for _, rel := range dbRels {
+			ref1 := relations.FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah)
+			ref2 := relations.FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah)
+			results = append(results, pairResult{
+				Ayah1:      ref1,
+				Ayah1Name:  s.quran.SurahName(rel.Ayah1Surah),
+				Ayah2:      ref2,
+				Ayah2Name:  s.quran.SurahName(rel.Ayah2Surah),
+				Category:   rel.Category,
+				Note:       rel.Note,
+				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+			})
+		}
 	}
 
-	lang := sanitizeLang(r.FormValue("lang"))
-	http.Redirect(w, r, withLang(fmt.Sprintf("/ayah/%d/%d", surah, ayah), lang), http.StatusSeeOther)
+	s.render(w, "search.html", withCommonViewData(r, map[string]any{
+		"Title":      "Search pairs",
+		"Query":      q,
+		"QueryLabel": queryLabel,
+		"Results":    results,
+		"ErrMsg":     errMsg,
+	}))
 }
 
 func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
@@ -1038,6 +1105,7 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["CollectionsURL"] = withLang("/collections", lang)
 	data["SurahIndexURL"] = withLang("/surah", lang)
 	data["JuzIndexURL"] = withLang("/juz", lang)
+	data["SearchURL"] = withLang("/search", lang)
 	return data
 }
 
