@@ -210,7 +210,17 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	diff1, diff2 := diffHighlight(ayah1.TextAR, ayah2.TextAR)
+	var diff1, diff2 template.HTML
+	if rel, ok, err := s.db.ByPair(s1, y1, s2, y2); err == nil && ok {
+		h := parseHighlights(rel.Highlights)
+		if len(h.Ayah1) > 0 || len(h.Ayah2) > 0 {
+			diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
+			diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
+		}
+	}
+	if diff1 == "" {
+		diff1, diff2 = diffHighlight(ayah1.TextAR, ayah2.TextAR)
+	}
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
 		"Ayah1":            ayah1,
@@ -661,7 +671,8 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
 			note := strings.TrimSpace(r.FormValue("note"))
 			category := strings.TrimSpace(r.FormValue("category"))
-			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category); err != nil {
+			highlights := buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
 					"AdminError": adminErrorMessage(err),
 				})
@@ -975,8 +986,10 @@ func adminStatusMessage(code string) string {
 
 type adminRelationWithDiff struct {
 	relations.AdminRelationView
-	DiffText1 template.HTML
-	DiffText2 template.HTML
+	DiffText1  template.HTML
+	DiffText2  template.HTML
+	Ayah1Words []string
+	Ayah2Words []string
 }
 
 func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request, overrides map[string]any) {
@@ -1001,14 +1014,23 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		s1, y1, err1 := relations.ParseAyahRef(row.Ayah1)
 		s2, y2, err2 := relations.ParseAyahRef(row.Ayah2)
 		var d1, d2 template.HTML
+		var w1, w2 []string
 		if err1 == nil && err2 == nil {
 			a1, ok1 := s.quran.Get(s1, y1)
 			a2, ok2 := s.quran.Get(s2, y2)
 			if ok1 && ok2 {
-				d1, d2 = diffHighlight(a1.TextAR, a2.TextAR)
+				w1 = strings.Fields(a1.TextAR)
+				w2 = strings.Fields(a2.TextAR)
+				h := parseHighlights(row.Highlights)
+				if len(h.Ayah1) > 0 || len(h.Ayah2) > 0 {
+					d1 = applyHighlights(a1.TextAR, h.Ayah1)
+					d2 = applyHighlights(a2.TextAR, h.Ayah2)
+				} else {
+					d1, d2 = diffHighlight(a1.TextAR, a2.TextAR)
+				}
 			}
 		}
-		rowsWithDiff = append(rowsWithDiff, adminRelationWithDiff{row, d1, d2})
+		rowsWithDiff = append(rowsWithDiff, adminRelationWithDiff{row, d1, d2, w1, w2})
 	}
 
 	categoryOptions := adminCategoryOptions()

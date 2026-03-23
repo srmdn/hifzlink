@@ -188,7 +188,7 @@ func TestService_UpdateByID(t *testing.T) {
 		t.Fatalf("expected 1 row, got %d", len(rows))
 	}
 
-	if err := svc.UpdateByID(rows[0].ID, "60:9", "60:8", "after", "LAFZI"); err != nil {
+	if err := svc.UpdateByID(rows[0].ID, "60:9", "60:8", "after", "LAFZI", ""); err != nil {
 		t.Fatalf("UpdateByID: %v", err)
 	}
 
