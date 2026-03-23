@@ -4,37 +4,106 @@
 <body>
 {{template "topbar" .}}
 
-  <main class="container">
-    <section id="search" class="hero card">
-      <p class="eyebrow">HifzLink</p>
-      <h1>Find and compare mutashabihat verses</h1>
-      <p class="lead">Search by ayah reference to view the full verse and its similar verses side by side.</p>
-      <div class="hero-meta">
-        <span class="stat-pill">Arabic first</span>
-        <span class="stat-pill">6236 ayahs local</span>
-        <span class="stat-pill">EN/ID toggle</span>
-      </div>
-      <form action="/search" method="post" class="search-form">
-        <input type="hidden" name="lang" value="{{.Lang}}" />
-        <input type="text" name="ayah" placeholder="surah:ayah — e.g. 60:8" value="{{.SearchQuery}}" required autocomplete="off" />
-        <button type="submit">Open Ayah</button>
-        {{if .SearchError}}<p class="error-msg" role="alert">{{.SearchError}}</p>{{end}}
-      </form>
+  <main>
 
-      <div class="home-quick-links">
-        <a class="button-link" href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Compare 60:8 ↔ 60:9</a>
-        <a class="button-link" href="/surah/60?lang={{.Lang}}">Surah 60 Relations</a>
-        <a class="button-link" href="/juz/28?lang={{.Lang}}">Juz 28 Relations</a>
+    {{/* ── Hero ───────────────────────────────────────────────── */}}
+    <section class="lp-hero">
+      <div class="container lp-hero-inner">
+        <p class="lp-eyebrow">Open source · Arabic-first · Free to use</p>
+        <h1 class="lp-headline">Your brain confuses<br>similar verses.<br>Now you can track that.</h1>
+        <p class="lp-sub">hifzlink captures the confusion patterns you encounter during recitation — so the next time your mind slips from one verse to another, you know exactly where the difference is.</p>
+        <div class="lp-cta-group">
+          <a class="lp-cta-primary" href="{{.SearchURL}}">Search pairs →</a>
+          <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">Browse by Surah</a>
+        </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Start Points</h2>
-      <ul class="simple-list">
-        <li><a href="/ayah/60/8?lang={{.Lang}}">Ayah 60:8 — Al-Mumtahanah</a></li>
-        <li><a href="/ayah/60/9?lang={{.Lang}}">Ayah 60:9 — Al-Mumtahanah</a></li>
-      </ul>
+    {{/* ── Why I built this ───────────────────────────────────── */}}
+    <section class="lp-section lp-story">
+      <div class="container lp-section-inner">
+        <p class="lp-section-label">Why I built this</p>
+        <blockquote class="lp-quote">
+          "When I'm reciting and my brain slips from one verse to a similar one, I want a tool that captures that relationship — so next time I encounter it, I can immediately recall: <em>ah, this is the one that sounds like 60:9. The difference is here.</em>"
+        </blockquote>
+        <p class="lp-story-body">Mutashabihat — verses that are nearly identical in wording — are one of the hardest parts of Quran memorization. Standard review tools don't model this kind of confusion. hifzlink does.</p>
+      </div>
     </section>
+
+    {{/* ── Features ───────────────────────────────────────────── */}}
+    <section class="lp-section lp-features">
+      <div class="container lp-section-inner">
+        <p class="lp-section-label">Features</p>
+        <h2 class="lp-section-title">Everything you need for mutashabihat review</h2>
+        <div class="lp-feature-grid">
+          <div class="lp-feature-card">
+            <div class="lp-feature-icon">⟺</div>
+            <h3>Word-level diff</h3>
+            <p>Compare two similar verses side by side with exact word-level highlighting — see precisely where one verse diverges from the other.</p>
+          </div>
+          <div class="lp-feature-card">
+            <div class="lp-feature-icon">⌕</div>
+            <h3>Search by ayah or surah</h3>
+            <p>Look up any ayah reference, surah number, or surah name to instantly see all saved pairs involving it.</p>
+          </div>
+          <div class="lp-feature-card">
+            <div class="lp-feature-icon">◫</div>
+            <h3>Browse by Surah &amp; Juz</h3>
+            <p>Explore the full map of known similar verses organized by surah or juz — scan where confusions are concentrated.</p>
+          </div>
+          <div class="lp-feature-card">
+            <div class="lp-feature-icon">⊞</div>
+            <h3>Collections</h3>
+            <p>Group pairs into named collections for focused review sessions — isolate the verses you're currently working on.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {{/* ── How it works ───────────────────────────────────────── */}}
+    <section class="lp-section lp-how">
+      <div class="container lp-section-inner">
+        <p class="lp-section-label">How it works</p>
+        <h2 class="lp-section-title">Three steps from confusion to clarity</h2>
+        <ol class="lp-steps">
+          <li class="lp-step">
+            <span class="lp-step-num">1</span>
+            <div>
+              <h3>Encounter a confusion</h3>
+              <p>During recitation, your mind slips — you land on the wrong verse or can't tell two similar ones apart.</p>
+            </div>
+          </li>
+          <li class="lp-step">
+            <span class="lp-step-num">2</span>
+            <div>
+              <h3>Search for the pair</h3>
+              <p>Type the ayah reference into Search. If the pair is saved, you'll see it immediately — along with any other verses that share the same confusion pattern.</p>
+            </div>
+          </li>
+          <li class="lp-step">
+            <span class="lp-step-num">3</span>
+            <div>
+              <h3>Compare and lock it in</h3>
+              <p>Open the side-by-side compare view. The highlighted diff shows exactly which words differ — so your brain builds the right anchor.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    {{/* ── Browse CTA ──────────────────────────────────────────── */}}
+    <section class="lp-section lp-browse-cta">
+      <div class="container lp-section-inner lp-browse-inner">
+        <h2 class="lp-section-title">Start reviewing</h2>
+        <p class="lp-sub">Browse the full collection of saved mutashabihat pairs, or search for a specific verse.</p>
+        <div class="lp-cta-group">
+          <a class="lp-cta-primary" href="{{.SearchURL}}">Search pairs →</a>
+          <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">By Surah</a>
+          <a class="lp-cta-secondary" href="{{.JuzIndexURL}}">By Juz</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
 {{template "footer" .}}
