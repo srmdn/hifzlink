@@ -6,6 +6,11 @@ The format is inspired by Keep a Changelog.
 
 ## [Unreleased] — Milestone 3 in progress
 
+### Added
+
+- `docs/CURATION.md`: contributor workflow for adding and verifying mutashabihat pairs, including format reference, category guide, verification checklist, and common mistakes
+- expanded `data/relations.seed.json` from 9 to 67 curated mutashabihat pairs covering surahs 2 through 114 across all confusion-pattern categories
+
 ## [0.2.0] - 2026-03-24 — Milestone 2 complete
 
 ### Added

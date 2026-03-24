@@ -59,7 +59,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 
 ## Milestone 3: Data Quality And Curation
 
-1. expand `relations.seed.json` into a curated starter set of well-known mutashabihat pairs
+1. [done] expand `relations.seed.json` into a curated starter set of well-known mutashabihat pairs (67 pairs across all categories)
 2. [done] define relation taxonomy for mutashabihat curation:
 - confusion-pattern categories (single field, admin-selectable):
   - `lafzi` — near-identical wording, almost word-for-word
@@ -70,7 +70,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
   - `pronoun_shift` — differs only in pronoun (هو/هم, كم/كن, etc.)
   - `other` — does not fit cleanly into any above pattern
 - multi-tag support and secondary thematic tags — **deferred**: single confusion-pattern field is sufficient for current dataset size
-3. document curation workflow for contributors
+3. [done] document curation workflow for contributors (`docs/CURATION.md`)
 
 ## Milestone 4: Open Source Maturity
 
