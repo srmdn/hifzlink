@@ -78,7 +78,8 @@
     const link = document.getElementById("back-link");
     if (link && document.referrer) {
       try {
-        if (new URL(document.referrer).origin === window.location.origin) {
+        const ref = new URL(document.referrer);
+        if (ref.origin === window.location.origin && ref.pathname !== window.location.pathname) {
           link.href = document.referrer;
         }
       } catch (_) {}
