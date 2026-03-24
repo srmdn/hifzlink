@@ -24,7 +24,7 @@ graph TD
 
     subgraph Data["Data Layer"]
         QuranJSON["data/quran.json\n(in-memory at startup)"]
-        SQLiteDB["hifzlink.db\n(relations only)"]
+        SQLiteDB["relations.db\n(relations only)"]
     end
 
     Browser -->|HTTP request| Router
