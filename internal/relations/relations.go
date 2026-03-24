@@ -22,8 +22,10 @@ type AyahView struct {
 type PairView struct {
 	Ayah1     string `json:"ayah1"`
 	Ayah1Name string `json:"ayah1_name,omitempty"`
+	Ayah1URL  string `json:"-"`
 	Ayah2     string `json:"ayah2"`
 	Ayah2Name string `json:"ayah2_name,omitempty"`
+	Ayah2URL  string `json:"-"`
 	Note      string `json:"note,omitempty"`
 }
 
@@ -161,8 +163,10 @@ func (s *Service) PairsBySurah(surah int) ([]PairView, error) {
 		out = append(out, PairView{
 			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
 			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
+			Ayah1URL:  fmt.Sprintf("/ayah/%d/%d", rel.Ayah1Surah, rel.Ayah1Ayah),
 			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
 			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
+			Ayah2URL:  fmt.Sprintf("/ayah/%d/%d", rel.Ayah2Surah, rel.Ayah2Ayah),
 			Note:      rel.Note,
 		})
 	}
@@ -190,8 +194,10 @@ func (s *Service) PairsByJuz(juz int) ([]PairView, error) {
 		out = append(out, PairView{
 			Ayah1:     FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
 			Ayah1Name: s.quran.SurahName(rel.Ayah1Surah),
+			Ayah1URL:  fmt.Sprintf("/ayah/%d/%d", rel.Ayah1Surah, rel.Ayah1Ayah),
 			Ayah2:     FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
 			Ayah2Name: s.quran.SurahName(rel.Ayah2Surah),
+			Ayah2URL:  fmt.Sprintf("/ayah/%d/%d", rel.Ayah2Surah, rel.Ayah2Ayah),
 			Note:      rel.Note,
 		})
 	}

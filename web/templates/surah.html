@@ -11,12 +11,15 @@
     <section class="card">
       <h2>Mutashabihat Pairs</h2>
       {{if .Pairs}}
+      <p class="pairs-hint">Click a verse to open it, or Compare to see both side by side.</p>
       <ul class="pairs-list">
         {{range .Pairs}}
         <li class="pair-item">
           <div class="line-head">
             <span class="pair-refs">
-              {{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}
+              <a class="ayah-chip" href="{{.Ayah1URL}}?lang={{$.Lang}}">{{.Ayah1}}</a>
+              <span class="meta">↔</span>
+              <a class="ayah-chip" href="{{.Ayah2URL}}?lang={{$.Lang}}">{{.Ayah2}}</a>
             </span>
             <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
           </div>
