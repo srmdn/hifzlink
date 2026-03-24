@@ -294,6 +294,8 @@
 
 .lp-hero-inner {
   max-width: 720px;
+  width: 100%;
+  text-align: center;
 }
 
 .lp-eyebrow {
@@ -318,7 +320,7 @@
   font-size: 1.08rem;
   color: var(--text-muted);
   max-width: 580px;
-  margin: 0 0 2rem;
+  margin: 0 auto 2rem;
   line-height: 1.7;
 }
 
@@ -548,15 +550,6 @@
 @media (max-width: 600px) {
   .lp-hero {
     padding: 2rem 0;
-  }
-
-  .lp-hero-inner {
-    text-align: center;
-  }
-
-  .lp-hero-inner .lp-sub {
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .lp-section {
