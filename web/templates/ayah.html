@@ -5,7 +5,7 @@
 {{template "topbar" .}}
 
   <main class="container">
-    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
+    <p class="back"><a href="{{.HomeURL}}" id="back-link">← Back</a></p>
     <div class="page-heading">
       <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
       <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
@@ -80,6 +80,16 @@
 
 {{template "footer" .}}
 <script>
+  (() => {
+    const link = document.getElementById("back-link");
+    if (link && document.referrer) {
+      try {
+        if (new URL(document.referrer).origin === window.location.origin) {
+          link.href = document.referrer;
+        }
+      } catch (_) {}
+    }
+  })();
   (() => {
     const toggle = document.getElementById("tafsir-toggle");
     const body = document.getElementById("tafsir-body");
