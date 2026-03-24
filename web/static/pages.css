@@ -284,7 +284,7 @@
 /* ── Landing page ─────────────────────────────────────────────── */
 
 .lp-hero {
-  padding: 5rem 0 4rem;
+  padding: 2rem 0;
   border-bottom: 1px solid var(--border);
   min-height: 100vh;
   min-height: 100dvh;
@@ -389,6 +389,7 @@
   text-transform: uppercase;
   color: var(--accent);
   margin: 0 0 0.75rem;
+  text-align: center;
 }
 
 .lp-section-title {
@@ -397,6 +398,7 @@
   letter-spacing: -0.01em;
   color: var(--text);
   margin: 0 0 2rem;
+  text-align: center;
 }
 
 .lp-quote {
@@ -404,17 +406,19 @@
   font-style: italic;
   color: var(--text);
   border-left: 3px solid var(--accent);
-  margin: 0 0 1.25rem;
+  margin: 0 auto 1.25rem;
   padding: 0.5rem 0 0.5rem 1.25rem;
   line-height: 1.75;
+  max-width: 680px;
 }
 
 .lp-story-body {
   font-size: 0.95rem;
   color: var(--text-muted);
   line-height: 1.75;
-  margin: 0;
+  margin: 0 auto 1.5rem;
   max-width: 620px;
+  text-align: center;
 }
 
 .lp-feature-grid {
@@ -454,7 +458,7 @@
 .lp-steps {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -505,11 +509,6 @@
   margin: 0 auto;
 }
 
-.lp-browse-inner .lp-sub {
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .lp-diff-example {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -544,7 +543,8 @@
 .lp-diff-caption {
   font-size: 0.88rem;
   color: var(--text-muted);
-  margin: 0;
+  margin: 0.75rem 0 0;
+  text-align: center;
 }
 
 @media (max-width: 600px) {
