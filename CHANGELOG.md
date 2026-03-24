@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is inspired by Keep a Changelog.
 
-## [Unreleased]
+## [Unreleased] — Milestone 3 in progress
 
 ### Added
 
@@ -48,6 +48,31 @@ The format is inspired by Keep a Changelog.
 - topbar: removed Dashboard link (auth deferred); Search now links to `/search` page
 - responsive button system: `.btn` (primary), `.btn-sm` (inline), `.btn-outline` (secondary), `.btn-danger` (destructive) with tablet (≤768px) and mobile (≤480px) touch-target sizing; all templates updated to use new classes
 - mobile layout improvements: hero content centers on small screens, search row stacks vertically, diff example collapses to single column, CTA groups adjust per breakpoint
+- hero section: full viewport height (`min-height: 100dvh`) with flex vertical centering; buttons centered, equal-width, column-stacked on all breakpoints
+- landing page styling audit: section labels/titles centered, story body centered, diff caption spacing, hero padding reduced to prevent flex centering conflict
+- `main { padding-top }` fix: `.container { padding: 0 1rem }` shorthand was overriding vertical spacing via class specificity; switched to `padding-left`/`padding-right` only
+- admin auth: server now auto-loads `.env` from project root at startup so `HIFZLINK_ADMIN_USER`/`HIFZLINK_ADMIN_PASS` work without shell export
+- em dashes removed from all visitor-facing templates: replaced with periods, commas, conjunctions, or colons depending on context
+
+## [0.2.0] - 2026-03-24 — Milestone 2 complete
+
+### Added
+
+- server-rendered admin relation management page at `/admin/relations` with add/list/edit/delete flow and word picker for diff highlights
+- server-rendered collections (`/collections`, `/collections/{id}`) with create/save/remove flows
+- dashboard (`/dashboard`) with quick resume links, recent collections, and recent saved items
+- search page at `/search` supporting ayah ref, surah number, surah name, and category filter
+- `SurahByName` lookup in `internal/search` for case-insensitive prefix match on surah names
+
+### Changed
+
+- compare page now shows related pairs section instead of sequential prev/next navigation
+- relation category taxonomy revised to confusion-pattern only (`lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`); old thematic values migrated to `other` on first startup
+- style.css split into `base.css`, `topbar.css`, `components.css`, `admin.css`, `pages.css`
+- landing page redesigned as SaaS-style public page with hero, story section, diff example (60:8 ↔ 60:9), features grid, how-it-works steps, and browse CTA
+- topbar: removed Dashboard link until auth is implemented; Search links to `/search` page
+- responsive button system (`.btn`, `.btn-sm`, `.btn-outline`, `.btn-danger`) replacing ad-hoc classes; all templates updated
+- admin HTTP Basic Auth credentials now auto-loaded from `.env` at startup
 
 ## [0.1.0] - 2026-03-15
 

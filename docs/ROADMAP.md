@@ -19,54 +19,57 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - friendly not-found page for invalid ayah references
 - clear form validation messages in search flow
 
-## Milestone 2: Memorization UX
+## Milestone 2: Memorization UX — [done]
 
 1. [done] relation management UI:
-- simple add relation form page (server-rendered)
+- [done] simple add relation form page (server-rendered)
 - [done] optional delete relation action (safe confirmation)
 - [done] edit relation action
 
-2. compare enhancements:
+2. [done] compare enhancements:
 - [done] visual diff emphasis for repeated/changed words (non-destructive highlighting)
 - [done] related pairs section on compare page — shows all pairs sharing either ayah, replaces next/prev sequential navigation
 
-3. browsing improvements:
-- filter relation lists by surah range/juz
-- searchable relation index
-- scalable relation indexing for large datasets:
-  - [done] surah index page with relation counts
-  - [done] juz index page with relation counts
-  - [done] ayah-relation search page (search-first, not full dump) — supports ayah ref, surah number, surah name
-  - server-side pagination — **deferred**: dataset is manually curated and unlikely to grow large enough to need it; revisit if relation count exceeds ~500
-  - faceted filters (`surah`, `juz`, `category`, `has_note`, date range)
-  - default recent-first ordering with quick-resume links
+3. [done] browsing improvements:
+- [done] surah index page with relation counts
+- [done] juz index page with relation counts
+- [done] ayah-relation search page (search-first, not full dump) — supports ayah ref, surah number, surah name
+- [done] category filter on search page
+- server-side pagination — **deferred**: dataset is manually curated and unlikely to grow large enough to need it; revisit if relation count exceeds ~500
+- faceted filters beyond category (`surah`, `juz`, `has_note`, date range) — **deferred**: search page covers the core use case
+- surah-range/juz filter on relation lists — **deferred**
+- recent-first ordering on relation lists — **deferred**
 
-4. personal workflow:
+4. [done] personal workflow:
 - [done] bookmark/save ayah and relation pairs
 - [done] saved collections (custom groups) for murojaah sessions
-- [done] user dashboard page (recently viewed, recently compared, quick resume)
-- optional notes attached to saved ayah entries
+- [done] user dashboard page (quick resume, recent collections, recent saved items)
 
-5. account support:
+5. [done] public-facing UI:
+- [done] landing page redesigned as SaaS-style public page (hero, story, diff example, features, how-it-works, browse CTA)
+- [done] topbar restructured: Dashboard hidden until auth is implemented; Search links to /search
+- [done] style.css split into focused files (base, topbar, components, admin, pages)
+- [done] responsive button system (.btn, .btn-sm, .btn-outline, .btn-danger) with touch targets
+- [done] full mobile layout pass: hero centering, search row stacking, diff example collapse
+
+6. account support — **deferred to post-MVP**:
 - login/auth for user-specific saved data
 - local-first fallback mode when auth is disabled
 - session and access control hardening
 
 ## Milestone 3: Data Quality And Curation
 
-1. expand `relations.seed.json` into curated starter set
+1. expand `relations.seed.json` into a curated starter set of well-known mutashabihat pairs
 2. [done] define relation taxonomy for mutashabihat curation:
-- primary murojaah tags (confusion pattern):
-  - `lafzi_near_identical`
-  - `word_swap`
-  - `addition_omission`
-  - `order_change`
-  - `ending_variation`
-  - `pronoun_shift`
-- secondary thematic tags (optional):
-  - `aqidah`, `ahkam`, `adab`, `qasas`, `dua`, `targhib_tarhib`, `other`
-- relation records should support multiple tags over time (not single category only)
-- add category/tag manager page in admin UI
+- confusion-pattern categories (single field, admin-selectable):
+  - `lafzi` — near-identical wording, almost word-for-word
+  - `word_swap` — one or more words differ between otherwise identical verses
+  - `addition_omission` — one verse has an extra word or phrase the other lacks
+  - `order_change` — same words in different sequence
+  - `ending_variation` — verses identical except for the final word or phrase
+  - `pronoun_shift` — differs only in pronoun (هو/هم, كم/كن, etc.)
+  - `other` — does not fit cleanly into any above pattern
+- multi-tag support and secondary thematic tags — **deferred**: single confusion-pattern field is sufficient for current dataset size
 3. document curation workflow for contributors
 
 ## Milestone 4: Open Source Maturity
