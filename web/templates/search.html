@@ -22,12 +22,6 @@
           autofocus
           class="search-pairs-input"
         />
-        <select name="category" class="search-pairs-select">
-          <option value="">All patterns</option>
-          {{range .CategoryOptions}}
-          <option value="{{.Key}}"{{if eq $.CategoryFilter .Key}} selected{{end}}>{{.Label}}</option>
-          {{end}}
-        </select>
         <button type="submit" class="btn">Search</button>
       </div>
     </form>
@@ -40,6 +34,13 @@
       {{if .Results}}
       <section class="card">
         <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} for {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
+        {{if .FilterPills}}
+        <div class="filter-pills">
+          {{range .FilterPills}}
+          <a href="{{.URL}}" class="filter-pill{{if .Active}} active{{end}}">{{.Label}}</a>
+          {{end}}
+        </div>
+        {{end}}
         <p class="pairs-hint">Click a verse to open it, or Compare to see both side by side.</p>
         <ul class="pairs-list">
           {{range .Results}}

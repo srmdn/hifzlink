@@ -244,7 +244,14 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		categoryLabelMap[opt.Key] = opt.Label
 	}
 
+	type filterPill struct {
+		Label  string
+		URL    string
+		Active bool
+	}
+
 	var results []pairResult
+	var filterPills []filterPill
 	var queryLabel string
 	var errMsg string
 
@@ -271,13 +278,13 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		}
 
 		lang := pageLang(r)
+
+		// Build all results without category filter first.
+		var allResults []pairResult
 		for _, rel := range dbRels {
-			if categoryFilter != "" && strings.ToLower(rel.Category) != categoryFilter {
-				continue
-			}
 			ref1 := relations.FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah)
 			ref2 := relations.FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah)
-			results = append(results, pairResult{
+			allResults = append(allResults, pairResult{
 				Ayah1:         ref1,
 				Ayah1Name:     s.quran.SurahName(rel.Ayah1Surah),
 				Ayah1URL:      withLang(fmt.Sprintf("/ayah/%d/%d", rel.Ayah1Surah, rel.Ayah1Ayah), lang),
@@ -290,17 +297,51 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 				CompareURL:    withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
 			})
 		}
+
+		// Build filter pills from distinct categories present in results.
+		seen := map[string]bool{}
+		var presentCategories []string
+		for _, r := range allResults {
+			if r.Category != "" && !seen[r.Category] {
+				seen[r.Category] = true
+				presentCategories = append(presentCategories, r.Category)
+			}
+		}
+		if len(presentCategories) >= 1 {
+			baseURL := fmt.Sprintf("/search?q=%s&lang=%s", neturl.QueryEscape(q), lang)
+			filterPills = append(filterPills, filterPill{Label: "All", URL: baseURL, Active: categoryFilter == ""})
+			for _, opt := range categoryOptions {
+				if seen[opt.Key] {
+					filterPills = append(filterPills, filterPill{
+						Label:  opt.Label,
+						URL:    baseURL + "&category=" + opt.Key,
+						Active: categoryFilter == opt.Key,
+					})
+				}
+			}
+		}
+
+		// Apply category filter.
+		if categoryFilter != "" {
+			for _, r := range allResults {
+				if strings.ToLower(r.Category) == categoryFilter {
+					results = append(results, r)
+				}
+			}
+		} else {
+			results = allResults
+		}
 	}
 
 	s.render(w, "search.html", withCommonViewData(r, map[string]any{
-		"Title":            "Search pairs",
-		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
-		"Query":            q,
-		"QueryLabel":       queryLabel,
-		"Results":          results,
-		"ErrMsg":           errMsg,
-		"CategoryOptions":  categoryOptions,
-		"CategoryFilter":   categoryFilter,
+		"Title":          "Search pairs",
+		"Description":    "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
+		"Query":          q,
+		"QueryLabel":     queryLabel,
+		"Results":        results,
+		"ErrMsg":         errMsg,
+		"FilterPills":    filterPills,
+		"CategoryFilter": categoryFilter,
 		"CategoryLabelMap": categoryLabelMap,
 	}))
 }
