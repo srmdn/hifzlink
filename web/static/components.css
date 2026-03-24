@@ -255,6 +255,35 @@ mark.word-unique {
 
 .pair-refs {
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ayah-chip {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  background: #e8f4f2;
+  border: 1px solid #b8d8d3;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1a6b5e;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ayah-chip:hover {
+  background: #c8eae4;
+  border-color: #7bbdb5;
+  color: #0f4f44;
+}
+
+.pairs-hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
 }
 
 .note {

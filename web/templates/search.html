@@ -40,11 +40,16 @@
       {{if .Results}}
       <section class="card">
         <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} for {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
+        <p class="pairs-hint">Click a verse to open it, or Compare to see both side by side.</p>
         <ul class="pairs-list">
           {{range .Results}}
           <li class="pair-item">
             <div class="line-head">
-              <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+              <span class="pair-refs">
+                <a class="ayah-chip" href="{{.Ayah1URL}}">{{.Ayah1}}</a>
+                <span class="meta">↔</span>
+                <a class="ayah-chip" href="{{.Ayah2URL}}">{{.Ayah2}}</a>
+              </span>
               <a class="btn-sm" href="{{.CompareURL}}">Compare</a>
             </div>
             <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .CategoryLabel}} · <span class="category-tag">{{.CategoryLabel}}</span>{{end}}</p>

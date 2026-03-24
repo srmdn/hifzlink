@@ -228,8 +228,10 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	type pairResult struct {
 		Ayah1         string
 		Ayah1Name     string
+		Ayah1URL      string
 		Ayah2         string
 		Ayah2Name     string
+		Ayah2URL      string
 		Category      string
 		CategoryLabel string
 		Note          string
@@ -278,8 +280,10 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 			results = append(results, pairResult{
 				Ayah1:         ref1,
 				Ayah1Name:     s.quran.SurahName(rel.Ayah1Surah),
+				Ayah1URL:      withLang(fmt.Sprintf("/ayah/%d/%d", rel.Ayah1Surah, rel.Ayah1Ayah), lang),
 				Ayah2:         ref2,
 				Ayah2Name:     s.quran.SurahName(rel.Ayah2Surah),
+				Ayah2URL:      withLang(fmt.Sprintf("/ayah/%d/%d", rel.Ayah2Surah, rel.Ayah2Ayah), lang),
 				Category:      rel.Category,
 				CategoryLabel: categoryLabelMap[rel.Category],
 				Note:          rel.Note,
