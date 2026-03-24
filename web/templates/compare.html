@@ -26,7 +26,7 @@
           {{end}}
         </select>
         <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
-        <button type="submit">Save Pair</button>
+        <button type="submit" class="btn">Save Pair</button>
       </form>
       {{else}}
       <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
@@ -35,7 +35,7 @@
     </section>
 
     <div class="compare-toolbar">
-      <button type="button" class="button-secondary" id="toggle-highlights">Hide highlights</button>
+      <button type="button" class="btn-outline" id="toggle-highlights">Hide highlights</button>
     </div>
 
     <section class="compare-grid">

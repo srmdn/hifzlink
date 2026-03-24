@@ -42,7 +42,7 @@
           {{end}}
         </ul>
 
-        <button type="submit">Add Relation</button>
+        <button type="submit" class="btn">Add Relation</button>
       </form>
     </section>
 
@@ -57,7 +57,7 @@
           <option value="{{.Key}}" {{if eq $.CategoryFilter .Key}}selected{{end}}>{{.Label}}</option>
           {{end}}
         </select>
-        <button type="submit">Apply</button>
+        <button type="submit" class="btn">Apply</button>
       </form>
       {{if .RelationGroups}}
       {{range .RelationGroups}}
@@ -73,10 +73,10 @@
           <div class="line-head">
             <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
             <div class="admin-row-actions">
-              <a class="button-link" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
-              <button class="button-secondary" type="button" data-edit-toggle="edit-{{.ID}}">Edit</button>
+              <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
+              <button class="btn-outline" type="button" data-edit-toggle="edit-{{.ID}}">Edit</button>
               <button
-                class="button-danger js-open-delete"
+                class="btn-danger js-open-delete"
                 type="button"
                 data-id="{{.ID}}"
                 data-label="{{.Ayah1}} ↔ {{.Ayah2}}"
@@ -127,13 +127,13 @@
                 {{range $i, $w := .Ayah2Words}}<span class="word-picker-word" data-idx="{{$i}}">{{$w}}</span> {{end}}
               </div>
               <input type="hidden" name="highlights_ayah2" class="highlights-input" />
-              <button type="button" class="button-secondary clear-highlights-btn">Clear all highlights</button>
+              <button type="button" class="btn-outline clear-highlights-btn">Clear all highlights</button>
             </div>
             {{end}}
 
             <div class="admin-edit-actions">
-              <button type="submit">Save</button>
-              <button class="button-secondary" type="button" data-edit-cancel="edit-{{.ID}}">Cancel</button>
+              <button type="submit" class="btn">Save</button>
+              <button class="btn-outline" type="button" data-edit-cancel="edit-{{.ID}}">Cancel</button>
             </div>
           </form>
         </li>
@@ -152,12 +152,12 @@
       <h3>Delete Relation</h3>
       <p id="delete-dialog-text" class="meta">Are you sure you want to delete this relation?</p>
       <div class="delete-dialog-actions">
-        <button type="button" class="button-secondary" id="delete-cancel">Cancel</button>
+        <button type="button" class="btn-outline" id="delete-cancel">Cancel</button>
         <form id="delete-form" action="/admin/relations" method="post" class="inline-form">
           <input type="hidden" name="action" value="delete" />
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="id" id="delete-id" value="" />
-          <button type="submit" class="button-danger">Delete</button>
+          <button type="submit" class="btn-danger">Delete</button>
         </form>
       </div>
     </div>

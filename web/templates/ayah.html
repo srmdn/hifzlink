@@ -29,7 +29,7 @@
           {{end}}
         </select>
         <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
-        <button type="submit">Save Ayah</button>
+        <button type="submit" class="btn">Save Ayah</button>
       </form>
       {{else}}
       <p class="meta">No collections yet. <a href="/collections?lang={{.Lang}}">Create a collection</a> first.</p>
@@ -45,7 +45,7 @@
         <li class="related-item">
           <div class="line-head">
             <a href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.Surah}}:{{.Ayah}} ({{.SurahName}})</a>
-            <a class="button-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">Compare</a>
+            <a class="btn-sm" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">Compare</a>
           </div>
           <p class="arabic arabic-small" lang="ar">{{.Text}}</p>
           {{if .Translation}}

@@ -139,6 +139,17 @@
   color: var(--accent);
 }
 
+@media (max-width: 600px) {
+  .search-pairs-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-pairs-select {
+    width: 100%;
+  }
+}
+
 /* ── Surah index ──────────────────────────────────────────────── */
 
 .surah-index-list {
@@ -491,9 +502,59 @@
   justify-content: center;
 }
 
+.lp-diff-example {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.lp-diff-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.lp-diff-ref {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.lp-diff-arabic {
+  font-family: "Amiri Quran", "Noto Naskh Arabic", serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  line-height: 2.1;
+  direction: rtl;
+  text-align: right;
+  color: #0b2734;
+  margin: 0;
+}
+
+.lp-diff-caption {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 @media (max-width: 600px) {
   .lp-hero {
     padding: 3rem 0 2.5rem;
+  }
+
+  .lp-hero-inner {
+    text-align: center;
+  }
+
+  .lp-hero-inner .lp-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .lp-hero-inner .lp-cta-group {
+    justify-content: center;
   }
 
   .lp-section {
@@ -507,5 +568,9 @@
 
   .lp-browse-inner .lp-cta-group {
     align-items: center;
+  }
+
+  .lp-diff-example {
+    grid-template-columns: 1fr;
   }
 }
