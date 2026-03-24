@@ -22,6 +22,12 @@
           autofocus
           class="search-pairs-input"
         />
+        <select name="category" class="search-pairs-select">
+          <option value="">All patterns</option>
+          {{range .CategoryOptions}}
+          <option value="{{.Key}}"{{if eq $.CategoryFilter .Key}} selected{{end}}>{{.Label}}</option>
+          {{end}}
+        </select>
         <button type="submit" class="button-primary">Search</button>
       </div>
     </form>
@@ -33,7 +39,7 @@
     {{if .Query}}
       {{if .Results}}
       <section class="card">
-        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} — {{.QueryLabel}}</h2>
+        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} — {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
         <ul class="pairs-list">
           {{range .Results}}
           <li class="pair-item">
@@ -41,14 +47,14 @@
               <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
               <a class="button-link" href="{{.CompareURL}}">Compare</a>
             </div>
-            <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .Category}} · <span class="category-tag">{{.Category}}</span>{{end}}</p>
+            <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .CategoryLabel}} · <span class="category-tag">{{.CategoryLabel}}</span>{{end}}</p>
             {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
           </li>
           {{end}}
         </ul>
       </section>
       {{else if not .ErrMsg}}
-      <p class="meta">No pairs found for <strong>{{.Query}}</strong>.</p>
+      <p class="meta">No pairs found for <strong>{{.Query}}</strong>{{if .CategoryFilter}} with pattern <strong>{{index .CategoryLabelMap .CategoryFilter}}</strong>{{end}}.</p>
       {{end}}
     {{end}}
   </main>
