@@ -4,7 +4,7 @@
 
 Deliver a stable, contributor-friendly open source Quran murojaah tool focused on mutashabihat review.
 
-## Milestone 1: Reliability (Near Term)
+## Milestone 1: Reliability — [done]
 
 1. [done] add handler/unit tests for:
 - ayah endpoints with `lang` modes
