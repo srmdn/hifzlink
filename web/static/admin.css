@@ -1,0 +1,252 @@
+.admin-error {
+  margin-bottom: 0.75rem;
+}
+
+.admin-success {
+  margin: 0 0 0.75rem;
+  color: #0f5b4f;
+  background: #e7f5f2;
+  border: 1px solid #c8e8e2;
+  border-radius: 10px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.7rem;
+  align-items: end;
+}
+
+.admin-form label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.admin-form label[for="note"] {
+  grid-column: 1 / -1;
+}
+
+.admin-form label[for="category"] {
+  grid-column: 1 / -1;
+}
+
+.admin-form #note,
+.admin-form #category {
+  grid-column: 1 / -1;
+}
+
+.admin-category-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.admin-category-guide {
+  grid-column: 1 / -1;
+  margin: 0.18rem 0 0;
+  padding-left: 1rem;
+  color: #516576;
+  font-size: 0.86rem;
+}
+
+.admin-category-guide li {
+  margin: 0.2rem 0;
+}
+
+.admin-form button {
+  grid-column: 1 / -1;
+  width: fit-content;
+}
+
+.admin-relation-group {
+  margin-bottom: 1.2rem;
+}
+
+.admin-group-anchor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2d4a5a;
+  background: #e8f2f7;
+  border-left: 3px solid #6ab0c8;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0 6px 6px 0;
+  margin: 0 0 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-relations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-filter-form {
+  display: flex;
+  align-items: end;
+  gap: 0.55rem;
+  margin: 0 0 0.7rem;
+  flex-wrap: wrap;
+}
+
+.admin-filter-form label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.admin-filter-form select {
+  min-width: 170px;
+}
+
+.admin-relation-item {
+  border-top: 1px solid var(--border);
+  padding: 0.82rem 0;
+}
+
+.admin-relation-item:first-child {
+  border-top: 0;
+}
+
+.admin-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.category-badge {
+  display: inline-block;
+  margin: 0.12rem 0 0.24rem;
+  border: 1px solid #cddbe4;
+  background: #ecf2f6;
+  color: #2d4558;
+  border-radius: 999px;
+  padding: 0.16rem 0.52rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.word-picker-section {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+}
+
+.word-picker-label {
+  font-size: 0.78rem;
+  color: #526679;
+  margin: 0 0 0.35rem;
+}
+
+.word-picker {
+  direction: rtl;
+  text-align: right;
+  background: #f0f6fa;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  margin-bottom: 0.35rem;
+  line-height: 2.4;
+  font-family: "Amiri Quran", serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+}
+
+.word-picker-word {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 1px 3px;
+  transition: background 0.12s;
+  user-select: none;
+}
+
+.word-picker-word:hover {
+  background: #fde68a;
+}
+
+.word-picker-word.selected {
+  background: #ffe066;
+  font-weight: 600;
+}
+
+.admin-diff {
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-diff .arabic {
+  margin: 0;
+}
+
+.admin-edit-form {
+  margin-top: 0.55rem;
+  border: 1px dashed #c8d6e0;
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 0.62rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.44rem 0.6rem;
+}
+
+.admin-edit-form[hidden] {
+  display: none !important;
+}
+
+.admin-edit-form label {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.admin-edit-actions {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  gap: 0.42rem;
+  margin-top: 0.25rem;
+}
+
+.delete-dialog {
+  border: 0;
+  border-radius: 14px;
+  width: min(92vw, 420px);
+  padding: 0;
+  box-shadow: 0 18px 34px rgba(7, 19, 31, 0.28);
+}
+
+.delete-dialog::backdrop {
+  background: rgba(12, 24, 38, 0.42);
+}
+
+.delete-dialog-body {
+  padding: 0.95rem;
+}
+
+.delete-dialog-body h3 {
+  margin: 0 0 0.4rem;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .admin-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-edit-form {
+    grid-template-columns: 1fr;
+  }
+}
