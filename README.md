@@ -2,6 +2,8 @@
 
 Simple Go web app to help memorizers review similar Quran verses (mutashabihat).
 
+![HifzLink homepage](docs/screenshots/homepage.webp)
+
 ## Stack
 
 - Go (`net/http`)
