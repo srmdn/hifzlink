@@ -1,9 +1,19 @@
-data/relations.db
+# Database
+data/*.db
+data/*.db-wal
+data/*.db-shm
 data/raw/
 
+# Binary
+hifzlink
+bin/
+
+# Secrets
+.env*
+!.env.example
+
+# Misc
 .DS_Store
 *.log
 tmp/
-bin/
 coverage.out
-.env
