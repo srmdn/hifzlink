@@ -134,15 +134,23 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	categoryFilter := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("category")))
 
 	type pairResult struct {
-		Ayah1      string
-		Ayah1Name  string
-		Ayah2      string
-		Ayah2Name  string
-		Category   string
-		Note       string
-		CompareURL string
+		Ayah1         string
+		Ayah1Name     string
+		Ayah2         string
+		Ayah2Name     string
+		Category      string
+		CategoryLabel string
+		Note          string
+		CompareURL    string
+	}
+
+	categoryOptions := adminCategoryOptions()
+	categoryLabelMap := make(map[string]string, len(categoryOptions))
+	for _, opt := range categoryOptions {
+		categoryLabelMap[opt.Key] = opt.Label
 	}
 
 	var results []pairResult
@@ -154,15 +162,12 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		if surahNum, ayahNum, parseErr := relations.ParseAyahRef(q); parseErr == nil {
-			// exact ayah ref: e.g. 60:8
 			queryLabel = fmt.Sprintf("pairs involving %s", relations.FormatAyahRef(surahNum, ayahNum))
 			dbRels, err = s.db.ByAyah(surahNum, ayahNum)
 		} else if n, atoiErr := strconv.Atoi(q); atoiErr == nil && n >= 1 && n <= 114 {
-			// surah number: e.g. 60
 			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
 			dbRels, err = s.db.BySurah(n)
 		} else if n := search.SurahByName(q); n > 0 {
-			// surah name: e.g. "mumtahanah"
 			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
 			dbRels, err = s.db.BySurah(n)
 		} else {
@@ -176,26 +181,33 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 
 		lang := pageLang(r)
 		for _, rel := range dbRels {
+			if categoryFilter != "" && strings.ToLower(rel.Category) != categoryFilter {
+				continue
+			}
 			ref1 := relations.FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah)
 			ref2 := relations.FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah)
 			results = append(results, pairResult{
-				Ayah1:      ref1,
-				Ayah1Name:  s.quran.SurahName(rel.Ayah1Surah),
-				Ayah2:      ref2,
-				Ayah2Name:  s.quran.SurahName(rel.Ayah2Surah),
-				Category:   rel.Category,
-				Note:       rel.Note,
-				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+				Ayah1:         ref1,
+				Ayah1Name:     s.quran.SurahName(rel.Ayah1Surah),
+				Ayah2:         ref2,
+				Ayah2Name:     s.quran.SurahName(rel.Ayah2Surah),
+				Category:      rel.Category,
+				CategoryLabel: categoryLabelMap[rel.Category],
+				Note:          rel.Note,
+				CompareURL:    withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
 			})
 		}
 	}
 
 	s.render(w, "search.html", withCommonViewData(r, map[string]any{
-		"Title":      "Search pairs",
-		"Query":      q,
-		"QueryLabel": queryLabel,
-		"Results":    results,
-		"ErrMsg":     errMsg,
+		"Title":            "Search pairs",
+		"Query":            q,
+		"QueryLabel":       queryLabel,
+		"Results":          results,
+		"ErrMsg":           errMsg,
+		"CategoryOptions":  categoryOptions,
+		"CategoryFilter":   categoryFilter,
+		"CategoryLabelMap": categoryLabelMap,
 	}))
 }
 

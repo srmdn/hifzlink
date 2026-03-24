@@ -839,6 +839,22 @@ mark.word-unique {
   outline-offset: 1px;
 }
 
+.search-pairs-select {
+  padding: 0.55em 0.75em;
+  font-size: 0.88rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-pairs-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 .search-pairs-label {
   font-size: 0.9rem;
   font-weight: 600;
