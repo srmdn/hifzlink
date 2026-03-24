@@ -6,7 +6,7 @@
 
   <main class="container">
     <p class="back">
-      <a href="/ayah/{{.Ayah1.Surah}}/{{.Ayah1.Ayah}}?lang={{.Lang}}">← {{.Ref1}}</a>
+      <a href="/ayah/{{.Ayah1.Surah}}/{{.Ayah1.Ayah}}?lang={{.Lang}}" id="back-link">← Back</a>
     </p>
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
 
@@ -74,6 +74,16 @@
 
 {{template "footer" .}}
 <script>
+  (() => {
+    const link = document.getElementById("back-link");
+    if (link && document.referrer) {
+      try {
+        if (new URL(document.referrer).origin === window.location.origin) {
+          link.href = document.referrer;
+        }
+      } catch (_) {}
+    }
+  })();
   (() => {
     const btn = document.getElementById("toggle-highlights");
     const grid = document.querySelector(".compare-grid");
