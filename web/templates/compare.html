@@ -5,9 +5,6 @@
 {{template "topbar" .}}
 
   <main class="container">
-    <p class="back">
-      <a href="/ayah/{{.Ayah1.Surah}}/{{.Ayah1.Ayah}}?lang={{.Lang}}" id="back-link">← Back</a>
-    </p>
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
 
     <section class="card">
@@ -74,20 +71,6 @@
 
 {{template "footer" .}}
 <script>
-  (() => {
-    const link = document.getElementById("back-link");
-    if (link && document.referrer) {
-      try {
-        const ref = new URL(document.referrer);
-        if (ref.origin !== window.location.origin) return;
-        const rp = new URLSearchParams(ref.search);
-        const cp = new URLSearchParams(window.location.search);
-        rp.delete("lang"); cp.delete("lang");
-        const isLangSwitch = ref.pathname === window.location.pathname && rp.toString() === cp.toString();
-        if (!isLangSwitch) link.href = document.referrer;
-      } catch (_) {}
-    }
-  })();
   (() => {
     const btn = document.getElementById("toggle-highlights");
     const grid = document.querySelector(".compare-grid");

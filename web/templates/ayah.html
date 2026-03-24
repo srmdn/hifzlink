@@ -5,7 +5,6 @@
 {{template "topbar" .}}
 
   <main class="container">
-    <p class="back"><a href="{{.HomeURL}}" id="back-link">← Back</a></p>
     <div class="page-heading">
       <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
       <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
@@ -80,21 +79,6 @@
 
 {{template "footer" .}}
 <script>
-  (() => {
-    const link = document.getElementById("back-link");
-    if (link && document.referrer) {
-      try {
-        const ref = new URL(document.referrer);
-        if (ref.origin !== window.location.origin) return;
-        // Ignore referrer if it's just a lang switch (same path, same params minus lang).
-        const rp = new URLSearchParams(ref.search);
-        const cp = new URLSearchParams(window.location.search);
-        rp.delete("lang"); cp.delete("lang");
-        const isLangSwitch = ref.pathname === window.location.pathname && rp.toString() === cp.toString();
-        if (!isLangSwitch) link.href = document.referrer;
-      } catch (_) {}
-    }
-  })();
   (() => {
     const toggle = document.getElementById("tafsir-toggle");
     const body = document.getElementById("tafsir-body");
