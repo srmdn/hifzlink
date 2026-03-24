@@ -6,7 +6,7 @@
 
   <main class="container">
     <h1>Browse by Surah</h1>
-    <p class="meta">114 surahs — surahs with mutashabihat pairs are highlighted.</p>
+    <p class="meta">114 surahs. Surahs with mutashabihat pairs are highlighted.</p>
 
     <div class="surah-index-list">
       {{range .Surahs}}
@@ -16,7 +16,7 @@
         {{if gt .RelationCount 0}}
         <span class="surah-index-badge">{{.RelationCount}}</span>
         {{else}}
-        <span class="surah-index-empty">—</span>
+        <span class="surah-index-empty">·</span>
         {{end}}
       </a>
       {{end}}

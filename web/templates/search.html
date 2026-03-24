@@ -39,7 +39,7 @@
     {{if .Query}}
       {{if .Results}}
       <section class="card">
-        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} — {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
+        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} for {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
         <ul class="pairs-list">
           {{range .Results}}
           <li class="pair-item">
