@@ -55,12 +55,13 @@ func newTestServer(t *testing.T) *server {
 	t.Cleanup(func() { dbStore.Close() })
 
 	return &server{
-		quran:     quranStore,
-		trans:     transStore,
-		db:        dbStore,
-		rels:      relations.NewService(dbStore, quranStore),
-		adminUser: "admin",
-		adminPass: "secret",
+		quran:        quranStore,
+		trans:        transStore,
+		db:           dbStore,
+		rels:         relations.NewService(dbStore, quranStore),
+		adminUser:    "admin",
+		adminPass:    "secret",
+		adminLimiter: newAdminRateLimiter(),
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
@@ -604,7 +605,7 @@ func TestHandleCollectionsPage_PostCreateRedirect(t *testing.T) {
 		t.Fatalf("expected 303, got %d", rr.Code)
 	}
 	location := rr.Header().Get("Location")
-	if !strings.Contains(location, "/collections/") || !strings.Contains(location, "status=created") {
+	if !strings.Contains(location, "/dashboard") || !strings.Contains(location, "status=created") {
 		t.Fatalf("unexpected redirect location: %s", location)
 	}
 }

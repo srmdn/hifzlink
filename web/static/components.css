@@ -266,6 +266,48 @@ mark.word-unique {
   margin-top: 2.5rem;
 }
 
+.tafsir-card .tafsir-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tafsir-card .tafsir-header h2 {
+  margin: 0;
+}
+
+.tafsir-source {
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 0.18rem;
+}
+
+.tafsir-body {
+  margin-top: 1rem;
+  border-top: 1px dashed var(--border);
+  padding-top: 1rem;
+  font-size: 0.97rem;
+  line-height: 1.75;
+  color: #2e3f4e;
+}
+
+.tafsir-body p {
+  margin: 0 0 0.9rem;
+}
+
+.tafsir-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tafsir-body h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.1rem 0 0.4rem;
+  color: #0b2734;
+}
+
 .not-found-card .button-link {
   margin-top: 0.5rem;
 }

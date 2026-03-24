@@ -25,6 +25,7 @@ import (
 type server struct {
 	quran   *search.Store
 	trans   *search.TranslationStore
+	tafsir  *search.TranslationStore
 	db      *db.Store
 	rels    *relations.Service
 	tmpl    *template.Template
@@ -116,6 +117,15 @@ func main() {
 		log.Fatalf("failed to load translations: %v", err)
 	}
 
+	tafsirDir := filepath.Join(baseDir, "data", "tafsir")
+	tafsirStore, err := search.LoadTranslationFiles(map[string]string{
+		"en": filepath.Join(tafsirDir, "en.ibn-kathir.json"),
+		"id": filepath.Join(tafsirDir, "id.kemenag.json"),
+	})
+	if err != nil {
+		log.Fatalf("failed to load tafsir: %v", err)
+	}
+
 	dbStore, err := db.Open(filepath.Join(baseDir, "data", "relations.db"))
 	if err != nil {
 		log.Fatalf("failed to open db: %v", err)
@@ -130,6 +140,7 @@ func main() {
 	s := &server{
 		quran:        quran,
 		trans:        translations,
+		tafsir:       tafsirStore,
 		db:           dbStore,
 		rels:         relations.NewService(dbStore, quran),
 		tmpl:         tmpl,
@@ -323,12 +334,15 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tafsirContent := s.tafsirFor(lang, surah, ayah)
 	s.render(w, "ayah.html", withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
 		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
 		"Ayah":            a,
 		"AyahTranslation": ayahTranslation,
+		"AyahTafsir":      tafsirContent,
+		"TafsirSource":    tafsirSourceLabel(lang),
 		"Related":         related,
 		"SurahName":       a.SurahName,
 		"Collections":     collections,
@@ -1245,6 +1259,50 @@ func (s *server) translationFor(lang string, surah, ayah int) string {
 	}
 	text, _ := s.trans.Get(lang, surah, ayah)
 	return text
+}
+
+func (s *server) tafsirFor(lang string, surah, ayah int) template.HTML {
+	if s.tafsir == nil || lang == "ar" {
+		return ""
+	}
+	text, ok := s.tafsir.Get(lang, surah, ayah)
+	if !ok {
+		return ""
+	}
+	if lang == "en" {
+		// en.ibn-kathir is already HTML from a trusted local file.
+		return template.HTML(text) //nolint:gosec
+	}
+	// id.kemenag is plain text with \n\n paragraph breaks.
+	return idTafsirToHTML(text)
+}
+
+func idTafsirToHTML(text string) template.HTML {
+	paragraphs := strings.Split(text, "\n\n")
+	var buf strings.Builder
+	for _, p := range paragraphs {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		p = template.HTMLEscapeString(p)
+		p = strings.ReplaceAll(p, "\n", "<br>")
+		buf.WriteString("<p>")
+		buf.WriteString(p)
+		buf.WriteString("</p>\n")
+	}
+	return template.HTML(buf.String()) //nolint:gosec
+}
+
+func tafsirSourceLabel(lang string) string {
+	switch lang {
+	case "en":
+		return "Ibn Kathir"
+	case "id":
+		return "Kemenag RI"
+	default:
+		return ""
+	}
 }
 
 func (s *server) withTranslations(lang string, related []relations.AyahView) []relations.AyahView {

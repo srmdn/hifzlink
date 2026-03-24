@@ -40,6 +40,21 @@
       {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
     </article>
 
+    {{if .AyahTafsir}}
+    <section class="card tafsir-card">
+      <div class="tafsir-header">
+        <div>
+          <h2>Tafsir</h2>
+          <span class="tafsir-source">{{.TafsirSource}}</span>
+        </div>
+        <button type="button" class="btn-sm" id="tafsir-toggle" aria-expanded="false" aria-controls="tafsir-body">Show</button>
+      </div>
+      <div class="tafsir-body" id="tafsir-body" hidden>
+        {{.AyahTafsir}}
+      </div>
+    </section>
+    {{end}}
+
     <section class="card">
       <h2>Related Verses</h2>
       {{if .Related}}
@@ -65,6 +80,18 @@
 
 {{template "footer" .}}
 <script>
+  (() => {
+    const toggle = document.getElementById("tafsir-toggle");
+    const body = document.getElementById("tafsir-body");
+    if (toggle && body) {
+      toggle.addEventListener("click", () => {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        body.hidden = expanded;
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        toggle.textContent = expanded ? "Show" : "Hide";
+      });
+    }
+  })();
   (() => {
     const btn = document.getElementById("share-btn");
     if (!btn) return;

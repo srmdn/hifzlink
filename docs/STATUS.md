@@ -1,10 +1,10 @@
 # Project Status
 
-Last updated: 2026-03-24 (session 6)
+Last updated: 2026-03-24 (session 7)
 
 ## Current State
 
-HifzLink is past MVP, Milestone 2 complete. The public-facing site is fully functional and styled for open source use.
+HifzLink v0.2.2. Tafsir display complete. The public-facing site is fully functional and styled for open source use.
 
 - full Quran Arabic dataset loaded locally (`6236` ayahs)
 - local SQLite relation storage working with migration system
@@ -37,6 +37,7 @@ HifzLink is past MVP, Milestone 2 complete. The public-facing site is fully func
 - dashboard: quick resume links, recent collections, recent saved items
 - admin relation management: add, edit, delete, category filter, word picker for highlights
 - admin protected by HTTP Basic Auth (`HIFZLINK_ADMIN_USER` / `HIFZLINK_ADMIN_PASS`)
+- tafsir display on ayah pages: collapsible section for `lang=en` (Ibn Kathir) and `lang=id` (Kemenag RI)
 
 ## Data And Scripts
 
