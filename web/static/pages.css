@@ -286,6 +286,10 @@
 .lp-hero {
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--border);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
 }
 
 .lp-hero-inner {
@@ -320,7 +324,7 @@
 
 .lp-cta-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.65rem;
   align-items: center;
 }
@@ -328,6 +332,9 @@
 .lp-cta-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 260px;
   background: var(--accent);
   color: #fff;
   font-weight: 700;
@@ -345,6 +352,9 @@
 .lp-cta-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 260px;
   background: var(--surface);
   color: var(--text);
   font-weight: 600;
@@ -498,10 +508,6 @@
   margin-right: auto;
 }
 
-.lp-browse-inner .lp-cta-group {
-  justify-content: center;
-}
-
 .lp-diff-example {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -541,7 +547,7 @@
 
 @media (max-width: 600px) {
   .lp-hero {
-    padding: 3rem 0 2.5rem;
+    padding: 2rem 0;
   }
 
   .lp-hero-inner {
@@ -553,21 +559,8 @@
     margin-right: auto;
   }
 
-  .lp-hero-inner .lp-cta-group {
-    justify-content: center;
-  }
-
   .lp-section {
     padding: 2.5rem 0;
-  }
-
-  .lp-cta-group {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .lp-browse-inner .lp-cta-group {
-    align-items: center;
   }
 
   .lp-diff-example {
