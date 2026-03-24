@@ -55,7 +55,7 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 ## Milestone 3: Data Quality And Curation
 
 1. expand `relations.seed.json` into curated starter set
-2. [in progress] define relation taxonomy for mutashabihat curation:
+2. [done] define relation taxonomy for mutashabihat curation:
 - primary murojaah tags (confusion pattern):
   - `lafzi_near_identical`
   - `word_swap`

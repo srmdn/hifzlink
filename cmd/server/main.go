@@ -1347,12 +1347,13 @@ func addQueryParam(path, key, value string) string {
 
 func adminCategoryOptions() []adminCategoryOption {
 	return []adminCategoryOption{
-		{Key: "lafzi", Label: "Lafzi (near-identical wording)", Hint: "Use when verses are very similar in wording with small wording changes."},
-		{Key: "maana", Label: "Maana (similar meaning)", Hint: "Use when wording differs more, but meaning/theme overlaps."},
-		{Key: "siyam", Label: "Siyam (fasting)", Hint: "Use for verses related to fasting rulings or guidance."},
-		{Key: "aqidah", Label: "Aqidah (belief)", Hint: "Use for belief, tawhid, iman, and related theology."},
-		{Key: "adab", Label: "Adab (manners/ethics)", Hint: "Use for etiquette and character guidance."},
-		{Key: "other", Label: "Other", Hint: "Use only when none of the categories fit clearly."},
+		{Key: "lafzi", Label: "Lafzi (near-identical wording)", Hint: "Verses are almost the same word-for-word — very small differences."},
+		{Key: "addition_omission", Label: "Addition / omission", Hint: "One verse adds or drops a word compared to the other."},
+		{Key: "word_swap", Label: "Word swap", Hint: "A word is replaced by a similar or related one."},
+		{Key: "ending_variation", Label: "Ending variation", Hint: "Same opening, but the ending differs."},
+		{Key: "order_change", Label: "Order change", Hint: "Same words, different sequence."},
+		{Key: "pronoun_shift", Label: "Pronoun shift", Hint: "A pronoun changes — e.g. هُوَ vs هُمْ, or كُمْ vs هُمْ."},
+		{Key: "other", Label: "Other", Hint: "Use only when none of the patterns fit clearly."},
 	}
 }
 
