@@ -183,7 +183,8 @@ func main() {
 
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "home.html", withCommonViewData(r, map[string]any{
-		"Title": "hifzlink — Quran mutashabihat review",
+		"Title":       "hifzlink — Quran mutashabihat review",
+		"Description": "hifzlink helps you identify and review mutashabihat — similar Quran verses that are easy to confuse. Try it yourself at hifz.click.",
 	}))
 }
 
@@ -278,6 +279,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "search.html", withCommonViewData(r, map[string]any{
 		"Title":            "Search pairs",
+		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
 		"Query":            q,
 		"QueryLabel":       queryLabel,
 		"Results":          results,
@@ -323,6 +325,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "ayah.html", withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
+		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
 		"Ayah":            a,
 		"AyahTranslation": ayahTranslation,
@@ -414,6 +417,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
+		"Description":      "Compare two similar Quran verses side by side and spot the differences. Try it yourself at hifz.click.",
 		"Ayah1":            ayah1,
 		"Ayah1Translation": s.translationFor(pageLang(r), s1, y1),
 		"Ayah2":            ayah2,
@@ -806,7 +810,8 @@ func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "surah-index.html", withCommonViewData(r, map[string]any{
-		"Title":  "Browse by Surah",
+		"Title":       "Browse by Surah",
+		"Description": "Browse all 114 surahs and their mutashabihat relations. Try it yourself at hifz.click.",
 		"Surahs": items,
 	}))
 }
@@ -850,7 +855,8 @@ func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "juz-index.html", withCommonViewData(r, map[string]any{
-		"Title": "Browse by Juz",
+		"Title":       "Browse by Juz",
+		"Description": "Browse mutashabihat relations across all 30 juz of the Quran. Try it yourself at hifz.click.",
 		"Juzs":  items,
 	}))
 }
@@ -873,7 +879,8 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "surah.html", withCommonViewData(r, map[string]any{
-		"Title":     fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Title":       fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Description": fmt.Sprintf("Browse mutashabihat relations in Surah %d — %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
 		"Surah":     surah,
 		"SurahName": s.quran.SurahName(surah),
 		"Pairs":     pairs,
@@ -898,7 +905,8 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "juz.html", withCommonViewData(r, map[string]any{
-		"Title": fmt.Sprintf("Juz %d Relations", juz),
+		"Title":       fmt.Sprintf("Juz %d Relations", juz),
+		"Description": fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
 		"Juz":   juz,
 		"Pairs": pairs,
 	}))
@@ -1193,6 +1201,13 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["SurahIndexURL"] = withLang("/surah", lang)
 	data["JuzIndexURL"] = withLang("/juz", lang)
 	data["SearchURL"] = withLang("/search", lang)
+
+	base := "https://" + r.Host
+	data["CanonicalURL"] = base + r.URL.Path
+	data["OGImageURL"] = base + "/static/og-image.png"
+	if _, ok := data["Description"]; !ok {
+		data["Description"] = "Master Quran mutashabihat — review similar verses and strengthen your memorization."
+	}
 	return data
 }
 
