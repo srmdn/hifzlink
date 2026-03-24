@@ -118,22 +118,6 @@
   outline-offset: 1px;
 }
 
-.search-pairs-select {
-  padding: 0.55em 0.75em;
-  font-size: 0.88rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.search-pairs-select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
 .search-pairs-label {
   font-size: 0.9rem;
   font-weight: 600;
@@ -153,14 +137,42 @@
   color: var(--accent);
 }
 
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0.9rem;
+}
+
+.filter-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--surface);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.filter-pill:hover {
+  background: #e8f4f2;
+  border-color: #b8d8d3;
+  color: #1a6b5e;
+}
+
+.filter-pill.active {
+  background: #1a6b5e;
+  border-color: #1a6b5e;
+  color: #fff;
+}
+
 @media (max-width: 600px) {
   .search-pairs-row {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .search-pairs-select {
-    width: 100%;
   }
 }
 
