@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -41,6 +42,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to locate project root: %v", err)
 	}
+
+	loadDotEnv(filepath.Join(baseDir, ".env"))
 
 	quran, err := search.Load(filepath.Join(baseDir, "data", "quran.json"))
 	if err != nil {
@@ -1279,6 +1282,32 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 	}
 
 	s.render(w, "admin-relations.html", withCommonViewData(r, data))
+}
+
+// loadDotEnv reads key=value pairs from path and sets them via os.Setenv,
+// skipping any key that is already set in the environment.
+func loadDotEnv(path string) {
+	f, err := os.Open(path)
+	if err != nil {
+		return // .env is optional
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		k, v, ok := strings.Cut(line, "=")
+		if !ok {
+			continue
+		}
+		k = strings.TrimSpace(k)
+		v = strings.TrimSpace(v)
+		if k != "" && os.Getenv(k) == "" {
+			os.Setenv(k, v)
+		}
+	}
 }
 
 func resolveBaseDir() (string, error) {
