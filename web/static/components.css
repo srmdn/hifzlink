@@ -1,0 +1,254 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  margin: 1rem 0;
+  box-shadow: var(--card-shadow);
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--text-muted);
+  max-width: 66ch;
+}
+
+.back {
+  margin: 0 0 0.75rem;
+}
+
+.back a {
+  color: #546779;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.32rem 0.66rem;
+  font-size: 0.84rem;
+}
+
+.hero-meta {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+  border-radius: 10px;
+  padding: 0.72rem 0.9rem;
+}
+
+input,
+select {
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+button,
+.button-link {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+button:hover,
+.button-link:hover {
+  background: var(--accent-strong);
+}
+
+.button-link {
+  display: inline-block;
+  padding: 0.4rem 0.74rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.button-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.55em 1em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button-primary:hover {
+  background: var(--accent-strong);
+}
+
+.button-danger {
+  border: 0;
+  background: #be123c;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0.4rem 0.74rem;
+  cursor: pointer;
+}
+
+.button-danger:hover {
+  background: #9f1239;
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #324a5e;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0.4rem 0.74rem;
+  cursor: pointer;
+}
+
+.button-secondary:hover {
+  background: #dce8ee;
+  color: #142838;
+}
+
+.error-msg {
+  grid-column: 1 / -1;
+  margin: 0.06rem 0 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.collection-form,
+.collection-save-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.7rem;
+  align-items: end;
+}
+
+.collection-form label,
+.collection-save-form label {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+}
+
+.collection-form input[id="collection-description"],
+.collection-save-form input[name="note"] {
+  grid-column: 1 / -1;
+}
+
+.collection-form button,
+.collection-save-form button {
+  width: fit-content;
+}
+
+.inline-form {
+  margin: 0;
+}
+
+.meta {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.simple-list,
+.related-list,
+.pairs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.simple-list li,
+.related-item,
+.pairs-list li {
+  border-top: 1px solid var(--border);
+  padding: 0.82rem 0;
+}
+
+.simple-list li:first-child,
+.related-item:first-child,
+.pairs-list li:first-child {
+  border-top: 0;
+}
+
+.line-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.66rem;
+  flex-wrap: wrap;
+}
+
+.verse-card {
+  border-left: 4px solid #b8d8d3;
+}
+
+.arabic {
+  margin: 0.72rem 0;
+  font-family: "Amiri Quran", "Noto Naskh Arabic", serif;
+  font-size: clamp(1.78rem, 3vw, 2.18rem);
+  line-height: 2.06;
+  direction: rtl;
+  text-align: right;
+  color: #0b2734;
+}
+
+.arabic-small {
+  font-size: clamp(1.45rem, 2.7vw, 1.78rem);
+}
+
+.translation {
+  margin: 0.5rem 0 0;
+  border-top: 1px dashed var(--border);
+  padding-top: 0.58rem;
+  color: #4f6278;
+  font-size: 0.99rem;
+}
+
+mark.word-unique {
+  background: #ffe066;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.pair-refs {
+  font-weight: 500;
+}
+
+.note {
+  margin-top: 0.3rem;
+}
+
+.not-found-card {
+  max-width: 540px;
+  margin-top: 2.5rem;
+}
+
+.not-found-card .button-link {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .collection-form,
+  .collection-save-form {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-meta {
+    gap: 0.36rem;
+  }
+}
