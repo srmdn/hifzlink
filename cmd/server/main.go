@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,6 +14,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/srmdn/hifzlink/internal/db"
 	"github.com/srmdn/hifzlink/internal/relations"
@@ -27,8 +30,66 @@ type server struct {
 	tmpl    *template.Template
 	baseDir string
 
-	adminUser string
-	adminPass string
+	adminUser    string
+	adminPass    string
+	adminLimiter *adminRateLimiter
+}
+
+// adminRateLimiter is a simple sliding-window rate limiter for admin endpoints.
+type adminRateLimiter struct {
+	mu      sync.Mutex
+	entries map[string][]time.Time
+}
+
+func newAdminRateLimiter() *adminRateLimiter {
+	return &adminRateLimiter{entries: make(map[string][]time.Time)}
+}
+
+func (l *adminRateLimiter) allow(ip string) bool {
+	const maxAttempts = 20
+	const window = time.Minute
+	now := time.Now()
+	cutoff := now.Add(-window)
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	times := l.entries[ip]
+	i := 0
+	for _, t := range times {
+		if t.After(cutoff) {
+			times[i] = t
+			i++
+		}
+	}
+	times = times[:i]
+	if len(times) >= maxAttempts {
+		l.entries[ip] = times
+		return false
+	}
+	l.entries[ip] = append(times, now)
+	return true
+}
+
+// internalError logs the error server-side and returns a generic 500 to the client.
+func internalError(w http.ResponseWriter, r *http.Request, err error) {
+	log.Printf("internal error %s %s: %v", r.Method, r.URL.Path, err)
+	http.Error(w, "internal server error", http.StatusInternalServerError)
+}
+
+// isSafeRedirect returns true if target is a safe relative URL (no open redirect).
+func isSafeRedirect(target string) bool {
+	return strings.HasPrefix(target, "/") && !strings.HasPrefix(target, "//")
+}
+
+// realIP extracts the real client IP, preferring X-Real-IP set by nginx.
+func realIP(r *http.Request) string {
+	if ip := r.Header.Get("X-Real-IP"); ip != "" {
+		return ip
+	}
+	addr := r.RemoteAddr
+	if i := strings.LastIndex(addr, ":"); i >= 0 {
+		return addr[:i]
+	}
+	return addr
 }
 
 type adminCategoryOption struct {
@@ -67,14 +128,15 @@ func main() {
 	}
 
 	s := &server{
-		quran:     quran,
-		trans:     translations,
-		db:        dbStore,
-		rels:      relations.NewService(dbStore, quran),
-		tmpl:      tmpl,
-		baseDir:   baseDir,
-		adminUser: strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
-		adminPass: strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
+		quran:        quran,
+		trans:        translations,
+		db:           dbStore,
+		rels:         relations.NewService(dbStore, quran),
+		tmpl:         tmpl,
+		baseDir:      baseDir,
+		adminUser:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
+		adminPass:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
+		adminLimiter: newAdminRateLimiter(),
 	}
 
 	mux := http.NewServeMux()
@@ -105,8 +167,16 @@ func main() {
 		port = "8080"
 	}
 	addr := "127.0.0.1:" + port
+	srv := &http.Server{
+		Addr:           addr,
+		Handler:        logRequests(mux),
+		ReadTimeout:    15 * time.Second,
+		WriteTimeout:   30 * time.Second,
+		IdleTimeout:    60 * time.Second,
+		MaxHeaderBytes: 1 << 20, // 1 MB
+	}
 	log.Printf("server listening on %s", addr)
-	if err := http.ListenAndServe(addr, logRequests(mux)); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -127,7 +197,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		surah, ayah, err := relations.ParseAyahRef(raw)
 		if err != nil {
 			lang := sanitizeLang(r.FormValue("lang"))
-			http.Redirect(w, r, fmt.Sprintf("/?error=invalid_ref&q=%s&lang=%s", raw, lang), http.StatusSeeOther)
+			http.Redirect(w, r, fmt.Sprintf("/?error=invalid_ref&q=%s&lang=%s", neturl.QueryEscape(raw), lang), http.StatusSeeOther)
 			return
 		}
 		lang := sanitizeLang(r.FormValue("lang"))
@@ -182,7 +252,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			internalError(w, r, err)
 			return
 		}
 
@@ -238,7 +308,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 
 	related, err := s.rels.RelatedAyahs(surah, ayah)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 	lang := pageLang(r)
@@ -247,7 +317,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 
 	collections, err := s.db.Collections()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -291,7 +361,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 
 	collections, err := s.db.Collections()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -379,12 +449,12 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	collections, err := s.db.RecentCollections(6)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 	recentItems, err := s.db.RecentCollectionItems(12)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -421,7 +491,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	allCollections, err := s.db.Collections()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -441,7 +511,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		collections, err := s.db.Collections()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			internalError(w, r, err)
 			return
 		}
 		s.render(w, "collections.html", withCommonViewData(r, map[string]any{
@@ -534,7 +604,7 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 	}
 	items, err := s.db.CollectionItems(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -659,12 +729,12 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 
 	inserted, err := s.db.AddCollectionItem(item)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
 	returnTo := strings.TrimSpace(r.FormValue("return_to"))
-	if returnTo == "" {
+	if returnTo == "" || !isSafeRedirect(returnTo) {
 		returnTo = fmt.Sprintf("/collections/%d", collectionID)
 	}
 	statusCode := "saved"
@@ -722,7 +792,7 @@ func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
 
 	counts, err := s.db.RelationCountBySurah()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -750,7 +820,7 @@ func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
 	// Compute juz relation counts from all relations via quran store.
 	allRels, err := s.db.All()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -791,14 +861,14 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	surah, err := parseSingleIntPath(r.URL.Path, "/surah/", "")
-	if err != nil {
+	if err != nil || surah < 1 || surah > 114 {
 		http.NotFound(w, r)
 		return
 	}
 
 	pairs, err := s.rels.PairsBySurah(surah)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -816,14 +886,14 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	juz, err := parseSingleIntPath(r.URL.Path, "/juz/", "")
-	if err != nil {
+	if err != nil || juz < 1 || juz > 30 {
 		http.NotFound(w, r)
 		return
 	}
 
 	pairs, err := s.rels.PairsByJuz(juz)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 
@@ -974,7 +1044,7 @@ func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
 	if len(parts) == 3 && parts[2] == "relations" {
 		related, err := s.rels.RelatedAyahs(surah, ayah)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			internalError(w, r, err)
 			return
 		}
 		lang := pageLang(r)
@@ -1021,14 +1091,14 @@ func (s *server) handleAPISurah(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	value, err := parseSingleIntPath(r.URL.Path, "/api/surah/", "/relations")
-	if err != nil {
+	if err != nil || value < 1 || value > 114 {
 		http.NotFound(w, r)
 		return
 	}
 
 	pairs, err := s.rels.PairsBySurah(value)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -1044,14 +1114,14 @@ func (s *server) handleAPIJuz(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	value, err := parseSingleIntPath(r.URL.Path, "/api/juz/", "/relations")
-	if err != nil {
+	if err != nil || value < 1 || value > 30 {
 		http.NotFound(w, r)
 		return
 	}
 
 	pairs, err := s.rels.PairsByJuz(value)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -1063,7 +1133,8 @@ func (s *server) handleAPIJuz(w http.ResponseWriter, r *http.Request) {
 func (s *server) render(w http.ResponseWriter, name string, data map[string]any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := s.tmpl.ExecuteTemplate(w, name, data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("render error template=%s: %v", name, err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 	}
 }
 
@@ -1212,7 +1283,7 @@ type adminRelationWithDiff struct {
 func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request, overrides map[string]any) {
 	rows, err := s.rels.AllRelations()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalError(w, r, err)
 		return
 	}
 	categoryFilter := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("category")))
@@ -1336,8 +1407,15 @@ func (s *server) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 
+	if !s.adminLimiter.allow(realIP(r)) {
+		http.Error(w, "too many requests", http.StatusTooManyRequests)
+		return false
+	}
+
 	user, pass, ok := r.BasicAuth()
-	if ok && user == s.adminUser && pass == s.adminPass {
+	userMatch := subtle.ConstantTimeCompare([]byte(user), []byte(s.adminUser))
+	passMatch := subtle.ConstantTimeCompare([]byte(pass), []byte(s.adminPass))
+	if ok && userMatch == 1 && passMatch == 1 {
 		return true
 	}
 
