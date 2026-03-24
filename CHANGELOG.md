@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is inspired by Keep a Changelog.
 
+## [0.2.2] - 2026-03-24 — Tafsir display
+
+### Added
+
+- collapsible tafsir section on ayah pages — shown for `lang=en` (Ibn Kathir) and `lang=id` (Kemenag RI)
+- `LoadTranslationFiles` in `internal/search` for loading stores from arbitrary lang→filepath mappings
+- `tafsirFor` server helper: en tafsir rendered as trusted HTML, id tafsir converted from plain text to paragraph HTML
+
+### Fixed
+
+- `handlers_test.go`: missing `adminLimiter` in test server helper (caused nil panic on admin endpoint tests)
+- `handlers_test.go`: stale redirect assertion for collection create (now goes to `/dashboard`)
+
 ## [0.2.1] - 2026-03-24 — Milestone 3 + open source maturity
 
 ### Added

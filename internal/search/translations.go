@@ -40,6 +40,32 @@ func LoadTranslations(dir string, langs ...string) (*TranslationStore, error) {
 	return store, nil
 }
 
+// LoadTranslationFiles loads a TranslationStore from explicit lang→filepath mappings.
+// Useful when filenames don't match the lang key (e.g. tafsir files).
+func LoadTranslationFiles(files map[string]string) (*TranslationStore, error) {
+	store := &TranslationStore{byLang: map[string]map[string]string{}}
+	for lang, path := range files {
+		lang = strings.ToLower(strings.TrimSpace(lang))
+		if lang == "" {
+			continue
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				store.byLang[lang] = map[string]string{}
+				continue
+			}
+			return nil, fmt.Errorf("read %s: %w", path, err)
+		}
+		parsed, err := parseTranslationJSON(b)
+		if err != nil {
+			return nil, fmt.Errorf("parse %s: %w", path, err)
+		}
+		store.byLang[lang] = parsed
+	}
+	return store, nil
+}
+
 func parseTranslationJSON(b []byte) (map[string]string, error) {
 	var m map[string]string
 	if err := json.Unmarshal(b, &m); err == nil {
