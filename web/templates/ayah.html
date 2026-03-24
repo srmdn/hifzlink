@@ -6,7 +6,10 @@
 
   <main class="container">
     <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
-    <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
+    <div class="page-heading">
+      <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
+      <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
+    </div>
 
     <article class="card verse-card">
       <p class="meta">Surah {{.Ayah.Surah}} · Ayah {{.Ayah.Ayah}} · Juz {{.Ayah.Juz}}</p>
@@ -61,5 +64,22 @@
   </main>
 
 {{template "footer" .}}
+<script>
+  (() => {
+    const btn = document.getElementById("share-btn");
+    if (!btn) return;
+    btn.addEventListener("click", async () => {
+      const url = window.location.href;
+      const title = document.title;
+      if (navigator.share) {
+        try { await navigator.share({ title, url }); } catch (_) {}
+      } else {
+        await navigator.clipboard.writeText(url);
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Share"; }, 2000);
+      }
+    });
+  })();
+</script>
 </body>
 </html>

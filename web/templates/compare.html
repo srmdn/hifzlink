@@ -36,6 +36,7 @@
 
     <div class="compare-toolbar">
       <button type="button" class="btn-outline" id="toggle-highlights">Hide highlights</button>
+      <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
     </div>
 
     <section class="compare-grid">
@@ -80,6 +81,22 @@
     btn.addEventListener("click", () => {
       const hidden = grid.classList.toggle("no-highlights");
       btn.textContent = hidden ? "Show highlights" : "Hide highlights";
+    });
+  })();
+
+  (() => {
+    const btn = document.getElementById("share-btn");
+    if (!btn) return;
+    btn.addEventListener("click", async () => {
+      const url = window.location.href;
+      const title = document.title;
+      if (navigator.share) {
+        try { await navigator.share({ title, url }); } catch (_) {}
+      } else {
+        await navigator.clipboard.writeText(url);
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Share"; }, 2000);
+      }
     });
   })();
 </script>
