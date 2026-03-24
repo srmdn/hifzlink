@@ -42,6 +42,7 @@ The format is inspired by Keep a Changelog.
 - top navigation now includes Dashboard entry for direct access
 - compare page now shows a "Related pairs" section — all other saved pairs sharing either ayah in the current comparison, replacing the previous next/prev sequential navigation
 - search page at `/search` (GET) — find mutashabihat pairs by ayah ref (e.g. `60:8`), surah number (`60`), or surah name (`Al-Mumtahanah`); topbar Search link updated to point here
+- relation category taxonomy revised to confusion-pattern only: `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`; old thematic values (`maana`, `siyam`, `aqidah`, `adab`) migrated to `other` on first startup
 
 ## [0.1.0] - 2026-03-15
 

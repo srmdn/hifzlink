@@ -118,6 +118,12 @@ func Open(path string) (*Store, error) {
 		return nil, fmt.Errorf("backfill collection_items.created_at: %w", err)
 	}
 
+	// Migrate old thematic category values to 'other' — these are topics, not confusion patterns.
+	if _, err := db.Exec(`UPDATE relations SET category = 'other' WHERE category IN ('maana', 'siyam', 'aqidah', 'adab')`); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("migrate legacy category values: %w", err)
+	}
+
 	return &Store{db: db}, nil
 }
 
