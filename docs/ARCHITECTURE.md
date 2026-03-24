@@ -10,6 +10,33 @@ The application consists of three main parts:
 2. Go backend server
 3. server-rendered frontend
 
+```mermaid
+graph TD
+    Browser["Browser"]
+
+    subgraph Server["Go HTTP Server (cmd/server)"]
+        Router["Router (net/http)"]
+        RelService["Relations Service\n(internal/relations)"]
+        Search["Quran Loader\n(internal/search)"]
+        DB["SQLite Store\n(internal/db)"]
+        Templates["HTML Templates\n(web/templates)"]
+    end
+
+    subgraph Data["Data Layer"]
+        QuranJSON["data/quran.json\n(in-memory at startup)"]
+        SQLiteDB["hifzlink.db\n(relations only)"]
+    end
+
+    Browser -->|HTTP request| Router
+    Router --> RelService
+    Router --> Search
+    RelService --> DB
+    DB --> SQLiteDB
+    Search --> QuranJSON
+    Router --> Templates
+    Templates -->|HTML response| Browser
+```
+
 ## Quran Dataset
 
 Primary file:
@@ -81,17 +108,24 @@ Fields:
 
 ## Request Flow
 
-Example: user searches for verse.
+Example: `GET /ayah/60/8`
 
-Request:
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant R as Router
+    participant S as Search (in-memory)
+    participant D as DB (SQLite)
+    participant T as Templates
 
-- `GET /ayah/60/8`
-
-Server flow:
-
-1. find verse in in-memory dataset
-2. find relations in SQLite
-3. render HTML page
+    B->>R: GET /ayah/60/8
+    R->>S: lookup ayah 60:8
+    S-->>R: ayah text + metadata
+    R->>D: query relations for 60:8
+    D-->>R: matching pairs
+    R->>T: render ayah page
+    T-->>B: HTML response
+```
 
 ## Compare Mode
 
