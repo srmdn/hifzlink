@@ -100,7 +100,11 @@ func main() {
 	mux.HandleFunc("/api/surah/", s.handleAPISurah)
 	mux.HandleFunc("/api/juz/", s.handleAPIJuz)
 
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := "127.0.0.1:" + port
 	log.Printf("server listening on %s", addr)
 	if err := http.ListenAndServe(addr, logRequests(mux)); err != nil {
 		log.Fatal(err)
