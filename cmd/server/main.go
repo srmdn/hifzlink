@@ -1303,7 +1303,46 @@ func (s *server) translationFor(lang string, surah, ayah int) string {
 		return ""
 	}
 	text, _ := s.trans.Get(lang, surah, ayah)
-	return text
+	return stripHTMLTags(text)
+}
+
+// stripHTMLTags removes HTML tags from s, returning plain text.
+// For tags like <sup>, the tag AND its inner content are removed entirely.
+// For all other tags, only the tag markers are removed (content is kept).
+func stripHTMLTags(s string) string {
+	if !strings.ContainsRune(s, '<') {
+		return s
+	}
+	// Tags whose content should also be removed (not just the tag markers).
+	contentDropTags := map[string]bool{"sup": true}
+	var buf strings.Builder
+	for len(s) > 0 {
+		start := strings.IndexByte(s, '<')
+		if start < 0 {
+			buf.WriteString(s)
+			break
+		}
+		buf.WriteString(s[:start])
+		s = s[start:]
+		end := strings.IndexByte(s, '>')
+		if end < 0 {
+			break
+		}
+		inner := strings.ToLower(strings.TrimSpace(s[1:end]))
+		s = s[end+1:]
+		if strings.HasPrefix(inner, "/") {
+			continue // closing tag, already past it
+		}
+		tagName := strings.FieldsFunc(inner, func(r rune) bool { return r == ' ' || r == '\t' || r == '\n' })
+		if len(tagName) > 0 && contentDropTags[tagName[0]] {
+			// Skip everything until the matching closing tag.
+			closeTag := "</" + tagName[0] + ">"
+			if idx := strings.Index(strings.ToLower(s), closeTag); idx >= 0 {
+				s = s[idx+len(closeTag):]
+			}
+		}
+	}
+	return buf.String()
 }
 
 func (s *server) tafsirFor(lang string, surah, ayah int) template.HTML {

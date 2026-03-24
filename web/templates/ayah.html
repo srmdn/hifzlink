@@ -85,9 +85,13 @@
     if (link && document.referrer) {
       try {
         const ref = new URL(document.referrer);
-        if (ref.origin === window.location.origin && ref.pathname !== window.location.pathname) {
-          link.href = document.referrer;
-        }
+        if (ref.origin !== window.location.origin) return;
+        // Ignore referrer if it's just a lang switch (same path, same params minus lang).
+        const rp = new URLSearchParams(ref.search);
+        const cp = new URLSearchParams(window.location.search);
+        rp.delete("lang"); cp.delete("lang");
+        const isLangSwitch = ref.pathname === window.location.pathname && rp.toString() === cp.toString();
+        if (!isLangSwitch) link.href = document.referrer;
       } catch (_) {}
     }
   })();
