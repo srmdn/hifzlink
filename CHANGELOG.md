@@ -43,6 +43,11 @@ The format is inspired by Keep a Changelog.
 - compare page now shows a "Related pairs" section — all other saved pairs sharing either ayah in the current comparison, replacing the previous next/prev sequential navigation
 - search page at `/search` (GET) — find mutashabihat pairs by ayah ref (e.g. `60:8`), surah number (`60`), or surah name (`Al-Mumtahanah`); topbar Search link updated to point here
 - relation category taxonomy revised to confusion-pattern only: `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`; old thematic values (`maana`, `siyam`, `aqidah`, `adab`) migrated to `other` on first startup
+- `style.css` split into focused files: `base.css`, `topbar.css`, `components.css`, `admin.css`, `pages.css` — each scoped to its concern for easier maintenance
+- landing page redesigned as SaaS-style public page: hero, story section with inline diff example (60:8 ↔ 60:9), features grid, how-it-works steps, and browse CTA
+- topbar: removed Dashboard link (auth deferred); Search now links to `/search` page
+- responsive button system: `.btn` (primary), `.btn-sm` (inline), `.btn-outline` (secondary), `.btn-danger` (destructive) with tablet (≤768px) and mobile (≤480px) touch-target sizing; all templates updated to use new classes
+- mobile layout improvements: hero content centers on small screens, search row stacks vertically, diff example collapses to single column, CTA groups adjust per breakpoint
 
 ## [0.1.0] - 2026-03-15
 

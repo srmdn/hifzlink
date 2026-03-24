@@ -28,7 +28,7 @@
           <option value="{{.Key}}"{{if eq $.CategoryFilter .Key}} selected{{end}}>{{.Label}}</option>
           {{end}}
         </select>
-        <button type="submit" class="button-primary">Search</button>
+        <button type="submit" class="btn">Search</button>
       </div>
     </form>
 
@@ -45,7 +45,7 @@
           <li class="pair-item">
             <div class="line-head">
               <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
-              <a class="button-link" href="{{.CompareURL}}">Compare</a>
+              <a class="btn-sm" href="{{.CompareURL}}">Compare</a>
             </div>
             <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .CategoryLabel}} · <span class="category-tag">{{.CategoryLabel}}</span>{{end}}</p>
             {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}

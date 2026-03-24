@@ -22,10 +22,10 @@
             <a href="/ayah/{{.Surah1}}/{{.Ayah1}}?lang={{$.Lang}}">{{.Ref1}} ({{.Surah1Name}})</a>
             {{else}}
             <span class="pair-refs">{{.Ref1}} <span class="meta">↔</span> {{.Ref2}}</span>
-            <a class="button-link" href="{{.CompareURL}}">Compare</a>
+            <a class="btn-sm" href="{{.CompareURL}}">Compare</a>
             {{end}}
             <button
-              class="button-danger js-open-remove"
+              class="btn-danger js-open-remove"
               type="button"
               data-item-id="{{.ID}}"
               data-item-label="{{.ItemTypeLabel}} {{.Ref1}}{{if .Ref2}} ↔ {{.Ref2}}{{end}}"
@@ -49,8 +49,8 @@
       {{else}}
       <p class="meta">No items in this collection yet.</p>
       <p class="meta">
-        <a class="button-link" href="{{.HomeURL}}#search">Go to Search</a>
-        <a class="button-link" href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Open Compare</a>
+        <a class="btn-sm" href="{{.SearchURL}}">Go to Search</a>
+        <a class="btn-sm" href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">Open Compare</a>
       </p>
       {{end}}
     </section>
@@ -61,12 +61,12 @@
       <h3>Remove Item</h3>
       <p id="remove-dialog-text" class="meta">Are you sure you want to remove this item from collection?</p>
       <div class="delete-dialog-actions">
-        <button type="button" class="button-secondary" id="remove-cancel">Cancel</button>
+        <button type="button" class="btn-outline" id="remove-cancel">Cancel</button>
         <form id="remove-form" action="/collections/items/delete" method="post" class="inline-form">
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="collection_id" value="{{.Collection.ID}}" />
           <input type="hidden" name="item_id" id="remove-item-id" value="" />
-          <button type="submit" class="button-danger">Remove</button>
+          <button type="submit" class="btn-danger">Remove</button>
         </form>
       </div>
     </div>

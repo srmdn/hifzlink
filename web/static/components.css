@@ -46,79 +46,107 @@ input,
 select,
 button {
   font: inherit;
-  border-radius: 10px;
-  padding: 0.72rem 0.9rem;
+}
+
+button {
+  cursor: pointer;
 }
 
 input,
 select {
   border: 1px solid var(--border);
   background: var(--surface-soft);
+  border-radius: 10px;
+  padding: 0.72rem 0.9rem;
 }
 
-button,
-.button-link {
-  border: 0;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
+/* ── Button system ────────────────────────────────────────────── */
+
+.btn,
+.btn-sm,
+.btn-outline,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
   text-decoration: none;
-}
-
-button:hover,
-.button-link:hover {
-  background: var(--accent-strong);
-}
-
-.button-link {
-  display: inline-block;
-  padding: 0.4rem 0.74rem;
   border-radius: 8px;
-  font-size: 0.9rem;
+  border: 0;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.button-primary {
+/* Primary — form submits, main actions */
+.btn {
   background: var(--accent);
   color: #fff;
-  font-weight: 700;
-  border: 0;
-  border-radius: 8px;
-  padding: 0.55em 1em;
-  cursor: pointer;
-  white-space: nowrap;
+  padding: 0.6em 1.15em;
+  font-size: 0.92rem;
 }
 
-.button-primary:hover {
+.btn:hover {
   background: var(--accent-strong);
 }
 
-.button-danger {
-  border: 0;
+/* Small — inline actions (Compare, Open, Resume) */
+.btn-sm {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.35em 0.72em;
+  font-size: 0.875rem;
+}
+
+.btn-sm:hover {
+  background: var(--accent-strong);
+}
+
+/* Outline — secondary/cancel actions */
+.btn-outline {
+  background: #fff;
+  color: #324a5e;
+  border: 1px solid var(--border);
+  padding: 0.58em 1.1em;
+  font-size: 0.92rem;
+}
+
+.btn-outline:hover {
+  background: #dce8ee;
+  color: #142838;
+}
+
+/* Danger — destructive actions */
+.btn-danger {
   background: #be123c;
   color: #fff;
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 0.4rem 0.74rem;
-  cursor: pointer;
+  padding: 0.6em 1.15em;
+  font-size: 0.92rem;
 }
 
-.button-danger:hover {
+.btn-danger:hover {
   background: #9f1239;
 }
 
-.button-secondary {
-  border: 1px solid var(--border);
-  background: #fff;
-  color: #324a5e;
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 0.4rem 0.74rem;
-  cursor: pointer;
+@media (max-width: 768px) {
+  .btn,
+  .btn-outline,
+  .btn-danger {
+    padding: 0.55em 1em;
+    font-size: 0.9rem;
+  }
 }
 
-.button-secondary:hover {
-  background: #dce8ee;
-  color: #142838;
+@media (max-width: 480px) {
+  .btn,
+  .btn-outline,
+  .btn-danger {
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    min-height: 38px;
+    padding: 0.4em 0.72em;
+  }
 }
 
 .error-msg {
