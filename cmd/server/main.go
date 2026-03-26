@@ -34,6 +34,8 @@ type server struct {
 	adminUser    string
 	adminPass    string
 	adminLimiter *adminRateLimiter
+
+	umamiID string
 }
 
 // adminRateLimiter is a simple sliding-window rate limiter for admin endpoints.
@@ -148,6 +150,7 @@ func main() {
 		adminUser:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
 		adminPass:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
 		adminLimiter: newAdminRateLimiter(),
+		umamiID:      strings.TrimSpace(os.Getenv("HIFZLINK_UMAMI_ID")),
 	}
 
 	mux := http.NewServeMux()
@@ -193,7 +196,7 @@ func main() {
 }
 
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "home.html", withCommonViewData(r, map[string]any{
+	s.render(w, "home.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "hifzlink — Quran mutashabihat review",
 		"Description": "hifzlink helps you identify and review mutashabihat — similar Quran verses that are easy to confuse. Try it yourself at hifz.click.",
 	}))
@@ -333,7 +336,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.render(w, "search.html", withCommonViewData(r, map[string]any{
+	s.render(w, "search.html", s.withCommonViewData(r, map[string]any{
 		"Title":          "Search pairs",
 		"Description":    "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
 		"Query":          q,
@@ -380,7 +383,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tafsirContent := s.tafsirFor(lang, surah, ayah)
-	s.render(w, "ayah.html", withCommonViewData(r, map[string]any{
+	s.render(w, "ayah.html", s.withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
 		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
@@ -474,7 +477,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		addRelated(rels2)
 	}
 
-	s.render(w, "compare.html", withCommonViewData(r, map[string]any{
+	s.render(w, "compare.html", s.withCommonViewData(r, map[string]any{
 		"Title":            "Compare",
 		"Description":      "Compare two similar Quran verses side by side and spot the differences. Try it yourself at hifz.click.",
 		"Ayah1":            ayah1,
@@ -558,7 +561,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "dashboard.html", withCommonViewData(r, map[string]any{
+	s.render(w, "dashboard.html", s.withCommonViewData(r, map[string]any{
 		"Title":             "Dashboard",
 		"RecentCollections": collections,
 		"AllCollections":    allCollections,
@@ -577,7 +580,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			internalError(w, r, err)
 			return
 		}
-		s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+		s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 			"Title":        "Collections",
 			"Collections":  collections,
 			"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
@@ -593,7 +596,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		lang := sanitizeLang(r.FormValue("lang"))
 		if name == "" {
 			collections, _ := s.db.Collections()
-			s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
 				"Collections":     collections,
 				"StatusNotice":    "",
@@ -607,7 +610,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		_, err := s.db.CreateCollection(name, description)
 		if err != nil {
 			collections, _ := s.db.Collections()
-			s.render(w, "collections.html", withCommonViewData(r, map[string]any{
+			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
 				"Collections":     collections,
 				"CollectionError": "Collection name already exists or is invalid.",
@@ -723,7 +726,7 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 		})
 	}
 
-	s.render(w, "collection-detail.html", withCommonViewData(r, map[string]any{
+	s.render(w, "collection-detail.html", s.withCommonViewData(r, map[string]any{
 		"Title":        collection.Name,
 		"Collection":   collection,
 		"Items":        viewItems,
@@ -868,7 +871,7 @@ func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.render(w, "surah-index.html", withCommonViewData(r, map[string]any{
+	s.render(w, "surah-index.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "Browse by Surah",
 		"Description": "Browse all 114 surahs and their mutashabihat relations. Try it yourself at hifz.click.",
 		"Surahs": items,
@@ -913,7 +916,7 @@ func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
 		items[i-1] = juzIndexItem{Number: i, RelationCount: counts[i]}
 	}
 
-	s.render(w, "juz-index.html", withCommonViewData(r, map[string]any{
+	s.render(w, "juz-index.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "Browse by Juz",
 		"Description": "Browse mutashabihat relations across all 30 juz of the Quran. Try it yourself at hifz.click.",
 		"Juzs":  items,
@@ -937,7 +940,7 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "surah.html", withCommonViewData(r, map[string]any{
+	s.render(w, "surah.html", s.withCommonViewData(r, map[string]any{
 		"Title":       fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
 		"Description": fmt.Sprintf("Browse mutashabihat relations in Surah %d — %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
 		"Surah":     surah,
@@ -963,7 +966,7 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "juz.html", withCommonViewData(r, map[string]any{
+	s.render(w, "juz.html", s.withCommonViewData(r, map[string]any{
 		"Title":       fmt.Sprintf("Juz %d Relations", juz),
 		"Description": fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
 		"Juz":   juz,
@@ -1248,7 +1251,7 @@ func logRequests(next http.Handler) http.Handler {
 	})
 }
 
-func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
+func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	lang := pageLang(r)
 	data["Lang"] = lang
 	data["HomeURL"] = withLang("/", lang)
@@ -1266,6 +1269,9 @@ func withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	data["OGImageURL"] = base + "/static/og-image.png"
 	if _, ok := data["Description"]; !ok {
 		data["Description"] = "Master Quran mutashabihat — review similar verses and strengthen your memorization."
+	}
+	if s.umamiID != "" {
+		data["UmamiID"] = s.umamiID
 	}
 	return data
 }
@@ -1403,7 +1409,7 @@ func (s *server) withTranslations(lang string, related []relations.AyahView) []r
 
 func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading, message string) {
 	w.WriteHeader(http.StatusNotFound)
-	s.render(w, "not-found.html", withCommonViewData(r, map[string]any{
+	s.render(w, "not-found.html", s.withCommonViewData(r, map[string]any{
 		"Title":   "Not Found",
 		"Heading": heading,
 		"Message": message,
@@ -1513,7 +1519,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		data[k] = v
 	}
 
-	s.render(w, "admin-relations.html", withCommonViewData(r, data))
+	s.render(w, "admin-relations.html", s.withCommonViewData(r, data))
 }
 
 // loadDotEnv reads key=value pairs from path and sets them via os.Setenv,
