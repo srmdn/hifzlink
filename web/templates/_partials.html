@@ -58,7 +58,9 @@
       {{if .QFEnabled}}
         {{if .CurrentUser}}
         <span class="auth-user"><span class="auth-user-name">{{.CurrentUser.Name}}</span></span>
-        <a class="auth-btn" href="{{.LogoutURL}}">Logout</a>
+        <form method="POST" action="{{.LogoutURL}}" style="display:inline">
+          <button type="submit" class="auth-btn">Logout</button>
+        </form>
         {{else}}
         <a class="auth-btn" href="{{.LoginURL}}">Login</a>
         {{end}}
@@ -93,7 +95,9 @@
     <p>Account</p>
     {{if .CurrentUser}}
     <p class="meta">{{.CurrentUser.Name}}</p>
-    <nav><a href="{{.LogoutURL}}">Logout</a></nav>
+    <form method="POST" action="{{.LogoutURL}}">
+      <button type="submit" class="auth-btn">Logout</button>
+    </form>
     {{else}}
     <nav><a href="{{.LoginURL}}">Login with Quran.Foundation</a></nav>
     {{end}}

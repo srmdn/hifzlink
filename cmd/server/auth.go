@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/srmdn/hifzlink/internal/db"
@@ -226,11 +227,15 @@ func (s *server) exchangeCode(r *http.Request, code, verifier string) (*tokenRes
 		"grant_type":    {"authorization_code"},
 		"code":          {code},
 		"redirect_uri":  {s.qfCallbackURI(r)},
-		"client_id":     {s.qfClientID},
-		"client_secret": {s.qfClientSecret},
 		"code_verifier": {verifier},
 	}
-	resp, err := http.PostForm(s.qfAuthEndpoint+"/oauth2/token", form)
+	req, err := http.NewRequest(http.MethodPost, s.qfAuthEndpoint+"/oauth2/token", strings.NewReader(form.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(s.qfClientID, s.qfClientSecret)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
