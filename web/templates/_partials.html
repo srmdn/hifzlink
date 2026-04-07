@@ -55,6 +55,14 @@
         <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">EN</a>
         <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">ID</a>
       </nav>
+      {{if .QFEnabled}}
+        {{if .CurrentUser}}
+        <span class="auth-user"><span class="auth-user-name">{{.CurrentUser.Name}}</span></span>
+        <a class="auth-btn" href="{{.LogoutURL}}">Logout</a>
+        {{else}}
+        <a class="auth-btn" href="{{.LoginURL}}">Login</a>
+        {{end}}
+      {{end}}
       <a class="github-link" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
   </div>
@@ -80,6 +88,17 @@
       <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">Arabic + Indonesian</a>
     </nav>
   </div>
+  {{if .QFEnabled}}
+  <div class="mobile-lang">
+    <p>Account</p>
+    {{if .CurrentUser}}
+    <p class="meta">{{.CurrentUser.Name}}</p>
+    <nav><a href="{{.LogoutURL}}">Logout</a></nav>
+    {{else}}
+    <nav><a href="{{.LoginURL}}">Login with Quran.Foundation</a></nav>
+    {{end}}
+  </div>
+  {{end}}
 </aside>
 
 <script>

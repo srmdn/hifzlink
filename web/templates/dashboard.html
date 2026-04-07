@@ -8,6 +8,14 @@
     <h1>Dashboard</h1>
     <p class="lead">Resume your murojaah quickly from recent saves and collections.</p>
 
+    {{if .QFEnabled}}{{if not .CurrentUser}}
+    <section class="card" style="text-align:center;padding:2rem 1.5rem">
+      <h2 style="margin-bottom:0.5rem">Sign in to sync your collections</h2>
+      <p class="meta" style="margin-bottom:1.25rem">Login with your Quran.Foundation account to save and sync mutashabihat pairs across devices.</p>
+      <a class="btn" href="{{.LoginURL}}">Login with Quran.Foundation</a>
+    </section>
+    {{end}}{{end}}
+
     <section class="card">
       <h2>Quick Resume</h2>
       <div class="hero-meta">

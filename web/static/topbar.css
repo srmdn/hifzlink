@@ -63,6 +63,40 @@
   gap: 0.5rem;
 }
 
+.auth-btn {
+  text-decoration: none;
+  color: #32495b;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 0.3rem 0.62rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background: #dce8ee;
+  color: #142838;
+}
+
+.auth-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  font-size: 0.82rem;
+  color: #40566a;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.auth-user-name {
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .github-link {
   text-decoration: none;
   color: #32495b;
