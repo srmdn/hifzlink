@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/srmdn/hifzlink/internal/db"
+	"github.com/srmdn/hifzlink/internal/qfclient"
 	"github.com/srmdn/hifzlink/internal/relations"
 	"github.com/srmdn/hifzlink/internal/search"
 )
@@ -43,6 +44,9 @@ type server struct {
 	qfAuthEndpoint string
 	qfAPIBase      string
 	qfRedirectURI  string // overrides auto-detected redirect URI (QF_REDIRECT_URI)
+
+	// Quran Foundation Content API client (nil when QF is not configured)
+	qf *qfclient.Client
 }
 
 // adminRateLimiter is a simple sliding-window rate limiter for admin endpoints.
@@ -170,6 +174,10 @@ func main() {
 		qfAuthEndpoint: strings.TrimSpace(os.Getenv("QF_AUTH_ENDPOINT")),
 		qfAPIBase:      strings.TrimSpace(os.Getenv("QF_API_BASE")),
 		qfRedirectURI:  strings.TrimSpace(os.Getenv("QF_REDIRECT_URI")),
+	}
+	s.qf = qfclient.New(s.qfClientID, s.qfClientSecret, s.qfAuthEndpoint, s.qfAPIBase)
+	if s.qf != nil {
+		log.Printf("qfclient: content API enabled (%s)", s.qfAPIBase)
 	}
 
 	// Clean up expired sessions on startup.
@@ -426,6 +434,18 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tafsirContent := s.tafsirFor(lang, surah, ayah)
+
+	// Fetch verse data from QF Content API (audio, Uthmani text).
+	var qfAudioURL string
+	if s.qf != nil {
+		verseKey := fmt.Sprintf("%d:%d", surah, ayah)
+		if vd, err := s.qf.FetchVerse(verseKey, 7); err != nil {
+			log.Printf("qfclient: verse %s: %v", verseKey, err)
+		} else {
+			qfAudioURL = vd.AudioURL
+		}
+	}
+
 	s.render(w, "ayah.html", s.withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
 		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
@@ -438,6 +458,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		"SurahName":       a.SurahName,
 		"Collections":     collections,
 		"SaveStatus":      collectionStatusMessage(r.URL.Query().Get("saved")),
+		"QFAudioURL":      qfAudioURL,
 	}))
 }
 

@@ -16,6 +16,14 @@
       {{if .AyahTranslation}}
       <p class="translation">{{.AyahTranslation}}</p>
       {{end}}
+      {{if .QFAudioURL}}
+      <div class="qf-audio">
+        <audio controls preload="none" style="width:100%;margin-top:0.75rem">
+          <source src="{{.QFAudioURL}}" type="audio/mpeg" />
+        </audio>
+        <p class="meta" style="margin-top:0.25rem">Recitation via <a href="https://quran.foundation" target="_blank" rel="noopener noreferrer">Quran Foundation</a></p>
+      </div>
+      {{end}}
 
       {{if .Collections}}
       <form action="/collections/items" method="post" class="collection-save-form">
