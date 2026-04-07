@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <div class="card" style="max-width:720px;margin:2rem auto;padding:2rem 2.5rem;">
+      <h1>Privacy Policy</h1>
+      <p style="color:var(--muted);font-size:.9rem;">Last updated: April 7, 2026</p>
+
+      <h2>What we collect</h2>
+      <p>hifzlink collects minimal data to operate the service:</p>
+      <ul>
+        <li><strong>Usage analytics</strong> — We use self-hosted Umami, a privacy-friendly analytics tool. It records page views and referrers but does not store personal information, cookies, or cross-site tracking data.</li>
+        <li><strong>Account data (optional)</strong> — If you sign in via the Quran Foundation, we receive a user identifier and display name from their OAuth2 service. This is stored locally to associate your saved collections with your account.</li>
+      </ul>
+
+      <h2>What we do not collect</h2>
+      <ul>
+        <li>We do not sell or share your data with third parties.</li>
+        <li>We do not use advertising trackers.</li>
+        <li>We do not store passwords. Authentication is handled entirely by the Quran Foundation OAuth2 service.</li>
+      </ul>
+
+      <h2>Third-party services</h2>
+      <ul>
+        <li><strong>Quran Foundation API</strong> — Used to fetch Quran verse data and (for signed-in users) to store personal collections. Their privacy policy applies to data processed through their service.</li>
+        <li><strong>Google Fonts</strong> — Fonts are loaded from Google's CDN. Google may log font requests per their standard privacy policy.</li>
+        <li><strong>Tanzil</strong> — Quran text is sourced from Tanzil. No data is sent to Tanzil at runtime.</li>
+      </ul>
+
+      <h2>Cookies</h2>
+      <p>If you sign in, a session cookie is stored in your browser to keep you logged in. It expires when you log out or the session times out. No tracking cookies are set for anonymous visitors.</p>
+
+      <h2>Data retention</h2>
+      <p>Your saved collections are stored as long as your account is active. You can delete your collections at any time from your dashboard. To request full account deletion, contact us.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy: <a href="mailto:mail@saidwp.com">mail@saidwp.com</a></p>
+    </div>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

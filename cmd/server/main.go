@@ -157,6 +157,8 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(baseDir, "web", "static")))))
 
 	mux.HandleFunc("/", s.handleHome)
+	mux.HandleFunc("/privacy", s.handlePrivacy)
+	mux.HandleFunc("/terms", s.handleTerms)
 	mux.HandleFunc("/search", s.handleSearch)
 	mux.HandleFunc("/ayah/", s.handleAyahPage)
 	mux.HandleFunc("/compare", s.handleComparePage)
@@ -199,6 +201,20 @@ func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "home.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "hifzlink — Quran mutashabihat review",
 		"Description": "hifzlink helps you identify and review mutashabihat — similar Quran verses that are easy to confuse. Try it yourself at hifz.click.",
+	}))
+}
+
+func (s *server) handlePrivacy(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "privacy.html", s.withCommonViewData(r, map[string]any{
+		"Title":       "Privacy Policy — hifzlink",
+		"Description": "Privacy policy for hifzlink, the open-source Quran mutashabihat review tool.",
+	}))
+}
+
+func (s *server) handleTerms(w http.ResponseWriter, r *http.Request) {
+	s.render(w, "terms.html", s.withCommonViewData(r, map[string]any{
+		"Title":       "Terms of Service — hifzlink",
+		"Description": "Terms of service for hifzlink, the open-source Quran mutashabihat review tool.",
 	}))
 }
 
