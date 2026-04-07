@@ -44,6 +44,18 @@ type RecentCollectionItem struct {
 	CollectionName string
 }
 
+// Session represents an authenticated user session created via QF OAuth2.
+type Session struct {
+	ID           string
+	UserID       string
+	Email        string
+	Name         string
+	AccessToken  string
+	RefreshToken string
+	ExpiresAt    int64
+	CreatedAt    string
+}
+
 type Store struct {
 	db *sql.DB
 }
@@ -88,6 +100,18 @@ func Open(path string) (*Store, error) {
 		UNIQUE(collection_id, item_type, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah)
 	);
 	CREATE INDEX IF NOT EXISTS idx_collection_items_collection ON collection_items (collection_id);
+
+	CREATE TABLE IF NOT EXISTS sessions (
+		id TEXT PRIMARY KEY,
+		user_id TEXT NOT NULL,
+		email TEXT NOT NULL DEFAULT '',
+		name TEXT NOT NULL DEFAULT '',
+		access_token TEXT NOT NULL,
+		refresh_token TEXT NOT NULL DEFAULT '',
+		expires_at INTEGER NOT NULL,
+		created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+	);
+	CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
 	`); err != nil {
 		_ = db.Close()
 		return nil, fmt.Errorf("migrate relations table: %w", err)
@@ -512,6 +536,45 @@ func ensureColumn(db *sql.DB, table, column, alterSQL string) error {
 
 	if _, err := db.Exec(alterSQL); err != nil {
 		return fmt.Errorf("migrate %s.%s: %w", table, column, err)
+	}
+	return nil
+}
+
+func (s *Store) CreateSession(sess Session) error {
+	_, err := s.db.Exec(`
+	INSERT OR REPLACE INTO sessions (id, user_id, email, name, access_token, refresh_token, expires_at, created_at)
+	VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	`, sess.ID, sess.UserID, sess.Email, sess.Name, sess.AccessToken, sess.RefreshToken, sess.ExpiresAt)
+	if err != nil {
+		return fmt.Errorf("create session: %w", err)
+	}
+	return nil
+}
+
+func (s *Store) SessionByID(id string) (Session, error) {
+	var sess Session
+	err := s.db.QueryRow(`
+	SELECT id, user_id, email, name, access_token, refresh_token, expires_at, COALESCE(created_at, '')
+	FROM sessions WHERE id = ?
+	`, id).Scan(&sess.ID, &sess.UserID, &sess.Email, &sess.Name, &sess.AccessToken, &sess.RefreshToken, &sess.ExpiresAt, &sess.CreatedAt)
+	if err != nil {
+		return Session{}, fmt.Errorf("session by id: %w", err)
+	}
+	return sess, nil
+}
+
+func (s *Store) DeleteSession(id string) error {
+	_, err := s.db.Exec(`DELETE FROM sessions WHERE id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("delete session: %w", err)
+	}
+	return nil
+}
+
+func (s *Store) DeleteExpiredSessions() error {
+	_, err := s.db.Exec(`DELETE FROM sessions WHERE expires_at < strftime('%s', 'now')`)
+	if err != nil {
+		return fmt.Errorf("delete expired sessions: %w", err)
 	}
 	return nil
 }

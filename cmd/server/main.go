@@ -36,6 +36,13 @@ type server struct {
 	adminLimiter *adminRateLimiter
 
 	umamiID string
+
+	// Quran Foundation OAuth2
+	qfClientID     string
+	qfClientSecret string
+	qfAuthEndpoint string
+	qfAPIBase      string
+	qfRedirectURI  string // overrides auto-detected redirect URI (QF_REDIRECT_URI)
 }
 
 // adminRateLimiter is a simple sliding-window rate limiter for admin endpoints.
@@ -101,6 +108,12 @@ type adminCategoryOption struct {
 	Hint  string
 }
 
+// userView holds the safe, template-visible subset of a session.
+type userView struct {
+	Name  string
+	Email string
+}
+
 func main() {
 	baseDir, err := resolveBaseDir()
 	if err != nil {
@@ -151,6 +164,17 @@ func main() {
 		adminPass:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
 		adminLimiter: newAdminRateLimiter(),
 		umamiID:      strings.TrimSpace(os.Getenv("HIFZLINK_UMAMI_ID")),
+
+		qfClientID:     strings.TrimSpace(os.Getenv("QF_CLIENT_ID")),
+		qfClientSecret: strings.TrimSpace(os.Getenv("QF_CLIENT_SECRET")),
+		qfAuthEndpoint: strings.TrimSpace(os.Getenv("QF_AUTH_ENDPOINT")),
+		qfAPIBase:      strings.TrimSpace(os.Getenv("QF_API_BASE")),
+		qfRedirectURI:  strings.TrimSpace(os.Getenv("QF_REDIRECT_URI")),
+	}
+
+	// Clean up expired sessions on startup.
+	if err := dbStore.DeleteExpiredSessions(); err != nil {
+		log.Printf("warn: delete expired sessions: %v", err)
 	}
 
 	mux := http.NewServeMux()
@@ -159,6 +183,9 @@ func main() {
 	mux.HandleFunc("/", s.handleHome)
 	mux.HandleFunc("/privacy", s.handlePrivacy)
 	mux.HandleFunc("/terms", s.handleTerms)
+	mux.HandleFunc("/auth/login", s.handleAuthLogin)
+	mux.HandleFunc("/auth/callback", s.handleAuthCallback)
+	mux.HandleFunc("/auth/logout", s.handleAuthLogout)
 	mux.HandleFunc("/search", s.handleSearch)
 	mux.HandleFunc("/ayah/", s.handleAyahPage)
 	mux.HandleFunc("/compare", s.handleComparePage)
@@ -1289,6 +1316,15 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	if s.umamiID != "" {
 		data["UmamiID"] = s.umamiID
 	}
+
+	// Auth state for templates.
+	data["QFEnabled"] = s.qfConfigured()
+	data["LoginURL"] = "/auth/login"
+	data["LogoutURL"] = "/auth/logout"
+	if sess, ok := s.currentSession(r); ok {
+		data["CurrentUser"] = userView{Name: sess.Name, Email: sess.Email}
+	}
+
 	return data
 }
 

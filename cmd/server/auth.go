@@ -1,0 +1,299 @@
+package main
+
+import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+
+	"github.com/srmdn/hifzlink/internal/db"
+)
+
+const (
+	cookieOAuthState    = "_oauth_state"
+	cookieOAuthVerifier = "_oauth_cv"
+	cookieSession       = "_session"
+	oauthCookieTTL      = 10 * time.Minute
+	sessionTTL          = 30 * 24 * time.Hour
+)
+
+// generateRandomBytes returns n cryptographically random bytes as base64url (no padding).
+func generateRandomBytes(n int) (string, error) {
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+// pkceChallenge computes the S256 code challenge from a verifier.
+func pkceChallenge(verifier string) string {
+	h := sha256.Sum256([]byte(verifier))
+	return base64.RawURLEncoding.EncodeToString(h[:])
+}
+
+// qfConfigured returns true when all required QF OAuth2 env vars are set.
+func (s *server) qfConfigured() bool {
+	return s.qfClientID != "" && s.qfClientSecret != "" && s.qfAuthEndpoint != ""
+}
+
+// qfCallbackURI returns the redirect URI for this request's host, or the
+// configured override if QF_REDIRECT_URI is set.
+func (s *server) qfCallbackURI(r *http.Request) string {
+	if s.qfRedirectURI != "" {
+		return s.qfRedirectURI
+	}
+	return "https://" + r.Host + "/auth/callback"
+}
+
+// handleAuthLogin starts the OAuth2 authorization code + PKCE flow.
+func (s *server) handleAuthLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if !s.qfConfigured() {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	state, err := generateRandomBytes(16)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+	verifier, err := generateRandomBytes(32)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	setShortCookie(w, cookieOAuthState, state)
+	setShortCookie(w, cookieOAuthVerifier, verifier)
+
+	params := url.Values{
+		"response_type":         {"code"},
+		"client_id":             {s.qfClientID},
+		"redirect_uri":          {s.qfCallbackURI(r)},
+		"scope":                 {"openid offline_access collection"},
+		"state":                 {state},
+		"code_challenge":        {pkceChallenge(verifier)},
+		"code_challenge_method": {"S256"},
+	}
+	http.Redirect(w, r, s.qfAuthEndpoint+"/oauth2/auth?"+params.Encode(), http.StatusFound)
+}
+
+// handleAuthCallback handles the redirect back from QF after user login.
+func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// User denied authorization.
+	if errParam := r.URL.Query().Get("error"); errParam != "" {
+		http.Redirect(w, r, "/?auth_error=denied", http.StatusSeeOther)
+		return
+	}
+
+	// Validate state to prevent CSRF.
+	stateCookie, err := r.Cookie(cookieOAuthState)
+	if err != nil || stateCookie.Value == "" {
+		http.Error(w, "missing oauth state", http.StatusBadRequest)
+		return
+	}
+	if r.URL.Query().Get("state") != stateCookie.Value {
+		http.Error(w, "invalid oauth state", http.StatusBadRequest)
+		return
+	}
+
+	cvCookie, err := r.Cookie(cookieOAuthVerifier)
+	if err != nil || cvCookie.Value == "" {
+		http.Error(w, "missing code verifier", http.StatusBadRequest)
+		return
+	}
+
+	// Clear PKCE cookies immediately.
+	clearCookie(w, cookieOAuthState)
+	clearCookie(w, cookieOAuthVerifier)
+
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		http.Error(w, "missing authorization code", http.StatusBadRequest)
+		return
+	}
+
+	tokens, err := s.exchangeCode(r, code, cvCookie.Value)
+	if err != nil {
+		internalError(w, r, fmt.Errorf("token exchange: %w", err))
+		return
+	}
+
+	userInfo, err := s.fetchUserInfo(tokens.AccessToken)
+	if err != nil {
+		internalError(w, r, fmt.Errorf("userinfo: %w", err))
+		return
+	}
+
+	sessionID, err := generateRandomBytes(24)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	expiresIn := tokens.ExpiresIn
+	if expiresIn <= 0 {
+		expiresIn = 3600
+	}
+	sess := db.Session{
+		ID:           sessionID,
+		UserID:       userInfo.Sub,
+		Email:        userInfo.Email,
+		Name:         userInfo.Name,
+		AccessToken:  tokens.AccessToken,
+		RefreshToken: tokens.RefreshToken,
+		ExpiresAt:    time.Now().Add(time.Duration(expiresIn) * time.Second).Unix(),
+	}
+	if err := s.db.CreateSession(sess); err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieSession,
+		Value:    sessionID,
+		Path:     "/",
+		MaxAge:   int(sessionTTL.Seconds()),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	lang := pageLang(r)
+	http.Redirect(w, r, withLang("/dashboard", lang), http.StatusSeeOther)
+}
+
+// handleAuthLogout clears the session cookie and deletes the session from the DB.
+func (s *server) handleAuthLogout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if c, err := r.Cookie(cookieSession); err == nil && c.Value != "" {
+		_ = s.db.DeleteSession(c.Value)
+	}
+	clearCookie(w, cookieSession)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// currentSession looks up the session for the current request, if any.
+func (s *server) currentSession(r *http.Request) (*db.Session, bool) {
+	c, err := r.Cookie(cookieSession)
+	if err != nil || c.Value == "" {
+		return nil, false
+	}
+	sess, err := s.db.SessionByID(c.Value)
+	if err != nil {
+		return nil, false
+	}
+	if time.Now().Unix() > sess.ExpiresAt {
+		return nil, false
+	}
+	return &sess, true
+}
+
+// tokenResponse is the JSON body returned by the token endpoint.
+type tokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
+}
+
+// userInfoResponse is the JSON body returned by the userinfo endpoint.
+type userInfoResponse struct {
+	Sub   string `json:"sub"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
+func (s *server) exchangeCode(r *http.Request, code, verifier string) (*tokenResponse, error) {
+	form := url.Values{
+		"grant_type":    {"authorization_code"},
+		"code":          {code},
+		"redirect_uri":  {s.qfCallbackURI(r)},
+		"client_id":     {s.qfClientID},
+		"client_secret": {s.qfClientSecret},
+		"code_verifier": {verifier},
+	}
+	resp, err := http.PostForm(s.qfAuthEndpoint+"/oauth2/token", form)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("token endpoint returned %d: %s", resp.StatusCode, body)
+	}
+	var tok tokenResponse
+	if err := json.Unmarshal(body, &tok); err != nil {
+		return nil, err
+	}
+	return &tok, nil
+}
+
+func (s *server) fetchUserInfo(accessToken string) (*userInfoResponse, error) {
+	req, err := http.NewRequest(http.MethodGet, s.qfAuthEndpoint+"/userinfo", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("userinfo endpoint returned %d: %s", resp.StatusCode, body)
+	}
+	var info userInfoResponse
+	if err := json.Unmarshal(body, &info); err != nil {
+		return nil, err
+	}
+	return &info, nil
+}
+
+func setShortCookie(w http.ResponseWriter, name, value string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     "/",
+		MaxAge:   int(oauthCookieTTL.Seconds()),
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
+func clearCookie(w http.ResponseWriter, name string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
