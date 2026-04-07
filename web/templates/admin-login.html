@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+{{template "head" .}}
+<body>
+{{template "topbar" .}}
+
+  <main class="container">
+    <div class="admin-login-wrap">
+      <h1 class="admin-login-title">Admin</h1>
+      {{if .LoginError}}
+      <p class="error-msg admin-login-error" role="alert">Invalid credentials. Try again.</p>
+      {{end}}
+      <form class="admin-login-form card" method="POST" action="/admin/login" autocomplete="off">
+        <label for="admin-user">Username</label>
+        <input id="admin-user" name="user" type="text" required autofocus autocomplete="username" />
+        <label for="admin-pass">Password</label>
+        <input id="admin-pass" name="pass" type="password" required autocomplete="current-password" />
+        <button type="submit" class="btn">Sign in</button>
+      </form>
+    </div>
+  </main>
+
+{{template "footer" .}}
+</body>
+</html>

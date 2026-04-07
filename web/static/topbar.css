@@ -81,6 +81,19 @@
   color: #142838;
 }
 
+.auth-dashboard {
+  text-decoration: none;
+  color: #32495b;
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.auth-dashboard:hover {
+  color: #142838;
+  text-decoration: underline;
+}
+
 .auth-user {
   display: inline-flex;
   align-items: center;

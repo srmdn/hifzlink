@@ -2,6 +2,41 @@
   margin-bottom: 0.75rem;
 }
 
+.admin-login-wrap {
+  max-width: 360px;
+  margin: 3rem auto;
+}
+
+.admin-login-title {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.admin-login-error {
+  margin-bottom: 1rem;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-login-form label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #526679;
+  margin-top: 0.25rem;
+}
+
+.admin-login-form label:first-of-type {
+  margin-top: 0;
+}
+
+.admin-login-form button {
+  margin-top: 0.5rem;
+}
+
 .admin-success {
   margin: 0 0 0.75rem;
   color: #0f5b4f;

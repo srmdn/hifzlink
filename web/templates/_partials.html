@@ -57,6 +57,7 @@
       </nav>
       {{if .QFEnabled}}
         {{if .CurrentUser}}
+        <a class="auth-dashboard" href="{{.DashboardURL}}">Dashboard</a>
         <span class="auth-user"><span class="auth-user-name">{{.CurrentUser.Name}}</span></span>
         <form method="POST" action="{{.LogoutURL}}" style="display:inline">
           <button type="submit" class="auth-btn">Logout</button>
@@ -65,7 +66,6 @@
         <a class="auth-btn" href="{{.LoginURL}}">Login</a>
         {{end}}
       {{end}}
-      <a class="github-link" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
   </div>
 </header>
@@ -81,6 +81,7 @@
     <a href="{{.SurahIndexURL}}">Surah</a>
     <a href="{{.JuzIndexURL}}">Juz</a>
     <a href="{{.SearchURL}}">Search</a>
+    {{if .CurrentUser}}<a href="{{.DashboardURL}}">Dashboard</a>{{end}}
   </nav>
   <div class="mobile-lang">
     <p>Language</p>
@@ -147,6 +148,10 @@
     <span>Quran text sourced from Tanzil</span>
     <span>·</span>
     <a href="https://github.com/srmdn/hifzlink" rel="noopener noreferrer" target="_blank">Open source</a>
+    <span>·</span>
+    <a href="/privacy">Privacy</a>
+    <span>·</span>
+    <a href="/terms">Terms</a>
   </div>
 </footer>
 {{end}}

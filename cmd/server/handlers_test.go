@@ -61,6 +61,7 @@ func newTestServer(t *testing.T) *server {
 		rels:         relations.NewService(dbStore, quranStore),
 		adminUser:    "admin",
 		adminPass:    "secret",
+		adminToken:   "test-admin-token",
 		adminLimiter: newAdminRateLimiter(),
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
@@ -69,6 +70,11 @@ func newTestServer(t *testing.T) *server {
 			{{define "dashboard.html"}}ok{{end}}
 		`)),
 	}
+}
+
+// addAdminCookie adds the admin session cookie to r, simulating a logged-in admin.
+func addAdminCookie(r *http.Request, token string) {
+	r.AddCookie(&http.Cookie{Name: cookieAdminSession, Value: token})
 }
 
 // --- /api/ayah/{surah}/{ayah} ---
@@ -245,7 +251,7 @@ func TestHandleAPIRelations_Post(t *testing.T) {
 	body := `{"ayah1":"60:8","ayah2":"60:9","note":"mutashabihat"}`
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -258,7 +264,7 @@ func TestHandleAPIRelations_InvalidJSON(t *testing.T) {
 	s := newTestServer(t)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader("not json"))
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -273,7 +279,7 @@ func TestHandleAPIRelations_UnknownAyah(t *testing.T) {
 	body := `{"ayah1":"999:999","ayah2":"60:9","note":""}`
 	req := httptest.NewRequest(http.MethodPost, "/api/relations", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
@@ -303,8 +309,8 @@ func TestHandleAPIRelations_Unauthorized(t *testing.T) {
 	rr := httptest.NewRecorder()
 	s.handleAPIRelations(rr, req)
 
-	if rr.Code != http.StatusUnauthorized {
-		t.Errorf("expected 401, got %d", rr.Code)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("expected 303 redirect to login, got %d", rr.Code)
 	}
 }
 
@@ -396,7 +402,7 @@ func TestHandleAdminRelations_PostAddRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -430,7 +436,7 @@ func TestHandleAdminRelations_PostDeleteRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -468,7 +474,7 @@ func TestHandleAdminRelations_PostEditRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -506,7 +512,7 @@ func TestHandleAdminRelations_PostEdit_InvalidCategoryBecomesUncategorized(t *te
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -565,7 +571,7 @@ func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/admin/relations", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("admin", "secret")
+	addAdminCookie(req, s.adminToken)
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
@@ -583,8 +589,11 @@ func TestHandleAdminRelations_Unauthorized(t *testing.T) {
 	rr := httptest.NewRecorder()
 	s.handleAdminRelations(rr, req)
 
-	if rr.Code != http.StatusUnauthorized {
-		t.Fatalf("expected 401, got %d", rr.Code)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected 303 redirect to login, got %d", rr.Code)
+	}
+	if loc := rr.Header().Get("Location"); loc != "/admin/login" {
+		t.Fatalf("expected redirect to /admin/login, got %s", loc)
 	}
 }
 

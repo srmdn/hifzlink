@@ -34,6 +34,7 @@ type server struct {
 
 	adminUser    string
 	adminPass    string
+	adminToken   string // random token for admin session cookie, generated at startup
 	adminLimiter *adminRateLimiter
 
 	umamiID string
@@ -180,6 +181,12 @@ func main() {
 		log.Printf("qfclient: content API enabled (%s)", s.qfAPIBase)
 	}
 
+	tok, err := generateRandomBytes(24)
+	if err != nil {
+		log.Fatalf("failed to generate admin token: %v", err)
+	}
+	s.adminToken = tok
+
 	// Clean up expired sessions on startup.
 	if err := dbStore.DeleteExpiredSessions(); err != nil {
 		log.Printf("warn: delete expired sessions: %v", err)
@@ -206,6 +213,8 @@ func main() {
 	mux.HandleFunc("/collections/", s.handleCollectionDetailPage)
 	mux.HandleFunc("/collections/items", s.handleCollectionItemsPost)
 	mux.HandleFunc("/collections/items/delete", s.handleCollectionItemsDelete)
+	mux.HandleFunc("/admin/login", s.handleAdminLogin)
+	mux.HandleFunc("/admin/logout", s.handleAdminLogout)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 
 	mux.HandleFunc("/api/ayah/", s.handleAPIAyah)
@@ -1677,21 +1686,11 @@ func (s *server) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
 		http.Error(w, "admin auth not configured (set HIFZLINK_ADMIN_USER and HIFZLINK_ADMIN_PASS)", http.StatusServiceUnavailable)
 		return false
 	}
-
-	if !s.adminLimiter.allow(realIP(r)) {
-		http.Error(w, "too many requests", http.StatusTooManyRequests)
-		return false
-	}
-
-	user, pass, ok := r.BasicAuth()
-	userMatch := subtle.ConstantTimeCompare([]byte(user), []byte(s.adminUser))
-	passMatch := subtle.ConstantTimeCompare([]byte(pass), []byte(s.adminPass))
-	if ok && userMatch == 1 && passMatch == 1 {
+	c, err := r.Cookie(cookieAdminSession)
+	if err == nil && c.Value != "" && subtle.ConstantTimeCompare([]byte(c.Value), []byte(s.adminToken)) == 1 {
 		return true
 	}
-
-	w.Header().Set("WWW-Authenticate", `Basic realm="HifzLink Admin", charset="UTF-8"`)
-	http.Error(w, "admin authentication required", http.StatusUnauthorized)
+	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
 	return false
 }
 
