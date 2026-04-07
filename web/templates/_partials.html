@@ -66,6 +66,12 @@
         <a class="auth-btn" href="{{.LoginURL}}">Login</a>
         {{end}}
       {{end}}
+      {{if .IsAdmin}}
+      <a class="admin-badge" href="{{.AdminURL}}">Admin</a>
+      <form method="POST" action="{{.AdminLogoutURL}}" style="display:inline">
+        <button type="submit" class="auth-btn">Admin Logout</button>
+      </form>
+      {{end}}
     </div>
   </div>
 </header>
@@ -102,6 +108,15 @@
     {{else}}
     <nav><a href="{{.LoginURL}}">Login with Quran.Foundation</a></nav>
     {{end}}
+  </div>
+  {{end}}
+  {{if .IsAdmin}}
+  <div class="mobile-lang">
+    <p>Admin</p>
+    <nav><a href="{{.AdminURL}}">Manage Relations</a></nav>
+    <form method="POST" action="{{.AdminLogoutURL}}" style="margin-top:0.5rem">
+      <button type="submit" class="auth-btn">Admin Logout</button>
+    </form>
   </div>
   {{end}}
 </aside>

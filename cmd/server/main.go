@@ -1386,8 +1386,14 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	data["QFEnabled"] = s.qfConfigured()
 	data["LoginURL"] = "/auth/login"
 	data["LogoutURL"] = "/auth/logout"
+	data["AdminURL"] = "/admin/relations"
+	data["AdminLogoutURL"] = "/admin/logout"
 	if sess, ok := s.currentSession(r); ok {
 		data["CurrentUser"] = userView{Name: sess.Name, Email: sess.Email}
+	}
+	if c, err := r.Cookie(cookieAdminSession); err == nil && c.Value != "" &&
+		subtle.ConstantTimeCompare([]byte(c.Value), []byte(s.adminToken)) == 1 {
+		data["IsAdmin"] = true
 	}
 
 	return data
