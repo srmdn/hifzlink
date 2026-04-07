@@ -58,6 +58,18 @@
       {{end}}
     </section>
 
+    {{if .QFBookmarks}}
+    <section class="card">
+      <h2>Quran Foundation Bookmarks</h2>
+      <p class="meta" style="margin-bottom:0.75rem">Verses you have synced to your Quran Foundation account.</p>
+      <ul class="simple-list">
+        {{range .QFBookmarks}}
+        <li><a href="{{.URL}}">{{.Ref}}</a></li>
+        {{end}}
+      </ul>
+    </section>
+    {{end}}
+
     <section class="card">
       <h2>Recent Saved Items</h2>
       {{if .RecentItems}}
