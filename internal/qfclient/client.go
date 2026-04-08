@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -245,7 +246,7 @@ func (c *Client) AddBookmark(userToken string, surahNum, ayahNum int) (*Bookmark
 // GetBookmarks returns all ayah bookmarks for the given user.
 // userToken is the user's OAuth2 access token from the session.
 func (c *Client) GetBookmarks(userToken string) ([]BookmarkData, error) {
-	req, err := http.NewRequest(http.MethodGet, c.userAPIBase()+"/bookmarks?type=ayah", nil)
+	req, err := http.NewRequest(http.MethodGet, c.userAPIBase()+"/bookmarks?mushafId=1&first=20", nil)
 	if err != nil {
 		return nil, fmt.Errorf("qfclient: build get-bookmarks request: %w", err)
 	}
@@ -260,7 +261,8 @@ func (c *Client) GetBookmarks(userToken string) ([]BookmarkData, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("qfclient: get bookmarks: HTTP %d", resp.StatusCode)
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("qfclient: get bookmarks: HTTP %d: %s", resp.StatusCode, body)
 	}
 
 	var out struct {

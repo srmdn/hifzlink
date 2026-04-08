@@ -89,7 +89,7 @@ func (s *server) handleAuthLogin(w http.ResponseWriter, r *http.Request) {
 		"response_type":         {"code"},
 		"client_id":             {s.qfClientID},
 		"redirect_uri":          {s.qfCallbackURI(r)},
-		"scope":                 {"openid offline_access user collection"},
+		"scope":                 {"openid offline_access user collection bookmark"},
 		"state":                 {state},
 		"nonce":                 {nonce},
 		"code_challenge":        {pkceChallenge(verifier)},
