@@ -309,8 +309,15 @@
 
 /* ── Landing page ─────────────────────────────────────────────── */
 
+.lp-main {
+  padding-top: 0;
+}
+
+/* Hero */
+
 .lp-hero {
-  padding: 2rem 0;
+  position: relative;
+  padding: 3.5rem 0 4rem;
   border-bottom: 1px solid var(--border);
   min-height: 100vh;
   min-height: 100dvh;
@@ -319,9 +326,51 @@
 }
 
 .lp-hero-inner {
-  max-width: 720px;
+  max-width: 900px;
   width: 100%;
-  text-align: center;
+}
+
+/* Desktop split: text left, buttons right */
+.lp-hero-layout {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.lp-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Side action buttons (hero + browse CTA) */
+.lp-side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex-shrink: 0;
+  width: 210px;
+}
+
+.lp-side-actions .lp-cta-primary,
+.lp-side-actions .lp-cta-secondary {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Scroll cue: pinned to bottom of hero */
+.lp-scroll-cue {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  color: var(--text-muted);
+  opacity: 0.45;
+  animation: lp-bounce 2s ease-in-out infinite;
+}
+
+@keyframes lp-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(6px); }
 }
 
 .lp-eyebrow {
@@ -345,59 +394,17 @@
 .lp-sub {
   font-size: 1.08rem;
   color: var(--text-muted);
-  max-width: 580px;
-  margin: 0 auto 2rem;
+  max-width: 560px;
+  margin: 0 0 0;
   line-height: 1.7;
 }
 
-.lp-cta-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  align-items: center;
+/* Diff preview inside hero */
+.lp-hero-diff {
+  margin-bottom: 0.75rem;
 }
 
-.lp-cta-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 260px;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95rem;
-  padding: 0.65em 1.3em;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: background 0.15s;
-}
-
-.lp-cta-primary:hover {
-  background: var(--accent-strong);
-}
-
-.lp-cta-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 260px;
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.92rem;
-  padding: 0.62em 1.1em;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  text-decoration: none;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.lp-cta-secondary:hover {
-  border-color: var(--accent);
-  background: rgba(0,0,0,0.02);
-}
+/* Sections */
 
 .lp-section {
   padding: 4rem 0;
@@ -431,25 +438,26 @@
   font-size: 1.08rem;
   font-style: italic;
   color: var(--text);
-  border-left: 3px solid var(--accent);
+  text-align: center;
   margin: 0 auto 1.25rem;
-  padding: 0.5rem 0 0.5rem 1.25rem;
   line-height: 1.75;
-  max-width: 680px;
+  max-width: 660px;
 }
 
 .lp-story-body {
   font-size: 0.95rem;
   color: var(--text-muted);
   line-height: 1.75;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto;
   max-width: 620px;
   text-align: center;
 }
 
+/* Feature grid */
+
 .lp-feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
 }
 
@@ -461,10 +469,9 @@
 }
 
 .lp-feature-icon {
-  font-size: 1.4rem;
   margin-bottom: 0.75rem;
   color: var(--accent);
-  line-height: 1;
+  display: flex;
 }
 
 .lp-feature-card h3 {
@@ -481,10 +488,19 @@
   line-height: 1.65;
 }
 
+.lp-login-note {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Steps */
+
 .lp-steps {
   list-style: none;
   padding: 0;
   margin: 0 auto;
+  max-width: 560px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -525,15 +541,76 @@
   line-height: 1.65;
 }
 
+/* Browse CTA (bottom) — desktop split */
+
 .lp-browse-cta {
   border-bottom: none;
   padding-bottom: 5rem;
 }
 
-.lp-browse-inner {
-  text-align: center;
-  margin: 0 auto;
+.lp-browse-split {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
 }
+
+.lp-browse-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.lp-browse-text .lp-section-title {
+  text-align: left;
+  margin-bottom: 0.6rem;
+}
+
+.lp-browse-text .lp-sub {
+  max-width: none;
+}
+
+/* CTAs (shared button styles) */
+
+.lp-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.65em 1.5em;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.lp-cta-primary:hover {
+  background: var(--accent-strong);
+}
+
+.lp-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.62em 1.1em;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.lp-cta-secondary:hover {
+  border-color: var(--accent);
+  background: rgba(0,0,0,0.02);
+}
+
+/* Diff cards */
 
 .lp-diff-example {
   display: grid;
@@ -573,9 +650,61 @@
   text-align: center;
 }
 
-@media (max-width: 600px) {
+/* Responsive */
+
+/* Tablet: stack hero layout, keep buttons in a row */
+@media (max-width: 980px) {
+  .lp-hero-layout {
+    flex-direction: column;
+    gap: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .lp-hero-text {
+    text-align: center;
+  }
+
+  .lp-hero-text .lp-eyebrow,
+  .lp-hero-text .lp-headline {
+    text-align: center;
+  }
+
+  .lp-hero-text .lp-sub {
+    margin: 0 auto;
+  }
+
+  .lp-side-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+
+  .lp-side-actions .lp-cta-primary,
+  .lp-side-actions .lp-cta-secondary {
+    width: auto;
+  }
+
+  .lp-browse-split {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .lp-browse-text .lp-section-title {
+    text-align: center;
+  }
+
+  .lp-browse-text .lp-sub {
+    margin: 0 auto;
+    max-width: 540px;
+  }
+}
+
+/* Mobile: stack buttons full-width */
+@media (max-width: 640px) {
   .lp-hero {
-    padding: 2rem 0;
+    padding: 2.5rem 0 4rem;
   }
 
   .lp-section {
@@ -584,5 +713,15 @@
 
   .lp-diff-example {
     grid-template-columns: 1fr;
+  }
+
+  .lp-side-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .lp-side-actions .lp-cta-primary,
+  .lp-side-actions .lp-cta-secondary {
+    width: 100%;
   }
 }

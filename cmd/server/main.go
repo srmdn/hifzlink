@@ -243,9 +243,14 @@ func main() {
 }
 
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
+	count, err := s.db.CountRelations()
+	if err != nil {
+		count = 0
+	}
 	s.render(w, "home.html", s.withCommonViewData(r, map[string]any{
-		"Title":       "hifzlink — Quran mutashabihat review",
-		"Description": "hifzlink helps you identify and review mutashabihat — similar Quran verses that are easy to confuse. Try it yourself at hifz.click.",
+		"Title":       "hifzlink: Quran mutashabihat review",
+		"Description": "hifzlink helps you identify and review mutashabihat: similar Quran verses that are easy to confuse during memorization. Try it yourself at hifz.click.",
+		"PairCount":   count,
 	}))
 }
 

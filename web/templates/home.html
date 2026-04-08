@@ -4,18 +4,45 @@
 <body>
 {{template "topbar" .}}
 
-  <main>
+  <main class="lp-main">
 
     {{/* ── Hero ───────────────────────────────────────────────── */}}
     <section class="lp-hero">
       <div class="container lp-hero-inner">
-        <p class="lp-eyebrow">Open source · Arabic-first · Free to use</p>
-        <h1 class="lp-headline">Your brain confuses<br>similar verses.<br>Now you can track that.</h1>
-        <p class="lp-sub">hifzlink captures the confusion patterns you encounter during recitation. The next time your mind slips from one verse to another, you know exactly where the difference is.</p>
-        <div class="lp-cta-group">
-          <a class="lp-cta-primary" href="{{.SearchURL}}">Search pairs →</a>
-          <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">Browse by Surah</a>
+
+        {{/* Desktop: text left, buttons right. Mobile/tablet: stacked. */}}
+        <div class="lp-hero-layout">
+          <div class="lp-hero-text">
+            <p class="lp-eyebrow">{{if .PairCount}}{{.PairCount}} pairs · {{end}}Open source · Free to use</p>
+            <h1 class="lp-headline">Your brain confuses<br>similar verses.<br>Now you can track that.</h1>
+            <p class="lp-sub">hifzlink captures the confusion patterns you encounter during recitation. The next time your mind slips from one verse to another, you know exactly where the difference is.</p>
+          </div>
+          <div class="lp-side-actions">
+            <a class="lp-cta-primary" href="{{.SearchURL}}">Compare verses →</a>
+            <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">Browse by Surah</a>
+          </div>
         </div>
+
+        {{/* ── Diff preview ── */}}
+        <div class="lp-diff-example lp-hero-diff">
+          <div class="lp-diff-card">
+            <p class="lp-diff-ref">60:8 · Al-Mumtahanah</p>
+            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">لَّا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">لَمْ يُقَاتِلُوكُمْ</mark> فِي الدِّينِ...</p>
+          </div>
+          <div class="lp-diff-card">
+            <p class="lp-diff-ref">60:9 · Al-Mumtahanah</p>
+            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">إِنَّمَا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">قَاتَلُوكُمْ</mark> فِي الدِّينِ...</p>
+          </div>
+        </div>
+        <p class="lp-diff-caption">Word-level highlights show exactly where two nearly identical verses diverge. <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">See full comparison →</a></p>
+
+      </div>
+
+      {{/* Scroll cue: absolute at bottom of hero, outside the centered inner */}}
+      <div class="lp-scroll-cue" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 8l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
     </section>
 
@@ -27,18 +54,6 @@
           "When I'm reciting and my brain slips from one verse to a similar one, I want a tool that captures that relationship. So next time I encounter it, I can immediately recall: <em>ah, this is the one that sounds like 60:9. The difference is here.</em>"
         </blockquote>
         <p class="lp-story-body">Mutashabihat are verses nearly identical in wording, and among the hardest parts of Quran memorization to master. Standard review tools don't model this kind of confusion. hifzlink does.</p>
-
-        <div class="lp-diff-example">
-          <div class="lp-diff-card">
-            <p class="lp-diff-ref">60:8 · Al-Mumtahanah</p>
-            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">لَّا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">لَمْ يُقَاتِلُوكُمْ</mark> فِي الدِّينِ...</p>
-          </div>
-          <div class="lp-diff-card">
-            <p class="lp-diff-ref">60:9 · Al-Mumtahanah</p>
-            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">إِنَّمَا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">قَاتَلُوكُمْ</mark> فِي الدِّينِ...</p>
-          </div>
-        </div>
-        <p class="lp-diff-caption">Highlighted words show exactly where these two nearly identical verses diverge. <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">See full comparison →</a></p>
       </div>
     </section>
 
@@ -49,24 +64,55 @@
         <h2 class="lp-section-title">Everything you need for mutashabihat review</h2>
         <div class="lp-feature-grid">
           <div class="lp-feature-card">
-            <div class="lp-feature-icon">⟺</div>
+            <div class="lp-feature-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M4 11h14M14 7l4 4-4 4M8 7L4 11l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
             <h3>Word-level diff</h3>
             <p>Compare two similar verses side by side with word-level highlighting. See precisely where one verse diverges from the other.</p>
           </div>
           <div class="lp-feature-card">
-            <div class="lp-feature-icon">⌕</div>
+            <div class="lp-feature-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M14.5 14.5L18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
             <h3>Search by ayah or surah</h3>
             <p>Look up any ayah reference, surah number, or surah name to instantly see all saved pairs involving it.</p>
           </div>
           <div class="lp-feature-card">
-            <div class="lp-feature-icon">◫</div>
+            <div class="lp-feature-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                <rect x="12" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                <rect x="3" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+                <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
             <h3>Browse by Surah &amp; Juz</h3>
             <p>Explore the full map of known similar verses organized by surah or juz. Scan where confusions are concentrated.</p>
           </div>
           <div class="lp-feature-card">
-            <div class="lp-feature-icon">⊞</div>
+            <div class="lp-feature-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M5 4h12a1 1 0 011 1v13l-3-2-3 2-3-2-3 2V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M8 9h6M8 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
             <h3>Collections</h3>
-            <p>Group pairs into named collections for focused review sessions and isolate the verses you're currently working on.</p>
+            <p>Group pairs into named collections for focused review sessions. Isolate the verses you're currently working on. <span class="lp-login-note">Login required.</span></p>
+          </div>
+          <div class="lp-feature-card">
+            <div class="lp-feature-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <polygon points="8,5 8,17 17,11" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <line x1="3" y1="5" x2="3" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Verse audio</h3>
+            <p>Listen to any verse with Alafasy recitation, powered by the Quran Foundation. Available on every ayah detail page.</p>
           </div>
         </div>
       </div>
@@ -105,13 +151,17 @@
 
     {{/* ── Browse CTA ──────────────────────────────────────────── */}}
     <section class="lp-section lp-browse-cta">
-      <div class="container lp-section-inner lp-browse-inner">
-        <h2 class="lp-section-title">Start reviewing</h2>
-        <p class="lp-sub">Browse the full collection of saved mutashabihat pairs, or search for a specific verse.</p>
-        <div class="lp-cta-group">
-          <a class="lp-cta-primary" href="{{.SearchURL}}">Search pairs →</a>
-          <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">By Surah</a>
-          <a class="lp-cta-secondary" href="{{.JuzIndexURL}}">By Juz</a>
+      <div class="container lp-section-inner">
+        <div class="lp-browse-split">
+          <div class="lp-browse-text">
+            <h2 class="lp-section-title">Start reviewing</h2>
+            <p class="lp-sub">Browse the full collection of saved mutashabihat pairs, or search for a specific verse.</p>
+          </div>
+          <div class="lp-side-actions">
+            <a class="lp-cta-primary" href="{{.SearchURL}}">Compare verses →</a>
+            <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">By Surah</a>
+            <a class="lp-cta-secondary" href="{{.JuzIndexURL}}">By Juz</a>
+          </div>
         </div>
       </div>
     </section>

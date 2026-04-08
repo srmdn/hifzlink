@@ -226,6 +226,12 @@ func (s *Store) All() ([]Relation, error) {
 	return scanRelations(rows)
 }
 
+func (s *Store) CountRelations() (int, error) {
+	var n int
+	err := s.db.QueryRow(`SELECT COUNT(*) FROM relations`).Scan(&n)
+	return n, err
+}
+
 func (s *Store) DeleteByID(id int64) error {
 	res, err := s.db.Exec(`DELETE FROM relations WHERE id = ?`, id)
 	if err != nil {
