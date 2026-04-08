@@ -36,7 +36,7 @@ func (s *server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{
 			Name:     cookieAdminSession,
 			Value:    s.adminToken,
-			Path:     "/admin",
+			Path:     "/",
 			MaxAge:   adminSessionMaxAge,
 			HttpOnly: true,
 			Secure:   true,
@@ -57,7 +57,7 @@ func (s *server) handleAdminLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     cookieAdminSession,
 		Value:    "",
-		Path:     "/admin",
+		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   true,
