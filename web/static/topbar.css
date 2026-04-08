@@ -320,6 +320,14 @@ body.menu-open {
   .github-link {
     display: none;
   }
+
+  /* Drawer handles all auth at this breakpoint — hide topbar auth */
+  .user-menu,
+  .topbar-right > a.auth-btn,
+  .topbar-right > .admin-badge,
+  .topbar-right > form {
+    display: none;
+  }
 }
 
 /* ── User menu dropdown ───────────────────────────────────────── */
@@ -362,13 +370,13 @@ body.menu-open {
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.75rem);
   right: 0;
   min-width: 190px;
-  background: #fff;
-  border: 1px solid var(--border);
+  background: #162534;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(7, 19, 31, 0.13);
+  box-shadow: 0 16px 40px rgba(7, 19, 31, 0.36);
   z-index: 50;
   overflow: hidden;
 }
@@ -379,14 +387,14 @@ body.menu-open {
 
 .user-dropdown-header {
   padding: 0.75rem 1rem 0.7rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-soft);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.18);
 }
 
 .user-dropdown-name {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text);
+  color: #e2edf6;
   display: block;
   white-space: nowrap;
   overflow: hidden;
@@ -401,9 +409,9 @@ body.menu-open {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #7c3d12;
-  background: #fef3c7;
-  border: 1px solid #fcd34d;
+  color: #fcd34d;
+  background: rgba(252, 211, 77, 0.12);
+  border: 1px solid rgba(252, 211, 77, 0.3);
   border-radius: 999px;
   padding: 0.1em 0.48em;
 }
@@ -416,9 +424,9 @@ body.menu-open {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 0.46rem 1rem;
+  padding: 0.48rem 1rem;
   font-size: 0.88rem;
-  color: var(--text);
+  color: #b8cfe0;
   text-decoration: none;
   background: none;
   border: none;
@@ -429,8 +437,8 @@ body.menu-open {
 }
 
 .user-dropdown-item:hover {
-  background: #eef6f4;
-  color: var(--accent-strong);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
 }
 
 .user-dropdown-btn {
@@ -439,17 +447,17 @@ body.menu-open {
 }
 
 .user-dropdown-item--muted {
-  color: var(--text-muted);
+  color: #6e8a9e;
   font-size: 0.84rem;
 }
 
 .user-dropdown-item--muted:hover {
-  color: var(--accent-strong);
+  color: #b8cfe0;
 }
 
 .user-dropdown-sep {
   height: 1px;
-  background: var(--border);
+  background: rgba(255, 255, 255, 0.07);
   margin: 0.3rem 0;
 }
 
@@ -510,13 +518,5 @@ body.menu-open {
 
   .mobile-drawer {
     width: min(88vw, 300px);
-  }
-
-  /* Auth handled exclusively by drawer on mobile */
-  .user-menu,
-  .topbar-right > a.auth-btn,
-  .topbar-right > .admin-badge,
-  .topbar-right > form {
-    display: none;
   }
 }
