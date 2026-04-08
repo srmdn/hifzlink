@@ -1697,7 +1697,7 @@ func formatTimestamp(raw string) string {
 	if err != nil {
 		return raw
 	}
-	return t.In(wib).Format("Jan 2, 2006, 15:04 WIB")
+	return t.In(wib).Format("Jan 2, 2006, 15:04 WIB (UTC+7)")
 }
 
 // formatUpdatedAt parses a SQLite CURRENT_TIMESTAMP string ("2006-01-02 15:04:05")
