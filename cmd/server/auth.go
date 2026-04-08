@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,6 +19,7 @@ import (
 const (
 	cookieOAuthState    = "_oauth_state"
 	cookieOAuthVerifier = "_oauth_cv"
+	cookieOAuthNonce    = "_oauth_nonce"
 	cookieSession       = "_session"
 	oauthCookieTTL      = 10 * time.Minute
 	sessionTTL          = 30 * 24 * time.Hour
@@ -73,16 +75,23 @@ func (s *server) handleAuthLogin(w http.ResponseWriter, r *http.Request) {
 		internalError(w, r, err)
 		return
 	}
+	nonce, err := generateRandomBytes(16)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
 
 	setShortCookie(w, cookieOAuthState, state)
 	setShortCookie(w, cookieOAuthVerifier, verifier)
+	setShortCookie(w, cookieOAuthNonce, nonce)
 
 	params := url.Values{
 		"response_type":         {"code"},
 		"client_id":             {s.qfClientID},
 		"redirect_uri":          {s.qfCallbackURI(r)},
-		"scope":                 {"openid offline_access collection"},
+		"scope":                 {"openid offline_access user collection"},
 		"state":                 {state},
+		"nonce":                 {nonce},
 		"code_challenge":        {pkceChallenge(verifier)},
 		"code_challenge_method": {"S256"},
 	}
@@ -96,8 +105,10 @@ func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// User denied authorization.
+	// User denied authorization or QF returned an error.
 	if errParam := r.URL.Query().Get("error"); errParam != "" {
+		errDesc := r.URL.Query().Get("error_description")
+		log.Printf("QF OAuth error: %s | description: %s | full URL: %s", errParam, errDesc, r.URL.RawQuery)
 		http.Redirect(w, r, "/?auth_error=denied", http.StatusSeeOther)
 		return
 	}
@@ -119,9 +130,10 @@ func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Clear PKCE cookies immediately.
+	// Clear PKCE/nonce cookies immediately.
 	clearCookie(w, cookieOAuthState)
 	clearCookie(w, cookieOAuthVerifier)
+	clearCookie(w, cookieOAuthNonce)
 
 	code := r.URL.Query().Get("code")
 	if code == "" {
