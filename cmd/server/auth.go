@@ -167,7 +167,7 @@ func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		ID:           sessionID,
 		UserID:       userInfo.Sub,
 		Email:        userInfo.Email,
-		Name:         userInfo.Name,
+		Name:         strings.TrimSpace(userInfo.FirstName + " " + userInfo.LastName),
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 		ExpiresAt:    time.Now().Add(time.Duration(expiresIn) * time.Second).Unix(),
@@ -229,9 +229,10 @@ type tokenResponse struct {
 
 // userInfoResponse is the JSON body returned by the userinfo endpoint.
 type userInfoResponse struct {
-	Sub   string `json:"sub"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Sub       string `json:"sub"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 func (s *server) exchangeCode(r *http.Request, code, verifier string) (*tokenResponse, error) {

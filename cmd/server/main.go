@@ -626,7 +626,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 			CollectionID:  item.Collection,
 			Collection:    item.CollectionName,
 			Ref1:          ref1,
-			CreatedAt:     item.CreatedAt,
+			CreatedAt:     formatTimestamp(item.CreatedAt),
 			Note:          item.Note,
 			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
 		}
@@ -670,8 +670,8 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "dashboard.html", s.withCommonViewData(r, map[string]any{
 		"Title":             "Dashboard",
-		"RecentCollections": collections,
-		"AllCollections":    allCollections,
+		"RecentCollections": toCollectionViews(collections),
+		"AllCollections":    toCollectionViews(allCollections),
 		"RecentItems":       items,
 		"ResumeAyahURL":     resumeAyahURL,
 		"ResumePairURL":     resumeRelationURL,
@@ -690,7 +690,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		}
 		s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 			"Title":        "Collections",
-			"Collections":  collections,
+			"Collections":  toCollectionViews(collections),
 			"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
 		}))
 		return
@@ -706,7 +706,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			collections, _ := s.db.Collections()
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
-				"Collections":     collections,
+				"Collections":     toCollectionViews(collections),
 				"StatusNotice":    "",
 				"CollectionError": "Collection name is required.",
 				"FormName":        name,
@@ -720,7 +720,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			collections, _ := s.db.Collections()
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
-				"Collections":     collections,
+				"Collections":     toCollectionViews(collections),
 				"CollectionError": "Collection name already exists or is invalid.",
 				"FormName":        name,
 				"FormDescription": description,
@@ -801,7 +801,7 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 				Arabic1:       a1.TextAR,
 				Translation1:  s.translationFor(lang, item.Ayah1Surah, item.Ayah1Ayah),
 				Note:          item.Note,
-				CreatedAt:     item.CreatedAt,
+				CreatedAt:     formatTimestamp(item.CreatedAt),
 			})
 			continue
 		}
@@ -830,13 +830,13 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 			Translation2:  s.translationFor(lang, item.Ayah2Surah, item.Ayah2Ayah),
 			CompareURL:    withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
 			Note:          item.Note,
-			CreatedAt:     item.CreatedAt,
+			CreatedAt:     formatTimestamp(item.CreatedAt),
 		})
 	}
 
 	s.render(w, "collection-detail.html", s.withCommonViewData(r, map[string]any{
 		"Title":        collection.Name,
-		"Collection":   collection,
+		"Collection":   toCollectionView(collection),
 		"Items":        viewItems,
 		"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
 	}))
@@ -1684,8 +1684,24 @@ func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading,
 	}))
 }
 
+// wib is the Asia/Jakarta timezone (UTC+7).
+var wib = time.FixedZone("WIB", 7*60*60)
+
+// formatTimestamp parses a SQLite CURRENT_TIMESTAMP string ("2006-01-02 15:04:05" UTC)
+// and returns a human-readable WIB string like "Apr 8, 2026, 21:30 WIB".
+func formatTimestamp(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", raw)
+	if err != nil {
+		return raw
+	}
+	return t.In(wib).Format("Jan 2, 2006, 15:04 WIB")
+}
+
 // formatUpdatedAt parses a SQLite CURRENT_TIMESTAMP string ("2006-01-02 15:04:05")
-// and returns a human-readable date string like "Apr 8, 2026".
+// and returns a human-readable WIB date string like "Apr 8, 2026".
 func formatUpdatedAt(raw string) string {
 	if raw == "" {
 		return ""
@@ -1694,7 +1710,34 @@ func formatUpdatedAt(raw string) string {
 	if err != nil {
 		return ""
 	}
-	return t.UTC().Format("Jan 2, 2006")
+	return t.In(wib).Format("Jan 2, 2006")
+}
+
+// collectionView is a display-ready version of db.Collection with formatted timestamps.
+type collectionView struct {
+	ID          int64
+	Name        string
+	Description string
+	CreatedAt   string
+	ItemCount   int
+}
+
+func toCollectionView(c db.Collection) collectionView {
+	return collectionView{
+		ID:          c.ID,
+		Name:        c.Name,
+		Description: c.Description,
+		CreatedAt:   formatTimestamp(c.CreatedAt),
+		ItemCount:   c.ItemCount,
+	}
+}
+
+func toCollectionViews(cs []db.Collection) []collectionView {
+	out := make([]collectionView, 0, len(cs))
+	for _, c := range cs {
+		out = append(out, toCollectionView(c))
+	}
+	return out
 }
 
 func adminStatusMessage(code string) string {
