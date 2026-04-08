@@ -9,6 +9,22 @@
     <h1>Edit Relation</h1>
     <p class="meta">{{.Relation.Ayah1}} ↔ {{.Relation.Ayah2}} &mdash; {{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}</p>
 
+    {{if or .DiffText1 .DiffText2}}
+    <section class="card admin-diff-preview">
+      <p class="meta">Current diff</p>
+      <div class="compare-grid">
+        <article class="card verse-card">
+          <p class="meta">{{.Relation.Ayah1}} · {{.Relation.Ayah1Name}}</p>
+          <p class="arabic" lang="ar">{{.DiffText1}}</p>
+        </article>
+        <article class="card verse-card">
+          <p class="meta">{{.Relation.Ayah2}} · {{.Relation.Ayah2Name}}</p>
+          <p class="arabic" lang="ar">{{.DiffText2}}</p>
+        </article>
+      </div>
+    </section>
+    {{end}}
+
     <section class="card">
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
 

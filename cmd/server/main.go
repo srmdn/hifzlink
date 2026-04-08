@@ -1214,14 +1214,26 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 		}
 
 		var w1, w2 []string
+		var diff1, diff2 template.HTML
 		s1, y1, err1 := relations.ParseAyahRef(rel.Ayah1)
 		s2, y2, err2 := relations.ParseAyahRef(rel.Ayah2)
 		if err1 == nil && err2 == nil {
-			if a1, ok1 := s.quran.Get(s1, y1); ok1 {
+			a1, ok1 := s.quran.Get(s1, y1)
+			a2, ok2 := s.quran.Get(s2, y2)
+			if ok1 {
 				w1 = strings.Fields(a1.TextAR)
 			}
-			if a2, ok2 := s.quran.Get(s2, y2); ok2 {
+			if ok2 {
 				w2 = strings.Fields(a2.TextAR)
+			}
+			if ok1 && ok2 {
+				if rel.Highlights != "" {
+					h := parseHighlights(rel.Highlights)
+					diff1 = applyHighlights(a1.TextAR, h.Ayah1)
+					diff2 = applyHighlights(a2.TextAR, h.Ayah2)
+				} else {
+					diff1, diff2 = diffHighlight(a1.TextAR, a2.TextAR)
+				}
 			}
 		}
 
@@ -1229,6 +1241,8 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 		s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
 			"Title":           "Edit Relation",
 			"Relation":        rel,
+			"DiffText1":       diff1,
+			"DiffText2":       diff2,
 			"Ayah1Words":      w1,
 			"Ayah2Words":      w2,
 			"CategoryOptions": categoryOptions,
