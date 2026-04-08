@@ -7,9 +7,9 @@
   <main class="container">
     <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
     <h1>Admin Relations</h1>
-    <p class="meta">Manage mutashabihat relations with a simple form. Use ayah reference format like <code>60:8</code>.</p>
+    <p class="meta">Manage mutashabihat relations. Use ayah reference format like <code>60:8</code>.</p>
 
-    <section class="card">
+    <section class="card" id="add-section">
       <h2>Add Relation</h2>
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
       {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
@@ -34,7 +34,7 @@
           <option value="{{.Key}}" {{if eq $.FormCategory .Key}}selected{{end}}>{{.Label}}</option>
           {{end}}
         </select>
-        <p class="meta admin-category-note">Choose the closest category. If unsure, use <code>Other</code> temporarily and refine later.</p>
+        <p class="meta admin-category-note">Choose the closest category. If unsure, use <code>Other</code> temporarily.</p>
 
         <ul class="admin-category-guide">
           {{range .CategoryOptions}}
@@ -48,54 +48,38 @@
 
     <section class="card">
       <h2>Existing Relations</h2>
-      <form class="admin-filter-form" action="/admin/relations" method="get">
-        <input type="hidden" name="lang" value="{{.Lang}}" />
-        <label for="category-filter">Category filter</label>
-        <select id="category-filter" name="category">
-          <option value="">All</option>
-          {{range .CategoryOptions}}
-          <option value="{{.Key}}" {{if eq $.CategoryFilter .Key}}selected{{end}}>{{.Label}}</option>
-          {{end}}
-        </select>
-        <button type="submit" class="btn">Apply</button>
-      </form>
-      {{if .RelationGroups}}
-      {{range .RelationGroups}}
-      <div class="admin-relation-group">
-        <h3 class="admin-group-anchor">
-          <span class="pair-refs">{{.AnchorRef}}</span>
-          <span class="meta">{{.AnchorName}}</span>
-        </h3>
-        <ul class="admin-relations-list">
+      <div class="admin-search-wrap">
+        <input
+          type="search"
+          id="relation-search"
+          class="admin-search-input"
+          placeholder="Search by ayah, surah, category, note..."
+          autocomplete="off"
+          autofocus
+        />
+      </div>
+
+      {{if .Relations}}
+      <ul class="admin-relations-list" id="relations-list">
         {{range .Relations}}
-        <li class="admin-relation-item">
+        <li class="admin-relation-item" data-search="{{.Ayah1}} {{.Ayah2}} {{.Ayah1Name}} {{.Ayah2Name}} {{.Category}} {{.Note}}">
           <div class="line-head">
-            <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+            <div class="admin-relation-refs">
+              <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+              <span class="meta">{{.Ayah1Name}} / {{.Ayah2Name}}</span>
+            </div>
             <div class="admin-row-actions">
+              {{if .Category}}<span class="category-badge">{{index $.CategoryLabelMap .Category}}</span>{{end}}
               <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
-              <a class="btn-outline" href="/admin/relations/{{.ID}}/edit?return_category={{$.CategoryFilter}}&lang={{$.Lang}}">Edit</a>
-              <button
-                class="btn-danger js-open-delete"
-                type="button"
-                data-id="{{.ID}}"
-                data-label="{{.Ayah1}} ↔ {{.Ayah2}}"
-              >Delete</button>
+              <a class="btn-outline" href="/admin/relations/{{.ID}}/edit?lang={{$.Lang}}">Edit</a>
+              <button class="btn-danger js-open-delete" type="button" data-id="{{.ID}}" data-label="{{.Ayah1}} ↔ {{.Ayah2}}">Delete</button>
             </div>
           </div>
-          <p class="meta">{{.Ayah1Name}} ↔ {{.Ayah2Name}}</p>
-          {{if .Category}}<p class="category-badge">{{index $.CategoryLabelMap .Category}}</p>{{end}}
           {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
-          {{if .DiffText1}}
-          <div class="admin-diff">
-            <p class="arabic arabic-small" lang="ar">{{.DiffText1}}</p>
-            <p class="arabic arabic-small" lang="ar">{{.DiffText2}}</p>
-          </div>
-          {{end}}
         </li>
         {{end}}
-        </ul>
-      </div>
-      {{end}}
+      </ul>
+      <p class="meta" id="no-results" hidden>No results. <a href="#add-section">Add a new relation?</a></p>
       {{else}}
       <p class="meta">No relations yet.</p>
       {{end}}
@@ -121,6 +105,7 @@
 {{template "footer" .}}
 <script>
   (() => {
+    // Delete dialog
     const dialog = document.getElementById("delete-dialog");
     const deleteText = document.getElementById("delete-dialog-text");
     const deleteID = document.getElementById("delete-id");
@@ -129,18 +114,29 @@
     document.querySelectorAll(".js-open-delete").forEach((btn) => {
       btn.addEventListener("click", () => {
         if (!dialog || !deleteText || !deleteID) return;
-        const id = btn.getAttribute("data-id") || "";
-        const label = btn.getAttribute("data-label") || "this relation";
-        deleteID.value = id;
-        deleteText.textContent = `Delete relation ${label}?`;
+        deleteID.value = btn.getAttribute("data-id") || "";
+        deleteText.textContent = `Delete relation ${btn.getAttribute("data-label") || "this relation"}?`;
         dialog.showModal();
       });
     });
+    if (cancelBtn && dialog) cancelBtn.addEventListener("click", () => dialog.close());
 
-    if (cancelBtn && dialog) {
-      cancelBtn.addEventListener("click", () => dialog.close());
-    }
+    // Search
+    const input = document.getElementById("relation-search");
+    const list = document.getElementById("relations-list");
+    const noResults = document.getElementById("no-results");
+    if (!input || !list) return;
 
+    input.addEventListener("input", () => {
+      const q = input.value.trim().toLowerCase();
+      let visible = 0;
+      list.querySelectorAll(".admin-relation-item").forEach((item) => {
+        const match = !q || (item.dataset.search || "").toLowerCase().includes(q);
+        item.hidden = !match;
+        if (match) visible++;
+      });
+      if (noResults) noResults.hidden = visible > 0 || !q;
+    });
   })();
 </script>
 </body>

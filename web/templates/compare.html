@@ -6,6 +6,7 @@
 
   <main class="container">
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
+    {{if .RelationUpdatedAt}}<p class="meta">Last updated: {{.RelationUpdatedAt}}</p>{{end}}
 
     <section class="card">
       {{if .Collections}}

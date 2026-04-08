@@ -17,6 +17,7 @@ type Relation struct {
 	Note       string
 	Category   string
 	Highlights string // JSON: {"ayah1":[0,2],"ayah2":[1,3]}
+	UpdatedAt  string
 }
 
 type Collection struct {
@@ -125,6 +126,14 @@ func Open(path string) (*Store, error) {
 		_ = db.Close()
 		return nil, err
 	}
+	if err := ensureColumn(db, "relations", "updated_at", "ALTER TABLE relations ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+	if _, err := db.Exec(`UPDATE relations SET updated_at = CURRENT_TIMESTAMP WHERE COALESCE(updated_at, '') = ''`); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("backfill relations.updated_at: %w", err)
+	}
 	if err := ensureColumn(db, "collections", "created_at", "ALTER TABLE collections ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); err != nil {
 		_ = db.Close()
 		return nil, err
@@ -158,9 +167,9 @@ func (s *Store) Close() error {
 func (s *Store) Add(rel Relation) (bool, error) {
 	res, err := s.db.Exec(`
 	INSERT OR IGNORE INTO relations
-		(ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, note, category, highlights)
+		(ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, note, category, highlights, updated_at)
 	VALUES
-		(?, ?, ?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 	`, rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah, rel.Note, rel.Category, rel.Highlights)
 	if err != nil {
 		return false, fmt.Errorf("insert relation: %w", err)
@@ -174,7 +183,7 @@ func (s *Store) Add(rel Relation) (bool, error) {
 
 func (s *Store) ByAyah(surah, ayah int) ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, ''), COALESCE(updated_at, '')
 	FROM relations
 	WHERE (ayah1_surah = ? AND ayah1_ayah = ?)
 	   OR (ayah2_surah = ? AND ayah2_ayah = ?)
@@ -190,7 +199,7 @@ func (s *Store) ByAyah(surah, ayah int) ([]Relation, error) {
 
 func (s *Store) BySurah(surah int) ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, ''), COALESCE(updated_at, '')
 	FROM relations
 	WHERE ayah1_surah = ? OR ayah2_surah = ?
 	ORDER BY ayah1_ayah, ayah2_ayah
@@ -205,7 +214,7 @@ func (s *Store) BySurah(surah int) ([]Relation, error) {
 
 func (s *Store) All() ([]Relation, error) {
 	rows, err := s.db.Query(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, ''), COALESCE(updated_at, '')
 	FROM relations
 	ORDER BY ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah
 	`)
@@ -235,7 +244,7 @@ func (s *Store) DeleteByID(id int64) error {
 func (s *Store) UpdateByID(rel Relation) error {
 	res, err := s.db.Exec(`
 	UPDATE relations
-	SET ayah1_surah = ?, ayah1_ayah = ?, ayah2_surah = ?, ayah2_ayah = ?, note = ?, category = ?, highlights = ?
+	SET ayah1_surah = ?, ayah1_ayah = ?, ayah2_surah = ?, ayah2_ayah = ?, note = ?, category = ?, highlights = ?, updated_at = CURRENT_TIMESTAMP
 	WHERE id = ?
 	`, rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah, rel.Note, rel.Category, rel.Highlights, rel.ID)
 	if err != nil {
@@ -477,11 +486,11 @@ func (s *Store) RelationCountBySurah() (map[int]int, error) {
 func (s *Store) ByID(id int64) (Relation, bool, error) {
 	var rel Relation
 	err := s.db.QueryRow(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, ''), COALESCE(updated_at, '')
 	FROM relations WHERE id = ?
 	`, id).Scan(
 		&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah,
-		&rel.Note, &rel.Category, &rel.Highlights,
+		&rel.Note, &rel.Category, &rel.Highlights, &rel.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
 		return Relation{}, false, nil
@@ -495,14 +504,14 @@ func (s *Store) ByID(id int64) (Relation, bool, error) {
 func (s *Store) ByPair(s1, y1, s2, y2 int) (Relation, bool, error) {
 	var rel Relation
 	err := s.db.QueryRow(`
-	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, ''), COALESCE(updated_at, '')
 	FROM relations
 	WHERE (ayah1_surah = ? AND ayah1_ayah = ? AND ayah2_surah = ? AND ayah2_ayah = ?)
 	   OR (ayah1_surah = ? AND ayah1_ayah = ? AND ayah2_surah = ? AND ayah2_ayah = ?)
 	LIMIT 1
 	`, s1, y1, s2, y2, s2, y2, s1, y1).Scan(
 		&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah,
-		&rel.Note, &rel.Category, &rel.Highlights,
+		&rel.Note, &rel.Category, &rel.Highlights, &rel.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
 		return Relation{}, false, nil
@@ -517,7 +526,7 @@ func scanRelations(rows *sql.Rows) ([]Relation, error) {
 	out := make([]Relation, 0)
 	for rows.Next() {
 		var rel Relation
-		if err := rows.Scan(&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah, &rel.Note, &rel.Category, &rel.Highlights); err != nil {
+		if err := rows.Scan(&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah, &rel.Note, &rel.Category, &rel.Highlights, &rel.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan relation: %w", err)
 		}
 		out = append(out, rel)

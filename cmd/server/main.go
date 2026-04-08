@@ -568,6 +568,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 	if relFound {
 		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
+		compareData["RelationUpdatedAt"] = formatUpdatedAt(rel.UpdatedAt)
 	}
 	s.render(w, "compare.html", s.withCommonViewData(r, compareData))
 }
@@ -1241,6 +1242,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 		s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
 			"Title":           "Edit Relation",
 			"Relation":        rel,
+			"RelationUpdatedAt": formatUpdatedAt(rel.UpdatedAt),
 			"DiffText1":       diff1,
 			"DiffText2":       diff2,
 			"Ayah1Words":      w1,
@@ -1677,6 +1679,19 @@ func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading,
 	}))
 }
 
+// formatUpdatedAt parses a SQLite CURRENT_TIMESTAMP string ("2006-01-02 15:04:05")
+// and returns a human-readable date string like "Apr 8, 2026".
+func formatUpdatedAt(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", raw)
+	if err != nil {
+		return ""
+	}
+	return t.UTC().Format("Jan 2, 2006")
+}
+
 func adminStatusMessage(code string) string {
 	switch code {
 	case "added":
@@ -1690,71 +1705,11 @@ func adminStatusMessage(code string) string {
 	}
 }
 
-type adminRelationGroup struct {
-	AnchorRef  string
-	AnchorName string
-	Relations  []adminRelationWithDiff
-}
-
-type adminRelationWithDiff struct {
-	relations.AdminRelationView
-	DiffText1  template.HTML
-	DiffText2  template.HTML
-	Ayah1Words []string
-	Ayah2Words []string
-}
-
 func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request, overrides map[string]any) {
 	rows, err := s.rels.AllRelations()
 	if err != nil {
 		internalError(w, r, err)
 		return
-	}
-	categoryFilter := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("category")))
-	if categoryFilter != "" {
-		filtered := make([]relations.AdminRelationView, 0, len(rows))
-		for _, row := range rows {
-			if strings.EqualFold(row.Category, categoryFilter) {
-				filtered = append(filtered, row)
-			}
-		}
-		rows = filtered
-	}
-
-	rowsWithDiff := make([]adminRelationWithDiff, 0, len(rows))
-	for _, row := range rows {
-		s1, y1, err1 := relations.ParseAyahRef(row.Ayah1)
-		s2, y2, err2 := relations.ParseAyahRef(row.Ayah2)
-		var d1, d2 template.HTML
-		var w1, w2 []string
-		if err1 == nil && err2 == nil {
-			a1, ok1 := s.quran.Get(s1, y1)
-			a2, ok2 := s.quran.Get(s2, y2)
-			if ok1 && ok2 {
-				w1 = strings.Fields(a1.TextAR)
-				w2 = strings.Fields(a2.TextAR)
-				if row.Highlights != "" {
-					h := parseHighlights(row.Highlights)
-					d1 = applyHighlights(a1.TextAR, h.Ayah1)
-					d2 = applyHighlights(a2.TextAR, h.Ayah2)
-				} else {
-					d1, d2 = diffHighlight(a1.TextAR, a2.TextAR)
-				}
-			}
-		}
-		rowsWithDiff = append(rowsWithDiff, adminRelationWithDiff{row, d1, d2, w1, w2})
-	}
-
-	// Group rows by anchor ayah (ayah1).
-	var groups []adminRelationGroup
-	for _, row := range rowsWithDiff {
-		if len(groups) == 0 || groups[len(groups)-1].AnchorRef != row.Ayah1 {
-			groups = append(groups, adminRelationGroup{
-				AnchorRef:  row.Ayah1,
-				AnchorName: row.Ayah1Name,
-			})
-		}
-		groups[len(groups)-1].Relations = append(groups[len(groups)-1].Relations, row)
 	}
 
 	categoryOptions := adminCategoryOptions()
@@ -1765,13 +1720,12 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 
 	data := map[string]any{
 		"Title":            "Admin Relations",
-		"RelationGroups":   groups,
+		"Relations":        rows,
 		"StatusNotice":     adminStatusMessage(r.URL.Query().Get("status")),
 		"FormAyah1":        "",
 		"FormAyah2":        "",
 		"FormNote":         "",
 		"FormCategory":     "",
-		"CategoryFilter":   categoryFilter,
 		"CategoryOptions":  categoryOptions,
 		"CategoryLabelMap": categoryLabelMap,
 		"AdminError":       "",

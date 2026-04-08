@@ -30,14 +30,15 @@ type PairView struct {
 }
 
 type AdminRelationView struct {
-	ID        int64
-	Ayah1     string
-	Ayah1Name string
-	Ayah2     string
-	Ayah2Name string
-	Note      string
-	Category  string
+	ID         int64
+	Ayah1      string
+	Ayah1Name  string
+	Ayah2      string
+	Ayah2Name  string
+	Note       string
+	Category   string
 	Highlights string
+	UpdatedAt  string
 }
 
 type Service struct {
@@ -222,6 +223,7 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 			Note:       rel.Note,
 			Category:   rel.Category,
 			Highlights: rel.Highlights,
+			UpdatedAt:  rel.UpdatedAt,
 		})
 	}
 	return out, nil
@@ -241,6 +243,7 @@ func (s *Service) RelationByID(id int64) (AdminRelationView, bool, error) {
 		Note:       rel.Note,
 		Category:   rel.Category,
 		Highlights: rel.Highlights,
+		UpdatedAt:  rel.UpdatedAt,
 	}, true, nil
 }
 

@@ -7,7 +7,7 @@
   <main class="container">
     <p class="back"><a href="{{.BackURL}}">← Back to Relations</a></p>
     <h1>Edit Relation</h1>
-    <p class="meta">{{.Relation.Ayah1}} ↔ {{.Relation.Ayah2}} &mdash; {{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}</p>
+    <p class="meta">{{.Relation.Ayah1}} ↔ {{.Relation.Ayah2}} · {{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}{{if .RelationUpdatedAt}} · Last updated: {{.RelationUpdatedAt}}{{end}}</p>
 
     {{if or .DiffText1 .DiffText2}}
     <section class="card admin-diff-preview">
