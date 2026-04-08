@@ -227,6 +227,23 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 	return out, nil
 }
 
+func (s *Service) RelationByID(id int64) (AdminRelationView, bool, error) {
+	rel, ok, err := s.db.ByID(id)
+	if err != nil || !ok {
+		return AdminRelationView{}, ok, err
+	}
+	return AdminRelationView{
+		ID:         rel.ID,
+		Ayah1:      FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah),
+		Ayah1Name:  s.quran.SurahName(rel.Ayah1Surah),
+		Ayah2:      FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah),
+		Ayah2Name:  s.quran.SurahName(rel.Ayah2Surah),
+		Note:       rel.Note,
+		Category:   rel.Category,
+		Highlights: rel.Highlights,
+	}, true, nil
+}
+
 func (s *Service) DeleteByID(id int64) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid relation id")

@@ -216,6 +216,7 @@ func main() {
 	mux.HandleFunc("/admin/login", s.handleAdminLogin)
 	mux.HandleFunc("/admin/logout", s.handleAdminLogout)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
+	mux.HandleFunc("/admin/relations/", s.handleAdminRelationEdit)
 
 	mux.HandleFunc("/api/ayah/", s.handleAPIAyah)
 	mux.HandleFunc("/api/relations", s.handleAPIRelations)
@@ -550,7 +551,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		addRelated(rels2)
 	}
 
-	s.render(w, "compare.html", s.withCommonViewData(r, map[string]any{
+	compareData := map[string]any{
 		"Title":            "Compare",
 		"Description":      "Compare two similar Quran verses side by side and spot the differences. Try it yourself at hifz.click.",
 		"Ayah1":            ayah1,
@@ -564,7 +565,11 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"Collections":      collections,
 		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
 		"RelatedPairs":     relatedPairs,
-	}))
+	}
+	if relFound {
+		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
+	}
+	s.render(w, "compare.html", s.withCommonViewData(r, compareData))
 }
 
 type qfBookmarkView struct {
@@ -1168,6 +1173,125 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			})
 			return
 		}
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+// handleAdminRelationEdit handles GET /admin/relations/{id}/edit and POST /admin/relations/{id}/edit.
+func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request) {
+	if !s.requireAdmin(w, r) {
+		return
+	}
+
+	// Parse id from /admin/relations/{id}/edit
+	trimmed := strings.TrimPrefix(r.URL.Path, "/admin/relations/")
+	trimmed = strings.TrimSuffix(trimmed, "/edit")
+	id, err := strconv.ParseInt(strings.TrimSpace(trimmed), 10, 64)
+	if err != nil || id <= 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	returnCategory := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("return_category")))
+	lang := pageLang(r)
+
+	backURL := withLang("/admin/relations", lang)
+	if returnCategory != "" {
+		backURL = withLang("/admin/relations?category="+returnCategory, lang)
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		rel, ok, err := s.rels.RelationByID(id)
+		if err != nil {
+			internalError(w, r, err)
+			return
+		}
+		if !ok {
+			s.renderNotFound(w, r, "Relation not found", "This relation does not exist.")
+			return
+		}
+
+		var w1, w2 []string
+		s1, y1, err1 := relations.ParseAyahRef(rel.Ayah1)
+		s2, y2, err2 := relations.ParseAyahRef(rel.Ayah2)
+		if err1 == nil && err2 == nil {
+			if a1, ok1 := s.quran.Get(s1, y1); ok1 {
+				w1 = strings.Fields(a1.TextAR)
+			}
+			if a2, ok2 := s.quran.Get(s2, y2); ok2 {
+				w2 = strings.Fields(a2.TextAR)
+			}
+		}
+
+		categoryOptions := adminCategoryOptions()
+		s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
+			"Title":           "Edit Relation",
+			"Relation":        rel,
+			"Ayah1Words":      w1,
+			"Ayah2Words":      w2,
+			"CategoryOptions": categoryOptions,
+			"BackURL":         backURL,
+			"ReturnCategory":  returnCategory,
+			"AdminError":      "",
+		}))
+
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+
+		returnCat := strings.ToLower(strings.TrimSpace(r.FormValue("return_category")))
+		postLang := sanitizeLang(r.FormValue("lang"))
+
+		ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+		ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+		note := strings.TrimSpace(r.FormValue("note"))
+		category := strings.TrimSpace(r.FormValue("category"))
+		highlights := r.FormValue("highlights_current")
+		if r.FormValue("highlights_modified") == "1" {
+			highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+		}
+
+		if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
+			rel, _, _ := s.rels.RelationByID(id)
+			var w1, w2 []string
+			s1, y1, err1 := relations.ParseAyahRef(ayah1)
+			s2, y2, err2 := relations.ParseAyahRef(ayah2)
+			if err1 == nil && err2 == nil {
+				if a1, ok1 := s.quran.Get(s1, y1); ok1 {
+					w1 = strings.Fields(a1.TextAR)
+				}
+				if a2, ok2 := s.quran.Get(s2, y2); ok2 {
+					w2 = strings.Fields(a2.TextAR)
+				}
+			}
+			categoryOptions := adminCategoryOptions()
+			backURL := withLang("/admin/relations", postLang)
+			if returnCat != "" {
+				backURL = withLang("/admin/relations?category="+returnCat, postLang)
+			}
+			s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
+				"Title":           "Edit Relation",
+				"Relation":        rel,
+				"Ayah1Words":      w1,
+				"Ayah2Words":      w2,
+				"CategoryOptions": categoryOptions,
+				"BackURL":         backURL,
+				"ReturnCategory":  returnCat,
+				"AdminError":      adminErrorMessage(err),
+			}))
+			return
+		}
+
+		redirectURL := withLang("/admin/relations?status=edited", postLang)
+		if returnCat != "" {
+			redirectURL = withLang("/admin/relations?category="+returnCat+"&status=edited", postLang)
+		}
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}

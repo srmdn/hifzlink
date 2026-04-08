@@ -474,6 +474,24 @@ func (s *Store) RelationCountBySurah() (map[int]int, error) {
 	return out, rows.Err()
 }
 
+func (s *Store) ByID(id int64) (Relation, bool, error) {
+	var rel Relation
+	err := s.db.QueryRow(`
+	SELECT id, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(category, ''), COALESCE(highlights, '')
+	FROM relations WHERE id = ?
+	`, id).Scan(
+		&rel.ID, &rel.Ayah1Surah, &rel.Ayah1Ayah, &rel.Ayah2Surah, &rel.Ayah2Ayah,
+		&rel.Note, &rel.Category, &rel.Highlights,
+	)
+	if err == sql.ErrNoRows {
+		return Relation{}, false, nil
+	}
+	if err != nil {
+		return Relation{}, false, fmt.Errorf("query relation by id: %w", err)
+	}
+	return rel, true, nil
+}
+
 func (s *Store) ByPair(s1, y1, s2, y2 int) (Relation, bool, error) {
 	var rel Relation
 	err := s.db.QueryRow(`

@@ -34,6 +34,7 @@
     <div class="compare-toolbar">
       <button type="button" class="btn-outline" id="toggle-highlights">Hide highlights</button>
       <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
+      {{if and .IsAdmin .AdminEditURL}}<a class="btn-outline" href="{{.AdminEditURL}}">Edit</a>{{end}}
     </div>
 
     <section class="compare-grid">
