@@ -341,6 +341,13 @@ mark.word-unique {
   margin-top: 0.5rem;
 }
 
+.qf-bookmarks-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
 @media (max-width: 640px) {
   .collection-form,
   .collection-save-form {

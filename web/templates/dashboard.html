@@ -61,12 +61,12 @@
     {{if .QFBookmarks}}
     <section class="card">
       <h2>Quran Foundation Bookmarks</h2>
-      <p class="meta" style="margin-bottom:0.75rem">Verses you have synced to your Quran Foundation account.</p>
-      <ul class="simple-list">
+      <p class="meta">Ayahs synced to your Quran.Foundation account.</p>
+      <div class="qf-bookmarks-grid">
         {{range .QFBookmarks}}
-        <li><a href="{{.URL}}">{{.Ref}}</a></li>
+        <a class="ayah-chip" href="{{.URL}}">{{.Ref}}</a>
         {{end}}
-      </ul>
+      </div>
     </section>
     {{end}}
 

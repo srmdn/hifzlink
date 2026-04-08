@@ -8,30 +8,6 @@
     <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
     {{if .RelationUpdatedAt}}<p class="meta">Last updated: {{.RelationUpdatedAt}}</p>{{end}}
 
-    <section class="card">
-      {{if .Collections}}
-      <form action="/collections/items" method="post" class="collection-save-form">
-        <input type="hidden" name="lang" value="{{.Lang}}" />
-        <input type="hidden" name="item_type" value="relation" />
-        <input type="hidden" name="ayah1" value="{{.Ref1}}" />
-        <input type="hidden" name="ayah2" value="{{.Ref2}}" />
-        <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
-        <label for="collection-id-compare">Save pair to collection</label>
-        <select id="collection-id-compare" name="collection_id" required>
-          <option value="">Select collection</option>
-          {{range .Collections}}
-          <option value="{{.ID}}">{{.Name}}</option>
-          {{end}}
-        </select>
-        <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
-        <button type="submit" class="btn">Save Pair</button>
-      </form>
-      {{else}}
-      <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
-      {{end}}
-      {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
-    </section>
-
     <div class="compare-toolbar">
       <button type="button" class="btn-outline" id="toggle-highlights">Hide highlights</button>
       <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
@@ -54,6 +30,39 @@
         {{end}}
       </article>
     </section>
+
+    {{if .QFEnabled}}
+    <section class="card compare-save-card">
+      {{if .CurrentUser}}
+        {{if .Collections}}
+        <form action="/collections/items" method="post" class="collection-save-form">
+          <input type="hidden" name="lang" value="{{.Lang}}" />
+          <input type="hidden" name="item_type" value="relation" />
+          <input type="hidden" name="ayah1" value="{{.Ref1}}" />
+          <input type="hidden" name="ayah2" value="{{.Ref2}}" />
+          <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
+          <label for="collection-id-compare">Save pair to collection</label>
+          <select id="collection-id-compare" name="collection_id" required>
+            <option value="">Select collection</option>
+            {{range .Collections}}
+            <option value="{{.ID}}">{{.Name}}</option>
+            {{end}}
+          </select>
+          <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
+          <button type="submit" class="btn">Save Pair</button>
+        </form>
+        {{else}}
+        <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
+        {{end}}
+        {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
+      {{else}}
+      <p class="compare-login-nudge">
+        <a href="{{.LoginURL}}">Login with Quran.Foundation</a> to save this pair to your collection.
+      </p>
+      {{end}}
+    </section>
+    {{end}}
+
     {{if .RelatedPairs}}
     <section class="related-pairs">
       <h2 class="related-pairs-title">Related pairs</h2>

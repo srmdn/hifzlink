@@ -57,19 +57,38 @@
       </nav>
       {{if .QFEnabled}}
         {{if .CurrentUser}}
-        <a class="auth-dashboard" href="{{.DashboardURL}}">Dashboard</a>
-        <span class="auth-user"><span class="auth-user-name">{{.CurrentUser.Name}}</span></span>
-        <form method="POST" action="{{.LogoutURL}}" style="display:inline">
-          <button type="submit" class="auth-btn">Logout</button>
-        </form>
+        <div class="user-menu" data-user-menu>
+          <button class="user-avatar-btn" type="button" aria-expanded="false" data-user-menu-toggle aria-label="Open user menu">
+            <span class="user-initials">{{if .CurrentUser.Name}}{{slice .CurrentUser.Name 0 1}}{{else}}?{{end}}</span>
+          </button>
+          <div class="user-dropdown" hidden data-user-dropdown>
+            <div class="user-dropdown-header">
+              <span class="user-dropdown-name">{{.CurrentUser.Name}}</span>
+              {{if .IsAdmin}}<span class="user-dropdown-role">Admin</span>{{end}}
+            </div>
+            <nav class="user-dropdown-nav">
+              <a class="user-dropdown-item" href="{{.DashboardURL}}">Dashboard</a>
+              <form method="POST" action="{{.LogoutURL}}">
+                <button type="submit" class="user-dropdown-item user-dropdown-btn">Sign out</button>
+              </form>
+              {{if .IsAdmin}}
+              <div class="user-dropdown-sep"></div>
+              <a class="user-dropdown-item user-dropdown-item--muted" href="{{.AdminURL}}">Admin Panel</a>
+              <form method="POST" action="{{.AdminLogoutURL}}">
+                <button type="submit" class="user-dropdown-item user-dropdown-btn user-dropdown-item--muted">Admin Sign out</button>
+              </form>
+              {{end}}
+            </nav>
+          </div>
+        </div>
         {{else if not .IsAdmin}}
         <a class="auth-btn" href="{{.LoginURL}}">Login</a>
         {{end}}
       {{end}}
-      {{if .IsAdmin}}
+      {{if and .IsAdmin (not .CurrentUser)}}
       <a class="admin-badge" href="{{.AdminURL}}">Admin</a>
       <form method="POST" action="{{.AdminLogoutURL}}" style="display:inline">
-        <button type="submit" class="auth-btn">Admin Logout</button>
+        <button type="submit" class="auth-btn">Logout</button>
       </form>
       {{end}}
     </div>
@@ -101,9 +120,12 @@
   <div class="mobile-lang">
     <p>Account</p>
     {{if .CurrentUser}}
-    <p class="meta">{{.CurrentUser.Name}}</p>
-    <form method="POST" action="{{.LogoutURL}}">
-      <button type="submit" class="auth-btn">Logout</button>
+    <div class="drawer-user-info">
+      <span class="drawer-user-avatar">{{if .CurrentUser.Name}}{{slice .CurrentUser.Name 0 1}}{{else}}?{{end}}</span>
+      <span class="drawer-user-name">{{.CurrentUser.Name}}</span>
+    </div>
+    <form method="POST" action="{{.LogoutURL}}" style="margin-top:0.5rem">
+      <button type="submit" class="auth-btn">Sign out</button>
     </form>
     {{else if not .IsAdmin}}
     <nav><a href="{{.LoginURL}}">Login with Quran.Foundation</a></nav>
@@ -113,9 +135,9 @@
   {{if .IsAdmin}}
   <div class="mobile-lang">
     <p>Admin</p>
-    <nav><a href="{{.AdminURL}}">Manage Relations</a></nav>
+    <nav><a href="{{.AdminURL}}">Admin Panel</a></nav>
     <form method="POST" action="{{.AdminLogoutURL}}" style="margin-top:0.5rem">
-      <button type="submit" class="auth-btn">Admin Logout</button>
+      <button type="submit" class="auth-btn">Admin Sign out</button>
     </form>
   </div>
   {{end}}
@@ -152,6 +174,31 @@
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 980) setOpen(false);
+    });
+  })();
+
+  (() => {
+    const setUserMenuOpen = (open) => {
+      const toggle = document.querySelector("[data-user-menu-toggle]");
+      const dropdown = document.querySelector("[data-user-dropdown]");
+      if (!toggle || !dropdown) return;
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      dropdown.hidden = !open;
+    };
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("[data-user-menu-toggle]")) {
+        const dropdown = document.querySelector("[data-user-dropdown]");
+        setUserMenuOpen(dropdown ? dropdown.hidden : true);
+        return;
+      }
+      if (!e.target.closest("[data-user-menu]")) {
+        setUserMenuOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setUserMenuOpen(false);
     });
   })();
 </script>
