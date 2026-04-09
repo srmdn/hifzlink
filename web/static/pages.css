@@ -45,6 +45,39 @@
   font-weight: inherit;
 }
 
+/* Practice Mode */
+.practice-controls {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.practice-controls.active { display: flex; }
+
+.compare-grid.practice-mode .verse-card:first-child {
+  filter: blur(8px);
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.25s;
+}
+.compare-grid.practice-mode.practice-right .verse-card:first-child {
+  filter: none;
+  user-select: auto;
+  pointer-events: auto;
+}
+.compare-grid.practice-mode.practice-right .verse-card:last-child {
+  filter: blur(8px);
+  user-select: none;
+  pointer-events: none;
+}
+.compare-grid.practice-mode.revealed .verse-card:first-child,
+.compare-grid.practice-mode.revealed .verse-card:last-child {
+  filter: none !important;
+  user-select: auto !important;
+  pointer-events: auto !important;
+}
+
 .related-pairs {
   margin-top: 1.5rem;
 }
