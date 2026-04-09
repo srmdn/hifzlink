@@ -215,6 +215,16 @@
 {{end}}
 
 {{define "footer"}}
+<script>
+  (() => {
+    document.querySelectorAll('.collection-save-form, .collection-form').forEach((form) => {
+      form.addEventListener('submit', () => {
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+      });
+    });
+  })();
+</script>
 <footer class="footer">
   <div class="container footer-inner">
     <span>Quran text sourced from Tanzil</span>

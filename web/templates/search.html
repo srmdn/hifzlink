@@ -60,7 +60,21 @@
         </ul>
       </section>
       {{else if not .ErrMsg}}
-      <p class="meta">No pairs found for <strong>{{.Query}}</strong>{{if .CategoryFilter}} with pattern <strong>{{index .CategoryLabelMap .CategoryFilter}}</strong>{{end}}.</p>
+      <div class="search-empty-state">
+        <p class="meta">No pairs found for <strong>{{.Query}}</strong>{{if .CategoryFilter}} with pattern <strong>{{index .CategoryLabelMap .CategoryFilter}}</strong>{{end}}.</p>
+        <p class="meta">Try a different format: <code>60:8</code> or <code>Al-Mumtahanah</code></p>
+        <div class="search-empty-links">
+          <a class="btn-sm" href="{{$.SurahIndexURL}}">Browse by Surah</a>
+          <a class="btn-sm" href="{{$.JuzIndexURL}}">Browse by Juz</a>
+        </div>
+        <p class="meta" style="margin-top:0.75rem">Popular pairs:</p>
+        <div class="search-empty-links">
+          <a class="ayah-chip" href="/compare?ayah1=60:8&ayah2=60:9&lang={{$.Lang}}">60:8 vs 60:9</a>
+          <a class="ayah-chip" href="/compare?ayah1=2:3&ayah2=2:284&lang={{$.Lang}}">2:3 vs 2:284</a>
+          <a class="ayah-chip" href="/compare?ayah1=1:1&ayah2=27:30&lang={{$.Lang}}">1:1 vs 27:30</a>
+          <a class="ayah-chip" href="/compare?ayah1=2:255&ayah2=3:18&lang={{$.Lang}}">2:255 vs 3:18</a>
+        </div>
+      </div>
       {{end}}
     {{end}}
   </main>

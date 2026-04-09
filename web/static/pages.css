@@ -188,6 +188,19 @@
   }
 }
 
+/* ── Search empty state ───────────────────────────────────────── */
+
+.search-empty-state {
+  margin-top: 1rem;
+}
+
+.search-empty-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
 /* ── Surah index ──────────────────────────────────────────────── */
 
 .surah-index-list {

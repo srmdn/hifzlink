@@ -5,6 +5,7 @@
 {{template "topbar" .}}
 
   <main class="container">
+    <p class="back"><a href="/surah/{{.Ayah.Surah}}?lang={{.Lang}}">← Surah {{.Ayah.Surah}}: {{.SurahName}}</a></p>
     <div class="page-heading">
       <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
       <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
@@ -58,9 +59,9 @@
           <h2>Tafsir</h2>
           <span class="tafsir-source">{{.TafsirSource}}</span>
         </div>
-        <button type="button" class="btn-sm" id="tafsir-toggle" aria-expanded="false" aria-controls="tafsir-body">Show</button>
+        <button type="button" class="btn-sm" id="tafsir-toggle" aria-expanded="true" aria-controls="tafsir-body">Hide</button>
       </div>
-      <div class="tafsir-body" id="tafsir-body" hidden>
+      <div class="tafsir-body" id="tafsir-body">
         {{.AyahTafsir}}
       </div>
     </section>
