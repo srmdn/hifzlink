@@ -658,6 +658,12 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	savedPairsCount, err := s.db.CountSavedPairs(sess.UserID)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
 	// Fetch QF bookmarks for logged-in users.
 	var qfBookmarks []qfBookmarkView
 	if s.qf != nil {
@@ -681,6 +687,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		"RecentItems":       items,
 		"ResumeAyahURL":     resumeAyahURL,
 		"ResumePairURL":     resumeRelationURL,
+		"SavedPairsCount":   savedPairsCount,
 		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
 		"QFBookmarks":       qfBookmarks,
 	}))

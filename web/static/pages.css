@@ -12,6 +12,23 @@
   margin: 0;
 }
 
+/* ── Dashboard ────────────────────────────────────────────────── */
+
+.review-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--accent-subtle, rgba(79,70,229,0.06));
+  border-color: var(--accent, #4f46e5);
+}
+
+.review-prompt-text {
+  margin: 0;
+  font-size: 0.97rem;
+}
+
 /* ── Compare page ─────────────────────────────────────────────── */
 
 .compare-toolbar {

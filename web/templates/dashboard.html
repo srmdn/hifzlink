@@ -16,6 +16,13 @@
     </section>
     {{end}}{{end}}
 
+    {{if and .ResumePairURL (gt .SavedPairsCount 0)}}
+    <section class="card review-prompt">
+      <p class="review-prompt-text">You have <strong>{{.SavedPairsCount}} saved {{if eq .SavedPairsCount 1}}pair{{else}}pairs{{end}}</strong>. Keep your hifz sharp.</p>
+      <a class="btn" href="{{.ResumePairURL}}">Start Review Session</a>
+    </section>
+    {{end}}
+
     <section class="card">
       <h2>Quick Resume</h2>
       <div class="hero-meta">

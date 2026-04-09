@@ -489,6 +489,21 @@ func (s *Store) RecentCollectionItems(limit int, userID string) ([]RecentCollect
 	return out, nil
 }
 
+// CountSavedPairs returns the total number of relation-type items saved by a user across all collections.
+func (s *Store) CountSavedPairs(userID string) (int, error) {
+	var count int
+	err := s.db.QueryRow(`
+	SELECT COUNT(*)
+	FROM collection_items ci
+	INNER JOIN collections c ON c.id = ci.collection_id
+	WHERE c.user_id = ? AND ci.item_type = 'relation'
+	`, userID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count saved pairs: %w", err)
+	}
+	return count, nil
+}
+
 // RelationCountBySurah returns a map of surah number → distinct relation count.
 // A relation is counted for a surah if either ayah belongs to it.
 func (s *Store) RelationCountBySurah() (map[int]int, error) {
