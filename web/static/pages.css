@@ -188,6 +188,43 @@
   }
 }
 
+/* ── Stats strip (homepage) ───────────────────────────────────── */
+
+.lp-stats {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-grid {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-num {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* ── Search empty state ───────────────────────────────────────── */
 
 .search-empty-state {

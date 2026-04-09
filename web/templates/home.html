@@ -118,6 +118,28 @@
       </div>
     </section>
 
+    {{/* ── Stats strip ───────────────────────────────────────── */}}
+    {{if .PairCount}}
+    <section class="lp-section lp-stats">
+      <div class="container lp-section-inner">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-num">{{.PairCount}}</span>
+            <span class="stat-label">curated pairs</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">114</span>
+            <span class="stat-label">surahs covered</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">6,236</span>
+            <span class="stat-label">ayahs indexed</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    {{end}}
+
     {{/* ── How it works ───────────────────────────────────────── */}}
     <section class="lp-section lp-how">
       <div class="container lp-section-inner">
