@@ -94,3 +94,26 @@ func key(surah, ayah int) string {
 func (s *Store) SurahName(surah int) string {
 	return lookupSurahName(surah)
 }
+
+func (s *Store) ArabicName(surah int) string {
+	return lookupSurahArabicName(surah)
+}
+
+func (s *Store) RevelationPlace(surah int) string {
+	return lookupRevelationPlace(surah)
+}
+
+// AyahCount returns the number of ayahs in the given surah.
+func (s *Store) AyahCount(surah int) int {
+	return len(s.bySurah[surah])
+}
+
+// JuzFirstAyah returns the surah and ayah number of the first ayah in the given juz.
+// Returns 0, 0 if juz has no data.
+func (s *Store) JuzFirstAyah(juz int) (surah, ayah int) {
+	ayahs := s.byJuz[juz]
+	if len(ayahs) == 0 {
+		return 0, 0
+	}
+	return ayahs[0].Surah, ayahs[0].Ayah
+}

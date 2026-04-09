@@ -120,6 +120,75 @@ var surahNames = [...]string{
 	"An-Nas",
 }
 
+// surahArabicNames holds the Arabic script name for each surah (index = surah number).
+var surahArabicNames = [...]string{
+	"",
+	"الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة",
+	"الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس",
+	"هود", "يوسف", "الرعد", "إبراهيم", "الحجر",
+	"النحل", "الإسراء", "الكهف", "مريم", "طه",
+	"الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان",
+	"الشعراء", "النمل", "القصص", "العنكبوت", "الروم",
+	"لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر",
+	"يس", "الصافات", "ص", "الزمر", "غافر",
+	"فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية",
+	"الأحقاف", "محمد", "الفتح", "الحجرات", "ق",
+	"الذاريات", "الطور", "النجم", "القمر", "الرحمن",
+	"الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة",
+	"الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق",
+	"التحريم", "الملك", "القلم", "الحاقة", "المعارج",
+	"نوح", "الجن", "المزمل", "المدثر", "القيامة",
+	"الإنسان", "المرسلات", "النبأ", "النازعات", "عبس",
+	"التكوير", "الانفطار", "المطففين", "الانشقاق", "البروج",
+	"الطارق", "الأعلى", "الغاشية", "الفجر", "البلد",
+	"الشمس", "الليل", "الضحى", "الشرح", "التين",
+	"العلق", "القدر", "البينة", "الزلزلة", "العاديات",
+	"القارعة", "التكاثر", "العصر", "الهمزة", "الفيل",
+	"قريش", "الماعون", "الكوثر", "الكافرون", "النصر",
+	"المسد", "الإخلاص", "الفلق", "الناس",
+}
+
+// surahRevelationPlaces holds where each surah was revealed ("Mecca" or "Medina").
+var surahRevelationPlaces = [...]string{
+	"",
+	"Mecca", "Medina", "Medina", "Medina", "Medina",
+	"Mecca", "Mecca", "Medina", "Medina", "Mecca",
+	"Mecca", "Mecca", "Medina", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Medina", "Mecca", "Medina", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Medina", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Medina", "Medina", "Medina", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Medina", "Medina", "Medina", "Medina",
+	"Medina", "Medina", "Medina", "Medina", "Medina",
+	"Medina", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Medina", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Medina", "Medina",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Mecca",
+	"Mecca", "Mecca", "Mecca", "Mecca", "Medina",
+	"Mecca", "Mecca", "Mecca", "Mecca",
+}
+
+func lookupSurahArabicName(surah int) string {
+	if surah > 0 && surah < len(surahArabicNames) {
+		return surahArabicNames[surah]
+	}
+	return ""
+}
+
+func lookupRevelationPlace(surah int) string {
+	if surah > 0 && surah < len(surahRevelationPlaces) {
+		return surahRevelationPlaces[surah]
+	}
+	return ""
+}
+
 func lookupSurahName(surah int) string {
 	if surah > 0 && surah < len(surahNames) {
 		return surahNames[surah]

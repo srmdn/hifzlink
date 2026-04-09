@@ -1106,11 +1106,14 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "surah.html", s.withCommonViewData(r, map[string]any{
-		"Title":       fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
-		"Description": fmt.Sprintf("Browse mutashabihat relations in Surah %d — %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
-		"Surah":     surah,
-		"SurahName": s.quran.SurahName(surah),
-		"Pairs":     pairs,
+		"Title":            fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Description":      fmt.Sprintf("Browse mutashabihat relations in Surah %d — %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
+		"Surah":            surah,
+		"SurahName":        s.quran.SurahName(surah),
+		"SurahArabicName":  s.quran.ArabicName(surah),
+		"AyahCount":        s.quran.AyahCount(surah),
+		"RevelationPlace":  s.quran.RevelationPlace(surah),
+		"Pairs":            pairs,
 	}))
 }
 
@@ -1131,11 +1134,17 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	juzStartSurah, juzStartAyah := s.quran.JuzFirstAyah(juz)
+	juzStartName := s.quran.SurahName(juzStartSurah)
+
 	s.render(w, "juz.html", s.withCommonViewData(r, map[string]any{
-		"Title":       fmt.Sprintf("Juz %d Relations", juz),
-		"Description": fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
-		"Juz":   juz,
-		"Pairs": pairs,
+		"Title":         fmt.Sprintf("Juz %d Relations", juz),
+		"Description":   fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
+		"Juz":           juz,
+		"JuzStartSurah": juzStartSurah,
+		"JuzStartAyah":  juzStartAyah,
+		"JuzStartName":  juzStartName,
+		"Pairs":         pairs,
 	}))
 }
 

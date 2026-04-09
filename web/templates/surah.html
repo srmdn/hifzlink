@@ -6,7 +6,13 @@
 
   <main class="container">
     <p class="back"><a href="{{.SurahIndexURL}}">← All Surahs</a></p>
-    <h1>Surah {{.Surah}}: {{.SurahName}}</h1>
+    <div class="surah-header">
+      <div class="surah-header-main">
+        <h1>Surah {{.Surah}}: {{.SurahName}}</h1>
+        <p class="meta surah-meta">{{.AyahCount}} ayahs · {{.RevelationPlace}}</p>
+      </div>
+      {{if .SurahArabicName}}<p class="surah-arabic" lang="ar" dir="rtl">{{.SurahArabicName}}</p>{{end}}
+    </div>
 
     <section class="card">
       <h2>Mutashabihat Pairs</h2>
