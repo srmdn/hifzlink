@@ -6,6 +6,7 @@ data/raw/
 
 # Binary
 hifzlink
+/server
 bin/
 
 # Secrets

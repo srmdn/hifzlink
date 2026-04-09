@@ -442,10 +442,11 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	related = s.withTranslations(lang, related)
 	ayahTranslation := s.translationFor(lang, surah, ayah)
 
-	collections, err := s.db.Collections()
-	if err != nil {
-		internalError(w, r, err)
-		return
+	var collections []db.Collection
+	if sess, ok := s.currentSession(r); ok {
+		if cols, err := s.db.Collections(sess.UserID); err == nil {
+			collections = cols
+		}
 	}
 
 	tafsirContent := s.tafsirFor(lang, surah, ayah)
@@ -503,10 +504,11 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	collections, err := s.db.Collections()
-	if err != nil {
-		internalError(w, r, err)
-		return
+	var collections []db.Collection
+	if sess, ok := s.currentSession(r); ok {
+		if cols, err := s.db.Collections(sess.UserID); err == nil {
+			collections = cols
+		}
 	}
 
 	var diff1, diff2 template.HTML
@@ -602,12 +604,18 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	collections, err := s.db.RecentCollections(6)
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	collections, err := s.db.RecentCollections(6, sess.UserID)
 	if err != nil {
 		internalError(w, r, err)
 		return
 	}
-	recentItems, err := s.db.RecentCollectionItems(12)
+	recentItems, err := s.db.RecentCollectionItems(12, sess.UserID)
 	if err != nil {
 		internalError(w, r, err)
 		return
@@ -644,7 +652,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		items = append(items, view)
 	}
 
-	allCollections, err := s.db.Collections()
+	allCollections, err := s.db.Collections(sess.UserID)
 	if err != nil {
 		internalError(w, r, err)
 		return
@@ -653,17 +661,15 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 	// Fetch QF bookmarks for logged-in users.
 	var qfBookmarks []qfBookmarkView
 	if s.qf != nil {
-		if sess, ok := s.currentSession(r); ok {
-			if bms, err := s.qf.GetBookmarks(sess.AccessToken); err != nil {
-				log.Printf("qfclient: get bookmarks: %v", err)
-			} else {
-				for _, b := range bms {
-					ref := relations.FormatAyahRef(b.SurahNum, b.AyahNum)
-					qfBookmarks = append(qfBookmarks, qfBookmarkView{
-						Ref: ref,
-						URL: withLang(fmt.Sprintf("/ayah/%d/%d", b.SurahNum, b.AyahNum), lang),
-					})
-				}
+		if bms, err := s.qf.GetBookmarks(sess.AccessToken); err != nil {
+			log.Printf("qfclient: get bookmarks: %v", err)
+		} else {
+			for _, b := range bms {
+				ref := relations.FormatAyahRef(b.SurahNum, b.AyahNum)
+				qfBookmarks = append(qfBookmarks, qfBookmarkView{
+					Ref: ref,
+					URL: withLang(fmt.Sprintf("/ayah/%d/%d", b.SurahNum, b.AyahNum), lang),
+				})
 			}
 		}
 	}
@@ -681,9 +687,15 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		collections, err := s.db.Collections()
+		collections, err := s.db.Collections(sess.UserID)
 		if err != nil {
 			internalError(w, r, err)
 			return
@@ -703,7 +715,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		description := strings.TrimSpace(r.FormValue("description"))
 		lang := sanitizeLang(r.FormValue("lang"))
 		if name == "" {
-			collections, _ := s.db.Collections()
+			collections, _ := s.db.Collections(sess.UserID)
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
 				"Collections":     toCollectionViews(collections),
@@ -715,9 +727,9 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err := s.db.CreateCollection(name, description)
+		_, err := s.db.CreateCollection(name, description, sess.UserID)
 		if err != nil {
-			collections, _ := s.db.Collections()
+			collections, _ := s.db.Collections(sess.UserID)
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
 				"Collections":     toCollectionViews(collections),
@@ -760,6 +772,13 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
 	idPath := strings.Trim(strings.TrimPrefix(r.URL.Path, "/collections/"), "/")
 	if idPath == "" {
 		http.NotFound(w, r)
@@ -771,7 +790,7 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	collection, err := s.db.CollectionByID(id)
+	collection, err := s.db.CollectionByID(id, sess.UserID)
 	if err != nil {
 		s.renderNotFound(w, r, "Collection not found", "This collection does not exist.")
 		return
@@ -847,6 +866,13 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Error(w, "login required", http.StatusUnauthorized)
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "invalid form", http.StatusBadRequest)
 		return
@@ -855,6 +881,12 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 	collectionID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("collection_id")), 10, 64)
 	if err != nil || collectionID <= 0 {
 		http.Error(w, "invalid collection", http.StatusBadRequest)
+		return
+	}
+
+	// Verify the collection belongs to the current user.
+	if _, err := s.db.CollectionByID(collectionID, sess.UserID); err != nil {
+		http.Error(w, "collection not found", http.StatusNotFound)
 		return
 	}
 	itemType := strings.ToLower(strings.TrimSpace(r.FormValue("item_type")))
@@ -935,6 +967,13 @@ func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Error(w, "login required", http.StatusUnauthorized)
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "invalid form", http.StatusBadRequest)
 		return
@@ -951,8 +990,8 @@ func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	lang := sanitizeLang(r.FormValue("lang"))
-	if err := s.db.DeleteCollectionItem(itemID); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := s.db.DeleteCollectionItemForUser(itemID, sess.UserID); err != nil {
+		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
 	http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=removed", collectionID), lang), http.StatusSeeOther)

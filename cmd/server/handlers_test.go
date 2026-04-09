@@ -77,6 +77,26 @@ func addAdminCookie(r *http.Request, token string) {
 	r.AddCookie(&http.Cookie{Name: cookieAdminSession, Value: token})
 }
 
+// addTestSession creates a QF session in the DB and adds the session cookie to r.
+// Returns the userID of the created session.
+func addTestSession(t *testing.T, s *server, r *http.Request) string {
+	t.Helper()
+	const testUserID = "test-user-001"
+	sess := db.Session{
+		ID:          "test-session-id",
+		UserID:      testUserID,
+		Email:       "test@example.com",
+		Name:        "Test User",
+		AccessToken: "test-access-token",
+		ExpiresAt:   9999999999, // far future
+	}
+	if err := s.db.CreateSession(sess); err != nil {
+		t.Fatalf("create test session: %v", err)
+	}
+	r.AddCookie(&http.Cookie{Name: cookieSession, Value: sess.ID})
+	return testUserID
+}
+
 // --- /api/ayah/{surah}/{ayah} ---
 
 func TestHandleAPIAyah_Basic(t *testing.T) {
@@ -607,6 +627,7 @@ func TestHandleCollectionsPage_PostCreateRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/collections", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	addTestSession(t, s, req)
 	rr := httptest.NewRecorder()
 	s.handleCollectionsPage(rr, req)
 
@@ -621,7 +642,8 @@ func TestHandleCollectionsPage_PostCreateRedirect(t *testing.T) {
 
 func TestHandleCollectionItemsPost_RelationRedirect(t *testing.T) {
 	s := newTestServer(t)
-	collectionID, err := s.db.CreateCollection("Daily", "")
+	const testUserID = "test-user-001"
+	collectionID, err := s.db.CreateCollection("Daily", "", testUserID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -637,6 +659,7 @@ func TestHandleCollectionItemsPost_RelationRedirect(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/collections/items", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	addTestSession(t, s, req)
 	rr := httptest.NewRecorder()
 	s.handleCollectionItemsPost(rr, req)
 
@@ -659,7 +682,8 @@ func TestHandleCollectionItemsPost_RelationRedirect(t *testing.T) {
 
 func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
 	s := newTestServer(t)
-	collectionID, err := s.db.CreateCollection("Daily", "")
+	const testUserID = "test-user-001"
+	collectionID, err := s.db.CreateCollection("Daily", "", testUserID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -675,6 +699,7 @@ func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/collections/items", strings.NewReader(form.Encode()))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		addTestSession(t, s, req)
 		rr := httptest.NewRecorder()
 		s.handleCollectionItemsPost(rr, req)
 		if rr.Code != http.StatusSeeOther {
@@ -695,8 +720,9 @@ func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
 
 func TestHandleDashboardPage(t *testing.T) {
 	s := newTestServer(t)
-	rr := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/dashboard?lang=en", nil)
+	addTestSession(t, s, req)
+	rr := httptest.NewRecorder()
 	s.handleDashboardPage(rr, req)
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)

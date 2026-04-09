@@ -321,11 +321,12 @@ body.menu-open {
     display: none;
   }
 
-  /* Drawer handles all auth at this breakpoint — hide topbar auth */
+  /* Drawer handles all nav, auth, and language at this breakpoint */
   .user-menu,
   .topbar-right > a.auth-btn,
   .topbar-right > .admin-badge,
-  .topbar-right > form {
+  .topbar-right > form,
+  .lang-switch {
     display: none;
   }
 }

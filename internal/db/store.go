@@ -22,6 +22,7 @@ type Relation struct {
 
 type Collection struct {
 	ID          int64
+	UserID      string
 	Name        string
 	Description string
 	CreatedAt   string
@@ -133,6 +134,10 @@ func Open(path string) (*Store, error) {
 	if _, err := db.Exec(`UPDATE relations SET updated_at = CURRENT_TIMESTAMP WHERE COALESCE(updated_at, '') = ''`); err != nil {
 		_ = db.Close()
 		return nil, fmt.Errorf("backfill relations.updated_at: %w", err)
+	}
+	if err := ensureColumn(db, "collections", "user_id", "ALTER TABLE collections ADD COLUMN user_id TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
 	}
 	if err := ensureColumn(db, "collections", "created_at", "ALTER TABLE collections ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); err != nil {
 		_ = db.Close()
@@ -266,10 +271,10 @@ func (s *Store) UpdateByID(rel Relation) error {
 	return nil
 }
 
-func (s *Store) CreateCollection(name, description string) (int64, error) {
+func (s *Store) CreateCollection(name, description, userID string) (int64, error) {
 	res, err := s.db.Exec(`
-	INSERT INTO collections (name, description, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)
-	`, strings.TrimSpace(name), strings.TrimSpace(description))
+	INSERT INTO collections (name, description, user_id, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+	`, strings.TrimSpace(name), strings.TrimSpace(description), userID)
 	if err != nil {
 		return 0, fmt.Errorf("create collection: %w", err)
 	}
@@ -280,15 +285,15 @@ func (s *Store) CreateCollection(name, description string) (int64, error) {
 	return id, nil
 }
 
-func (s *Store) Collections() ([]Collection, error) {
+func (s *Store) Collections(userID string) ([]Collection, error) {
 	rows, err := s.db.Query(`
 	SELECT c.id, c.name, COALESCE(c.description, ''), COALESCE(c.created_at, ''), COUNT(i.id)
-	FROM collections
-	AS c
+	FROM collections AS c
 	LEFT JOIN collection_items i ON i.collection_id = c.id
+	WHERE c.user_id = ?
 	GROUP BY c.id, c.name, c.description, c.created_at
 	ORDER BY c.name
-	`)
+	`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query collections: %w", err)
 	}
@@ -308,13 +313,13 @@ func (s *Store) Collections() ([]Collection, error) {
 	return out, nil
 }
 
-func (s *Store) CollectionByID(id int64) (Collection, error) {
+func (s *Store) CollectionByID(id int64, userID string) (Collection, error) {
 	var c Collection
 	err := s.db.QueryRow(`
 	SELECT id, name, COALESCE(description, ''), COALESCE(created_at, '')
 	FROM collections
-	WHERE id = ?
-	`, id).Scan(&c.ID, &c.Name, &c.Description, &c.CreatedAt)
+	WHERE id = ? AND user_id = ?
+	`, id, userID).Scan(&c.ID, &c.Name, &c.Description, &c.CreatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Collection{}, sql.ErrNoRows
@@ -382,7 +387,25 @@ func (s *Store) DeleteCollectionItem(itemID int64) error {
 	return nil
 }
 
-func (s *Store) RecentCollections(limit int) ([]Collection, error) {
+func (s *Store) DeleteCollectionItemForUser(itemID int64, userID string) error {
+	res, err := s.db.Exec(`
+	DELETE FROM collection_items
+	WHERE id = ? AND collection_id IN (SELECT id FROM collections WHERE user_id = ?)
+	`, itemID, userID)
+	if err != nil {
+		return fmt.Errorf("delete collection item: %w", err)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("delete collection item rows affected: %w", err)
+	}
+	if affected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
+func (s *Store) RecentCollections(limit int, userID string) ([]Collection, error) {
 	if limit <= 0 {
 		limit = 5
 	}
@@ -390,10 +413,11 @@ func (s *Store) RecentCollections(limit int) ([]Collection, error) {
 	SELECT c.id, c.name, COALESCE(c.description, ''), COALESCE(c.created_at, ''), COUNT(i.id)
 	FROM collections AS c
 	LEFT JOIN collection_items i ON i.collection_id = c.id
+	WHERE c.user_id = ?
 	GROUP BY c.id, c.name, c.description, c.created_at
 	ORDER BY datetime(c.created_at) DESC, c.id DESC
 	LIMIT ?
-	`, limit)
+	`, userID, limit)
 	if err != nil {
 		return nil, fmt.Errorf("query recent collections: %w", err)
 	}
@@ -413,7 +437,7 @@ func (s *Store) RecentCollections(limit int) ([]Collection, error) {
 	return out, nil
 }
 
-func (s *Store) RecentCollectionItems(limit int) ([]RecentCollectionItem, error) {
+func (s *Store) RecentCollectionItems(limit int, userID string) ([]RecentCollectionItem, error) {
 	if limit <= 0 {
 		limit = 10
 	}
@@ -431,9 +455,10 @@ func (s *Store) RecentCollectionItems(limit int) ([]RecentCollectionItem, error)
 		c.name
 	FROM collection_items ci
 	INNER JOIN collections c ON c.id = ci.collection_id
+	WHERE c.user_id = ?
 	ORDER BY datetime(ci.created_at) DESC, ci.id DESC
 	LIMIT ?
-	`, limit)
+	`, userID, limit)
 	if err != nil {
 		return nil, fmt.Errorf("query recent collection items: %w", err)
 	}
