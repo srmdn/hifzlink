@@ -61,6 +61,7 @@
       </section>
       {{else if not .ErrMsg}}
       <div class="search-empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <p class="meta">No pairs found for <strong>{{.Query}}</strong>{{if .CategoryFilter}} with pattern <strong>{{index .CategoryLabelMap .CategoryFilter}}</strong>{{end}}.</p>
         <p class="meta">Try a different format: <code>60:8</code> or <code>Al-Mumtahanah</code></p>
         <div class="search-empty-links">

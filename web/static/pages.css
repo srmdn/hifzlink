@@ -302,10 +302,42 @@
   letter-spacing: 0.05em;
 }
 
+/* ── Empty states with icons ──────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.25rem 0 0.5rem;
+  color: var(--muted);
+}
+
+.empty-state svg {
+  width: 2.25rem;
+  height: 2.25rem;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
 /* ── Search empty state ───────────────────────────────────────── */
 
 .search-empty-state {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.search-empty-state svg {
+  width: 2.25rem;
+  height: 2.25rem;
+  opacity: 0.45;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
 }
 
 .search-empty-links {
