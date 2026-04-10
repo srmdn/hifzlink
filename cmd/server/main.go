@@ -581,8 +581,9 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 }
 
 type qfBookmarkView struct {
-	Ref string
-	URL string
+	Ref         string
+	URL         string
+	QuranComURL string
 }
 
 type dashboardItemView struct {
@@ -595,6 +596,7 @@ type dashboardItemView struct {
 	PrimaryURL    string
 	SecondaryURL  string
 	CreatedAt     string
+	SyncedToQF    bool
 	Note          string
 }
 
@@ -622,6 +624,28 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lang := pageLang(r)
+
+	// Fetch QF bookmarks first so we can cross-reference saved items.
+	var qfBookmarks []qfBookmarkView
+	var qfLastSynced string
+	qfSynced := map[string]bool{} // "surah:ayah" keys
+	if s.qf != nil {
+		if bms, err := s.qf.GetBookmarks(sess.AccessToken); err != nil {
+			log.Printf("qfclient: get bookmarks: %v", err)
+		} else {
+			qfLastSynced = time.Now().In(wib).Format("Jan 2, 2006, 15:04 WIB")
+			for _, b := range bms {
+				ref := relations.FormatAyahRef(b.SurahNum, b.AyahNum)
+				qfBookmarks = append(qfBookmarks, qfBookmarkView{
+					Ref:         ref,
+					URL:         withLang(fmt.Sprintf("/ayah/%d/%d", b.SurahNum, b.AyahNum), lang),
+					QuranComURL: fmt.Sprintf("https://quran.com/%d/%d", b.SurahNum, b.AyahNum),
+				})
+				qfSynced[fmt.Sprintf("%d:%d", b.SurahNum, b.AyahNum)] = true
+			}
+		}
+	}
+
 	items := make([]dashboardItemView, 0, len(recentItems))
 	var resumeAyahURL string
 	var resumeRelationURL string
@@ -637,6 +661,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:     formatTimestamp(item.CreatedAt),
 			Note:          item.Note,
 			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
+			SyncedToQF:    qfSynced[fmt.Sprintf("%d:%d", item.Ayah1Surah, item.Ayah1Ayah)],
 		}
 		if item.ItemType == "relation" {
 			ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
@@ -664,22 +689,6 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch QF bookmarks for logged-in users.
-	var qfBookmarks []qfBookmarkView
-	if s.qf != nil {
-		if bms, err := s.qf.GetBookmarks(sess.AccessToken); err != nil {
-			log.Printf("qfclient: get bookmarks: %v", err)
-		} else {
-			for _, b := range bms {
-				ref := relations.FormatAyahRef(b.SurahNum, b.AyahNum)
-				qfBookmarks = append(qfBookmarks, qfBookmarkView{
-					Ref: ref,
-					URL: withLang(fmt.Sprintf("/ayah/%d/%d", b.SurahNum, b.AyahNum), lang),
-				})
-			}
-		}
-	}
-
 	s.render(w, "dashboard.html", s.withCommonViewData(r, map[string]any{
 		"Title":             "Dashboard",
 		"RecentCollections": toCollectionViews(collections),
@@ -690,6 +699,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		"SavedPairsCount":   savedPairsCount,
 		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
 		"QFBookmarks":       qfBookmarks,
+		"QFLastSynced":      qfLastSynced,
 	}))
 }
 

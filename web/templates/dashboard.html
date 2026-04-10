@@ -71,10 +71,13 @@
     {{if .QFBookmarks}}
     <section class="card">
       <h2>Quran Foundation Bookmarks</h2>
-      <p class="meta">Ayahs synced to your Quran.Foundation account.</p>
+      <p class="meta">Synced from your Quran.Foundation account.{{if .QFLastSynced}} Last synced: {{.QFLastSynced}}.{{end}}</p>
       <div class="qf-bookmarks-grid">
         {{range .QFBookmarks}}
-        <a class="ayah-chip" href="{{.URL}}">{{.Ref}}</a>
+        <div class="qf-bookmark-item">
+          <a class="ayah-chip" href="{{.URL}}">{{.Ref}}</a>
+          <a class="qf-qurancom-link" href="{{.QuranComURL}}" target="_blank" rel="noopener noreferrer">quran.com ↗</a>
+        </div>
         {{end}}
       </div>
     </section>
@@ -87,7 +90,7 @@
         {{range .RecentItems}}
         <li class="admin-relation-item">
           <div class="line-head">
-            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}</span>
+            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .SyncedToQF}} <span class="qf-synced-badge">QF</span>{{end}}</span>
             <div class="admin-row-actions">
               <a class="btn-sm" href="{{.PrimaryURL}}">Open Ayah</a>
               {{if .SecondaryURL}}<a class="btn-sm" href="{{.SecondaryURL}}">Open Compare</a>{{end}}
