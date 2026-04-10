@@ -63,6 +63,14 @@
         <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
         {{end}}
         {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
+        {{if .SavedItemID}}
+        <form action="/collections/items/mastered/{{.SavedItemID}}" method="post" class="mastered-form">
+          <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
+          <button type="submit" class="btn-mastered{{if .SavedItemMastered}} btn-mastered--done{{end}}">
+            {{if .SavedItemMastered}}Mastered ✓{{else}}Mark as Mastered{{end}}
+          </button>
+        </form>
+        {{end}}
       {{else}}
       <p class="compare-login-nudge">
         <a href="{{.LoginURL}}">Login with Quran.Foundation</a> to save this pair to your collection.

@@ -91,7 +91,7 @@
         {{range .RecentItems}}
         <li class="admin-relation-item">
           <div class="line-head">
-            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .SyncedToQF}} <span class="qf-synced-badge">QF</span>{{end}}</span>
+            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .SyncedToQF}} <span class="qf-synced-badge">QF</span>{{end}}{{if .Mastered}} <span class="mastered-badge">Mastered ✓</span>{{end}}</span>
             <div class="admin-row-actions">
               <a class="btn-sm" href="{{.PrimaryURL}}">Open Ayah</a>
               {{if .SecondaryURL}}<a class="btn-sm" href="{{.SecondaryURL}}">Open Compare</a>{{end}}

@@ -213,6 +213,7 @@ func main() {
 	mux.HandleFunc("/collections/", s.handleCollectionDetailPage)
 	mux.HandleFunc("/collections/items", s.handleCollectionItemsPost)
 	mux.HandleFunc("/collections/items/delete", s.handleCollectionItemsDelete)
+	mux.HandleFunc("/collections/items/mastered/", s.handleToggleMastered)
 	mux.HandleFunc("/admin/login", s.handleAdminLogin)
 	mux.HandleFunc("/admin/logout", s.handleAdminLogout)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
@@ -505,9 +506,15 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var collections []db.Collection
+	var savedItemID int64
+	var savedItemMastered bool
 	if sess, ok := s.currentSession(r); ok {
 		if cols, err := s.db.Collections(sess.UserID); err == nil {
 			collections = cols
+		}
+		if saved, found, _ := s.db.FindSavedRelation(sess.UserID, s1, y1, s2, y2); found {
+			savedItemID = saved.ID
+			savedItemMastered = saved.Mastered
 		}
 	}
 
@@ -569,9 +576,11 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"Ref2":             relations.FormatAyahRef(s2, y2),
 		"DiffText1":        diff1,
 		"DiffText2":        diff2,
-		"Collections":      collections,
-		"SaveStatus":       collectionStatusMessage(r.URL.Query().Get("saved")),
-		"RelatedPairs":     relatedPairs,
+		"Collections":       collections,
+		"SaveStatus":        collectionStatusMessage(r.URL.Query().Get("saved")),
+		"RelatedPairs":      relatedPairs,
+		"SavedItemID":       savedItemID,
+		"SavedItemMastered": savedItemMastered,
 	}
 	if relFound {
 		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
@@ -597,6 +606,7 @@ type dashboardItemView struct {
 	SecondaryURL  string
 	CreatedAt     string
 	SyncedToQF    bool
+	Mastered      bool
 	Note          string
 }
 
@@ -662,6 +672,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 			Note:          item.Note,
 			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
 			SyncedToQF:    qfSynced[fmt.Sprintf("%d:%d", item.Ayah1Surah, item.Ayah1Ayah)],
+			Mastered:      item.Mastered,
 		}
 		if item.ItemType == "relation" {
 			ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
@@ -1156,6 +1167,37 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		"JuzStartName":  juzStartName,
 		"Pairs":         pairs,
 	}))
+}
+
+// handleToggleMastered handles POST /collections/items/mastered/{id}.
+func (s *server) handleToggleMastered(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	sess, ok := s.currentSession(r)
+	if !ok {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	trimmed := strings.TrimPrefix(r.URL.Path, "/collections/items/mastered/")
+	itemID, err := strconv.ParseInt(strings.TrimSpace(trimmed), 10, 64)
+	if err != nil || itemID <= 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	if err := s.db.ToggleMastered(itemID, sess.UserID); err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	returnTo := r.FormValue("return_to")
+	if !isSafeRedirect(returnTo) {
+		returnTo = "/dashboard"
+	}
+	http.Redirect(w, r, returnTo, http.StatusSeeOther)
 }
 
 func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {

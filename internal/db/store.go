@@ -39,6 +39,7 @@ type CollectionItem struct {
 	Ayah2Ayah  int
 	Note       string
 	CreatedAt  string
+	Mastered   bool
 }
 
 type RecentCollectionItem struct {
@@ -144,6 +145,10 @@ func Open(path string) (*Store, error) {
 		return nil, err
 	}
 	if err := ensureColumn(db, "collection_items", "created_at", "ALTER TABLE collection_items ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+	if err := ensureColumn(db, "collection_items", "mastered", "ALTER TABLE collection_items ADD COLUMN mastered INTEGER NOT NULL DEFAULT 0"); err != nil {
 		_ = db.Close()
 		return nil, err
 	}
@@ -348,7 +353,7 @@ func (s *Store) AddCollectionItem(item CollectionItem) (bool, error) {
 
 func (s *Store) CollectionItems(collectionID int64) ([]CollectionItem, error) {
 	rows, err := s.db.Query(`
-	SELECT id, collection_id, item_type, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(created_at, '')
+	SELECT id, collection_id, item_type, ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah, COALESCE(note, ''), COALESCE(created_at, ''), COALESCE(mastered, 0)
 	FROM collection_items
 	WHERE collection_id = ?
 	ORDER BY id DESC
@@ -361,9 +366,11 @@ func (s *Store) CollectionItems(collectionID int64) ([]CollectionItem, error) {
 	out := make([]CollectionItem, 0)
 	for rows.Next() {
 		var item CollectionItem
-		if err := rows.Scan(&item.ID, &item.Collection, &item.ItemType, &item.Ayah1Surah, &item.Ayah1Ayah, &item.Ayah2Surah, &item.Ayah2Ayah, &item.Note, &item.CreatedAt); err != nil {
+		var mastered int
+		if err := rows.Scan(&item.ID, &item.Collection, &item.ItemType, &item.Ayah1Surah, &item.Ayah1Ayah, &item.Ayah2Surah, &item.Ayah2Ayah, &item.Note, &item.CreatedAt, &mastered); err != nil {
 			return nil, fmt.Errorf("scan collection item: %w", err)
 		}
+		item.Mastered = mastered == 1
 		out = append(out, item)
 	}
 	if err := rows.Err(); err != nil {
@@ -452,6 +459,7 @@ func (s *Store) RecentCollectionItems(limit int, userID string) ([]RecentCollect
 		ci.ayah2_ayah,
 		COALESCE(ci.note, ''),
 		COALESCE(ci.created_at, ''),
+		COALESCE(ci.mastered, 0),
 		c.name
 	FROM collection_items ci
 	INNER JOIN collections c ON c.id = ci.collection_id
@@ -467,6 +475,7 @@ func (s *Store) RecentCollectionItems(limit int, userID string) ([]RecentCollect
 	out := make([]RecentCollectionItem, 0)
 	for rows.Next() {
 		var item RecentCollectionItem
+		var mastered int
 		if err := rows.Scan(
 			&item.ID,
 			&item.Collection,
@@ -477,10 +486,12 @@ func (s *Store) RecentCollectionItems(limit int, userID string) ([]RecentCollect
 			&item.Ayah2Ayah,
 			&item.Note,
 			&item.CreatedAt,
+			&mastered,
 			&item.CollectionName,
 		); err != nil {
 			return nil, fmt.Errorf("scan recent collection item: %w", err)
 		}
+		item.Mastered = mastered == 1
 		out = append(out, item)
 	}
 	if err := rows.Err(); err != nil {
@@ -581,6 +592,52 @@ func scanRelations(rows *sql.Rows) ([]Relation, error) {
 		return nil, fmt.Errorf("iterate relations: %w", err)
 	}
 	return out, nil
+}
+
+// FindSavedRelation returns the first collection_item of type "relation" for the given user
+// matching the pair in either order. Returns (item, true, nil) if found.
+func (s *Store) FindSavedRelation(userID string, s1, a1, s2, a2 int) (CollectionItem, bool, error) {
+	var item CollectionItem
+	var mastered int
+	err := s.db.QueryRow(`
+	SELECT ci.id, ci.collection_id, ci.item_type, ci.ayah1_surah, ci.ayah1_ayah, ci.ayah2_surah, ci.ayah2_ayah,
+	       COALESCE(ci.note, ''), COALESCE(ci.created_at, ''), COALESCE(ci.mastered, 0)
+	FROM collection_items ci
+	INNER JOIN collections c ON c.id = ci.collection_id
+	WHERE c.user_id = ?
+	  AND ci.item_type = 'relation'
+	  AND (
+	    (ci.ayah1_surah = ? AND ci.ayah1_ayah = ? AND ci.ayah2_surah = ? AND ci.ayah2_ayah = ?)
+	    OR
+	    (ci.ayah1_surah = ? AND ci.ayah1_ayah = ? AND ci.ayah2_surah = ? AND ci.ayah2_ayah = ?)
+	  )
+	LIMIT 1
+	`, userID, s1, a1, s2, a2, s2, a2, s1, a1).Scan(
+		&item.ID, &item.Collection, &item.ItemType,
+		&item.Ayah1Surah, &item.Ayah1Ayah, &item.Ayah2Surah, &item.Ayah2Ayah,
+		&item.Note, &item.CreatedAt, &mastered,
+	)
+	if err == sql.ErrNoRows {
+		return CollectionItem{}, false, nil
+	}
+	if err != nil {
+		return CollectionItem{}, false, fmt.Errorf("find saved relation: %w", err)
+	}
+	item.Mastered = mastered == 1
+	return item, true, nil
+}
+
+// ToggleMastered flips the mastered flag on a collection item owned by the given user.
+func (s *Store) ToggleMastered(itemID int64, userID string) error {
+	_, err := s.db.Exec(`
+	UPDATE collection_items
+	SET mastered = CASE WHEN mastered = 0 THEN 1 ELSE 0 END
+	WHERE id = ? AND collection_id IN (SELECT id FROM collections WHERE user_id = ?)
+	`, itemID, userID)
+	if err != nil {
+		return fmt.Errorf("toggle mastered: %w", err)
+	}
+	return nil
 }
 
 func ensureColumn(db *sql.DB, table, column, alterSQL string) error {
