@@ -111,7 +111,8 @@
       } else {
         await navigator.clipboard.writeText(url);
         btn.textContent = "Copied!";
-        setTimeout(() => { btn.textContent = "Share"; }, 2000);
+        btn.classList.add("btn--copied");
+        setTimeout(() => { btn.textContent = "Share"; btn.classList.remove("btn--copied"); }, 2000);
       }
     });
   })();

@@ -1892,6 +1892,11 @@ func resolveBaseDir() (string, error) {
 	return "", fmt.Errorf("could not find data/quran.json from working directory %q", wd)
 }
 
+// requireAdmin checks for a valid admin session cookie.
+// TODO(auth): unify admin auth with QF OAuth. Plan: add HIFZLINK_ADMIN_EMAIL env var;
+// if CurrentUser.Email == adminEmail, set IsAdmin=true in the QF session. The admin
+// form and in-memory token go away entirely. Blocked on QF granting admin scope.
+// See docs/projects/hifzlink/AUTH-SECURITY.md for the full plan.
 func (s *server) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
 	if s == nil || strings.TrimSpace(s.adminUser) == "" || strings.TrimSpace(s.adminPass) == "" {
 		http.Error(w, "admin auth not configured (set HIFZLINK_ADMIN_USER and HIFZLINK_ADMIN_PASS)", http.StatusServiceUnavailable)

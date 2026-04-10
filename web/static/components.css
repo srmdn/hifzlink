@@ -115,6 +115,13 @@ select {
   color: #142838;
 }
 
+.btn--copied,
+.btn--copied:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
 /* Danger — destructive actions */
 .btn-danger {
   background: #be123c;
