@@ -44,6 +44,7 @@
       {{if .CurrentUser}}
         {{if .Collections}}
         <form action="/collections/items" method="post" class="collection-save-form">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="item_type" value="relation" />
           <input type="hidden" name="ayah1" value="{{.Ref1}}" />
@@ -65,6 +66,7 @@
         {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
         {{if .SavedItemID}}
         <form action="/collections/items/mastered/{{.SavedItemID}}" method="post" class="mastered-form">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
           <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
           <button type="submit" class="btn-mastered{{if .SavedItemMastered}} btn-mastered--done{{end}}">
             {{if .SavedItemMastered}}Mastered ✓{{else}}Mark as Mastered{{end}}

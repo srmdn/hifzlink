@@ -36,6 +36,7 @@ type server struct {
 	adminPass    string
 	adminToken   string // random token for admin session cookie, generated at startup
 	adminLimiter *adminRateLimiter
+	csrfSecret   []byte // HMAC key for CSRF token derivation
 
 	umamiID string
 
@@ -84,6 +85,29 @@ func (l *adminRateLimiter) allow(ip string) bool {
 	return true
 }
 
+// prune removes IPs that have no request history within the rate-limit window,
+// preventing the entries map from growing without bound.
+func (l *adminRateLimiter) prune() {
+	const window = time.Minute
+	cutoff := time.Now().Add(-window)
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	for ip, times := range l.entries {
+		i := 0
+		for _, t := range times {
+			if t.After(cutoff) {
+				times[i] = t
+				i++
+			}
+		}
+		if i == 0 {
+			delete(l.entries, ip)
+		} else {
+			l.entries[ip] = times[:i]
+		}
+	}
+}
+
 // internalError logs the error server-side and returns a generic 500 to the client.
 func internalError(w http.ResponseWriter, r *http.Request, err error) {
 	log.Printf("internal error %s %s: %v", r.Method, r.URL.Path, err)
@@ -118,6 +142,9 @@ type userView struct {
 	Name  string
 	Email string
 }
+
+// maxBodyBytes is the maximum POST body size accepted by mutation handlers.
+const maxBodyBytes = 64 * 1024 // 64 KB
 
 func main() {
 	baseDir, err := resolveBaseDir()
@@ -186,6 +213,21 @@ func main() {
 		log.Fatalf("failed to generate admin token: %v", err)
 	}
 	s.adminToken = tok
+
+	csrfStr, err := generateRandomBytes(32)
+	if err != nil {
+		log.Fatalf("failed to generate CSRF secret: %v", err)
+	}
+	s.csrfSecret = []byte(csrfStr)
+
+	// Periodically prune the admin rate-limiter map to prevent unbounded growth.
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			s.adminLimiter.prune()
+		}
+	}()
 
 	// Clean up expired sessions on startup.
 	if err := dbStore.DeleteExpiredSessions(); err != nil {
@@ -640,8 +682,16 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 	var qfLastSynced string
 	qfSynced := map[string]bool{} // "surah:ayah" keys
 	if s.qf != nil {
-		if bms, err := s.qf.GetBookmarks(sess.AccessToken); err != nil {
-			log.Printf("qfclient: get bookmarks: %v", err)
+		bms, bmErr := s.qf.GetBookmarks(sess.AccessToken)
+		if errors.Is(bmErr, qfclient.ErrUnauthorized) {
+			if newToken, refreshErr := s.refreshSession(sess); refreshErr == nil {
+				bms, bmErr = s.qf.GetBookmarks(newToken)
+			} else {
+				log.Printf("auth: refresh session for dashboard: %v", refreshErr)
+			}
+		}
+		if bmErr != nil {
+			log.Printf("qfclient: get bookmarks: %v", bmErr)
 		} else {
 			qfLastSynced = time.Now().In(wib).Format("Jan 2, 2006, 15:04 WIB")
 			for _, b := range bms {
@@ -735,8 +785,13 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		}))
 		return
 	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
 			return
 		}
 		name := strings.TrimSpace(r.FormValue("name"))
@@ -901,8 +956,13 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
 		return
 	}
 
@@ -969,13 +1029,22 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 
 	// If user is logged in and QF is configured, sync the primary ayah as a QF bookmark.
 	if s.qf != nil && inserted {
-		if sess, ok := s.currentSession(r); ok {
-			go func() {
-				if _, err := s.qf.AddBookmark(sess.AccessToken, item.Ayah1Surah, item.Ayah1Ayah); err != nil {
-					log.Printf("qfclient: sync bookmark %d:%d: %v", item.Ayah1Surah, item.Ayah1Ayah, err)
+		sessCopy := *sess // snapshot; goroutine may outlive request
+		go func() {
+			_, err := s.qf.AddBookmark(sessCopy.AccessToken, item.Ayah1Surah, item.Ayah1Ayah)
+			if errors.Is(err, qfclient.ErrUnauthorized) {
+				newToken, refreshErr := s.refreshSession(&sessCopy)
+				if refreshErr != nil {
+					log.Printf("qfclient: refresh for bookmark sync: %v", refreshErr)
+					return
 				}
-			}()
-		}
+				if _, err = s.qf.AddBookmark(newToken, item.Ayah1Surah, item.Ayah1Ayah); err != nil {
+					log.Printf("qfclient: sync bookmark %d:%d after refresh: %v", item.Ayah1Surah, item.Ayah1Ayah, err)
+				}
+			} else if err != nil {
+				log.Printf("qfclient: sync bookmark %d:%d: %v", item.Ayah1Surah, item.Ayah1Ayah, err)
+			}
+		}()
 	}
 
 	returnTo := strings.TrimSpace(r.FormValue("return_to"))
@@ -1002,8 +1071,13 @@ func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
 		return
 	}
 
@@ -1181,6 +1255,16 @@ func (s *server) handleToggleMastered(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
+		return
+	}
+
 	trimmed := strings.TrimPrefix(r.URL.Path, "/collections/items/mastered/")
 	itemID, err := strconv.ParseInt(strings.TrimSpace(trimmed), 10, 64)
 	if err != nil || itemID <= 0 {
@@ -1210,8 +1294,13 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 		s.renderAdminRelationsPage(w, r, nil)
 		return
 	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(s.adminToken)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
 			return
 		}
 
@@ -1366,8 +1455,13 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 		}))
 
 	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(s.adminToken)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
 			return
 		}
 
@@ -1642,10 +1736,12 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	data["AdminLogoutURL"] = "/admin/logout"
 	if sess, ok := s.currentSession(r); ok {
 		data["CurrentUser"] = userView{Name: sess.Name, Email: sess.Email}
+		data["CSRFToken"] = s.csrfTokenFor(sess.ID)
 	}
 	if c, err := r.Cookie(cookieAdminSession); err == nil && c.Value != "" &&
 		subtle.ConstantTimeCompare([]byte(c.Value), []byte(s.adminToken)) == 1 {
 		data["IsAdmin"] = true
+		data["AdminCSRFToken"] = s.csrfTokenFor(s.adminToken)
 	}
 
 	return data

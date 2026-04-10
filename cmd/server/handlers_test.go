@@ -54,7 +54,7 @@ func newTestServer(t *testing.T) *server {
 	}
 	t.Cleanup(func() { dbStore.Close() })
 
-	return &server{
+	s := &server{
 		quran:        quranStore,
 		trans:        transStore,
 		db:           dbStore,
@@ -63,6 +63,7 @@ func newTestServer(t *testing.T) *server {
 		adminPass:    "secret",
 		adminToken:   "test-admin-token",
 		adminLimiter: newAdminRateLimiter(),
+		csrfSecret:   []byte("test-csrf-secret"),
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
@@ -70,6 +71,7 @@ func newTestServer(t *testing.T) *server {
 			{{define "dashboard.html"}}ok{{end}}
 		`)),
 	}
+	return s
 }
 
 // addAdminCookie adds the admin session cookie to r, simulating a logged-in admin.
@@ -414,6 +416,7 @@ func TestHandleAdminRelations_PostAddRedirect(t *testing.T) {
 	s := newTestServer(t)
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
 	form.Set("action", "add")
 	form.Set("ayah1", "60:8")
 	form.Set("ayah2", "60:9")
@@ -450,6 +453,7 @@ func TestHandleAdminRelations_PostDeleteRedirect(t *testing.T) {
 	}
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
 	form.Set("action", "delete")
 	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
 	form.Set("lang", "en")
@@ -484,6 +488,7 @@ func TestHandleAdminRelations_PostEditRedirect(t *testing.T) {
 	}
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
 	form.Set("action", "edit")
 	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
 	form.Set("ayah1", "60:9")
@@ -522,6 +527,7 @@ func TestHandleAdminRelations_PostEdit_InvalidCategoryBecomesUncategorized(t *te
 	}
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
 	form.Set("action", "edit")
 	form.Set("id", strconv.FormatInt(rows[0].ID, 10))
 	form.Set("ayah1", "60:8")
@@ -581,6 +587,7 @@ func TestHandleAdminRelations_PostEdit_DuplicateShowsClearError(t *testing.T) {
 		t.Fatal("failed to locate non-duplicate target relation row")
 	}
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
 	form.Set("action", "edit")
 	form.Set("id", strconv.FormatInt(targetID, 10))
 	form.Set("ayah1", "60:8")
@@ -621,6 +628,7 @@ func TestHandleCollectionsPage_PostCreateRedirect(t *testing.T) {
 	s := newTestServer(t)
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor("test-session-id"))
 	form.Set("name", "Weekly Review")
 	form.Set("description", "Juz 28 pairs")
 	form.Set("lang", "id")
@@ -649,6 +657,7 @@ func TestHandleCollectionItemsPost_RelationRedirect(t *testing.T) {
 	}
 
 	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor("test-session-id"))
 	form.Set("collection_id", strconv.FormatInt(collectionID, 10))
 	form.Set("item_type", "relation")
 	form.Set("ayah1", "60:8")
@@ -690,6 +699,7 @@ func TestHandleCollectionItemsPost_DuplicateShowsDuplicateStatus(t *testing.T) {
 
 	postItem := func() string {
 		form := url.Values{}
+		form.Set("csrf_token", s.csrfTokenFor("test-session-id"))
 		form.Set("collection_id", strconv.FormatInt(collectionID, 10))
 		form.Set("item_type", "relation")
 		form.Set("ayah1", "60:8")

@@ -681,6 +681,17 @@ func (s *Store) CreateSession(sess Session) error {
 	return nil
 }
 
+// UpdateSessionTokens replaces the access/refresh tokens for a session after a token refresh.
+func (s *Store) UpdateSessionTokens(id, accessToken, refreshToken string, expiresAt int64) error {
+	_, err := s.db.Exec(`
+	UPDATE sessions SET access_token = ?, refresh_token = ?, expires_at = ? WHERE id = ?
+	`, accessToken, refreshToken, expiresAt, id)
+	if err != nil {
+		return fmt.Errorf("update session tokens: %w", err)
+	}
+	return nil
+}
+
 func (s *Store) SessionByID(id string) (Session, error) {
 	var sess Session
 	err := s.db.QueryRow(`

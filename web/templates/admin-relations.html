@@ -15,6 +15,7 @@
       {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
 
       <form action="/admin/relations" method="post" class="admin-form">
+        <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}" />
         <input type="hidden" name="action" value="add" />
         <input type="hidden" name="lang" value="{{.Lang}}" />
 
@@ -93,6 +94,7 @@
       <div class="delete-dialog-actions">
         <button type="button" class="btn-outline" id="delete-cancel">Cancel</button>
         <form id="delete-form" action="/admin/relations" method="post" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}" />
           <input type="hidden" name="action" value="delete" />
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="id" id="delete-id" value="" />

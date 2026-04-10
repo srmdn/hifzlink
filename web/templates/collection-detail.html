@@ -63,6 +63,7 @@
       <div class="delete-dialog-actions">
         <button type="button" class="btn-outline" id="remove-cancel">Cancel</button>
         <form id="remove-form" action="/collections/items/delete" method="post" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="collection_id" value="{{.Collection.ID}}" />
           <input type="hidden" name="item_id" id="remove-item-id" value="" />

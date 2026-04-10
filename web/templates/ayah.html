@@ -29,6 +29,7 @@
       {{if .CurrentUser}}
         {{if .Collections}}
         <form action="/collections/items" method="post" class="collection-save-form">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
           <input type="hidden" name="lang" value="{{.Lang}}" />
           <input type="hidden" name="item_type" value="ayah" />
           <input type="hidden" name="ayah1" value="{{.AyahRef}}" />

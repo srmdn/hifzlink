@@ -5,6 +5,7 @@ package qfclient
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,9 @@ import (
 	"sync"
 	"time"
 )
+
+// ErrUnauthorized is returned when the QF API rejects a user token with HTTP 401.
+var ErrUnauthorized = errors.New("qfclient: unauthorized")
 
 // Client talks to the Quran Foundation Content API.
 type Client struct {
@@ -219,6 +223,9 @@ func (c *Client) AddBookmark(userToken string, surahNum, ayahNum int) (*Bookmark
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, ErrUnauthorized
+	}
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("qfclient: add bookmark: HTTP %d", resp.StatusCode)
 	}
@@ -260,6 +267,9 @@ func (c *Client) GetBookmarks(userToken string) ([]BookmarkData, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, ErrUnauthorized
+	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		return nil, fmt.Errorf("qfclient: get bookmarks: HTTP %d: %s", resp.StatusCode, body)

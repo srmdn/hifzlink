@@ -29,6 +29,7 @@
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
 
       <form action="/admin/relations/{{.Relation.ID}}/edit?return_category={{.ReturnCategory}}" method="post" class="admin-form">
+        <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}" />
         <input type="hidden" name="lang" value="{{.Lang}}" />
         <input type="hidden" name="return_category" value="{{.ReturnCategory}}" />
 

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -159,10 +161,6 @@ func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expiresIn := tokens.ExpiresIn
-	if expiresIn <= 0 {
-		expiresIn = 3600
-	}
 	sess := db.Session{
 		ID:           sessionID,
 		UserID:       userInfo.Sub,
@@ -170,7 +168,7 @@ func (s *server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		Name:         strings.TrimSpace(userInfo.FirstName + " " + userInfo.LastName),
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
-		ExpiresAt:    time.Now().Add(time.Duration(expiresIn) * time.Second).Unix(),
+		ExpiresAt:    time.Now().Add(sessionTTL).Unix(), // session lives 30 days; access token is refreshed separately
 	}
 	if err := s.db.CreateSession(sess); err != nil {
 		internalError(w, r, err)
@@ -197,8 +195,18 @@ func (s *server) handleAuthLogout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if c, err := r.Cookie(cookieSession); err == nil && c.Value != "" {
-		_ = s.db.DeleteSession(c.Value)
+	r.Body = http.MaxBytesReader(w, r.Body, 1024)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	// Validate CSRF only when there is an active session (logout without a session is a no-op anyway).
+	if sess, ok := s.currentSession(r); ok {
+		if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
+			return
+		}
+		_ = s.db.DeleteSession(sess.ID)
 	}
 	clearCookie(w, cookieSession)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -314,4 +322,78 @@ func clearCookie(w http.ResponseWriter, name string) {
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	})
+}
+
+// refreshSession exchanges the stored refresh token for a new access token,
+// updates the session in the DB, and returns the new access token.
+// The sess struct is updated in place on success.
+func (s *server) refreshSession(sess *db.Session) (string, error) {
+	if sess.RefreshToken == "" {
+		return "", fmt.Errorf("no refresh token stored for session")
+	}
+	form := url.Values{
+		"grant_type":    {"refresh_token"},
+		"refresh_token": {sess.RefreshToken},
+	}
+	req, err := http.NewRequest(http.MethodPost, s.qfAuthEndpoint+"/oauth2/token", strings.NewReader(form.Encode()))
+	if err != nil {
+		return "", fmt.Errorf("build refresh request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(s.qfClientID, s.qfClientSecret)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("refresh token request: %w", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("read refresh response: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("refresh token: HTTP %d: %s", resp.StatusCode, body)
+	}
+
+	var tok tokenResponse
+	if err := json.Unmarshal(body, &tok); err != nil {
+		return "", fmt.Errorf("decode refresh response: %w", err)
+	}
+	if tok.AccessToken == "" {
+		return "", fmt.Errorf("empty access token in refresh response")
+	}
+
+	newExpiry := time.Now().Add(sessionTTL).Unix()
+	newRefresh := tok.RefreshToken
+	if newRefresh == "" {
+		newRefresh = sess.RefreshToken // keep the old one if not rotated
+	}
+
+	if err := s.db.UpdateSessionTokens(sess.ID, tok.AccessToken, newRefresh, newExpiry); err != nil {
+		return "", fmt.Errorf("persist refreshed tokens: %w", err)
+	}
+
+	sess.AccessToken = tok.AccessToken
+	sess.RefreshToken = newRefresh
+	sess.ExpiresAt = newExpiry
+	log.Printf("auth: refreshed session %s", sess.ID[:8])
+	return tok.AccessToken, nil
+}
+
+// csrfTokenFor derives a CSRF token from a session ID (or admin token)
+// using HMAC-SHA256 with the server's CSRF secret.
+func (s *server) csrfTokenFor(id string) string {
+	mac := hmac.New(sha256.New, s.csrfSecret)
+	mac.Write([]byte(id))
+	return base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
+}
+
+// validateCSRFToken returns true if the csrf_token form field matches the expected value.
+// Must be called after ParseForm.
+func (s *server) validateCSRFToken(r *http.Request, expected string) bool {
+	got := r.FormValue("csrf_token")
+	if got == "" || expected == "" {
+		return false
+	}
+	return subtle.ConstantTimeCompare([]byte(got), []byte(expected)) == 1
 }

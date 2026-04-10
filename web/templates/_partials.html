@@ -75,12 +75,14 @@
             <nav class="user-dropdown-nav">
               <a class="user-dropdown-item" href="{{.DashboardURL}}">Dashboard</a>
               <form method="POST" action="{{.LogoutURL}}">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <button type="submit" class="user-dropdown-item user-dropdown-btn">Sign out</button>
               </form>
               {{if .IsAdmin}}
               <div class="user-dropdown-sep"></div>
               <a class="user-dropdown-item user-dropdown-item--muted" href="{{.AdminURL}}">Admin Panel</a>
               <form method="POST" action="{{.AdminLogoutURL}}">
+                <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}">
                 <button type="submit" class="user-dropdown-item user-dropdown-btn user-dropdown-item--muted">Admin Sign out</button>
               </form>
               {{end}}
@@ -94,6 +96,7 @@
       {{if and .IsAdmin (not .CurrentUser)}}
       <a class="admin-badge" href="{{.AdminURL}}">Admin</a>
       <form method="POST" action="{{.AdminLogoutURL}}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}">
         <button type="submit" class="auth-btn">Logout</button>
       </form>
       {{end}}
@@ -135,6 +138,7 @@
       <span class="drawer-user-name">{{.CurrentUser.Name}}</span>
     </div>
     <form method="POST" action="{{.LogoutURL}}" style="margin-top:0.5rem">
+      <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
       <button type="submit" class="auth-btn">Sign out</button>
     </form>
     {{else if not .IsAdmin}}
@@ -147,6 +151,7 @@
     <p>Admin</p>
     <nav><a href="{{.AdminURL}}">Admin Panel</a></nav>
     <form method="POST" action="{{.AdminLogoutURL}}" style="margin-top:0.5rem">
+      <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}">
       <button type="submit" class="auth-btn">Admin Sign out</button>
     </form>
   </div>

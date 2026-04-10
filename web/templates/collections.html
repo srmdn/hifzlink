@@ -14,6 +14,7 @@
       {{if .CollectionError}}<p class="error-msg admin-error" role="alert">{{.CollectionError}}</p>{{end}}
       {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
       <form action="/collections" method="post" class="collection-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
         <input type="hidden" name="lang" value="{{.Lang}}" />
         <label for="collection-name">Name</label>
         <input id="collection-name" name="name" value="{{.FormName}}" required autocomplete="off" placeholder="Weekly review" />

@@ -21,6 +21,7 @@ func (s *server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "too many requests", http.StatusTooManyRequests)
 			return
 		}
+		r.Body = http.MaxBytesReader(w, r.Body, 1024)
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
@@ -52,6 +53,15 @@ func (s *server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 func (s *server) handleAdminLogout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 1024)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(s.adminToken)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
