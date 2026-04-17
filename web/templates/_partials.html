@@ -121,7 +121,6 @@
     <a href="{{.SurahIndexURL}}">Surah</a>
     <a href="{{.JuzIndexURL}}">Juz</a>
     <a href="{{.SearchURL}}">Search</a>
-    {{if .CurrentUser}}<a href="{{.DashboardURL}}">Dashboard</a>{{end}}
   </nav>
   <div class="mobile-lang">
     <p>Language</p>
@@ -131,14 +130,18 @@
       <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">Arabic + Indonesian</a>
     </nav>
   </div>
+  <div class="mobile-drawer-spacer"></div>
   {{if .QFEnabled}}
-  <div class="mobile-lang">
+  <div class="mobile-lang mobile-account">
     <p>Account</p>
     {{if .CurrentUser}}
     <div class="drawer-user-info">
       <span class="drawer-user-avatar">{{if .CurrentUser.Name}}{{slice .CurrentUser.Name 0 1}}{{else}}?{{end}}</span>
       <span class="drawer-user-name">{{.CurrentUser.Name}}</span>
     </div>
+    <nav style="margin-top:0.5rem">
+      <a href="{{.DashboardURL}}">Dashboard</a>
+    </nav>
     <form method="POST" action="{{.LogoutURL}}" style="margin-top:0.5rem">
       <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
       <button type="submit" class="auth-btn">Sign out</button>
@@ -149,7 +152,7 @@
   </div>
   {{end}}
   {{if .IsAdmin}}
-  <div class="mobile-lang">
+  <div class="mobile-lang mobile-account">
     <p>Admin</p>
     <nav><a href="{{.AdminURL}}">Admin Panel</a></nav>
     <form method="POST" action="{{.AdminLogoutURL}}" style="margin-top:0.5rem">
