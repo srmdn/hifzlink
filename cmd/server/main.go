@@ -1894,6 +1894,7 @@ func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading,
 func (s *server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
 	base := "https://" + r.Host
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=86400")
 	fmt.Fprintf(w, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", base)
 }
 
