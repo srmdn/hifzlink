@@ -420,7 +420,7 @@
 
 .juz-index-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(8, 1fr);
   gap: 0.65rem;
   margin-top: 1rem;
 }
@@ -472,9 +472,15 @@
   color: var(--text-muted);
 }
 
+@media (max-width: 980px) {
+  .juz-index-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 @media (max-width: 600px) {
   .juz-index-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -895,4 +901,5 @@
   .lp-side-actions .lp-cta-secondary {
     width: 100%;
   }
+
 }
