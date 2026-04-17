@@ -77,10 +77,11 @@
       <div class="qf-bookmarks-grid">
         {{range .QFBookmarks}}
         <div class="qf-bookmark-item">
-          <a class="ayah-chip" href="{{.URL}}">{{.Ref}}</a>
-          <a class="qf-qurancom-link" href="{{.QuranComURL}}" target="_blank" rel="noopener noreferrer" title="View on quran.com">
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2h4v1H3v6h6V6h1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm5 0h2v2h-1V3.4L5.7 6.7l-.7-.7L8.3 3H7V2z" fill="currentColor"/></svg>
-          </a>
+          <span class="qf-bookmark-ref">{{.Ref}}</span>
+          <div class="qf-bookmark-links">
+            <a class="qf-bookmark-link qf-bookmark-link--internal" href="{{.URL}}">hifz.click</a>
+            <a class="qf-bookmark-link qf-bookmark-link--external" href="{{.QuranComURL}}" target="_blank" rel="noopener noreferrer">quran.com ↗</a>
+          </div>
         </div>
         {{end}}
       </div>
