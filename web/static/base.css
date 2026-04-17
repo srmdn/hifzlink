@@ -16,12 +16,14 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  min-height: 100%;
+html {
+  height: 100%;
 }
 
 body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   background:
@@ -40,6 +42,7 @@ body {
 }
 
 main {
+  flex: 1;
   padding-top: 2.5rem;
   padding-bottom: 2.4rem;
 }
@@ -97,7 +100,14 @@ pre {
 }
 
 .footer-inner a {
-  color: var(--text-muted);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-inner a:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
 }
 
 @media (max-width: 640px) {
