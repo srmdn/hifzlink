@@ -261,6 +261,10 @@ func main() {
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 	mux.HandleFunc("/admin/relations/", s.handleAdminRelationEdit)
 
+	mux.HandleFunc("/robots.txt", s.handleRobotsTxt)
+	mux.HandleFunc("/sitemap.xml", s.handleSitemap)
+	mux.HandleFunc("/llms.txt", s.handleLLMsTxt)
+
 	mux.HandleFunc("/api/ayah/", s.handleAPIAyah)
 	mux.HandleFunc("/api/relations", s.handleAPIRelations)
 	mux.HandleFunc("/api/surah/", s.handleAPISurah)
@@ -375,10 +379,10 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 			queryLabel = fmt.Sprintf("pairs involving %s", relations.FormatAyahRef(surahNum, ayahNum))
 			dbRels, err = s.db.ByAyah(surahNum, ayahNum)
 		} else if n, atoiErr := strconv.Atoi(q); atoiErr == nil && n >= 1 && n <= 114 {
-			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
+			queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
 			dbRels, err = s.db.BySurah(n)
 		} else if n := search.SurahByName(q); n > 0 {
-			queryLabel = fmt.Sprintf("pairs in Surah %d — %s", n, s.quran.SurahName(n))
+			queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
 			dbRels, err = s.db.BySurah(n)
 		} else {
 			errMsg = fmt.Sprintf("Could not interpret %q — try an ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).", q)
@@ -608,8 +612,8 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	compareData := map[string]any{
-		"Title":            "Compare",
-		"Description":      "Compare two similar Quran verses side by side and spot the differences. Try it yourself at hifz.click.",
+		"Title":            fmt.Sprintf("Compare %s vs %s | hifzlink", relations.FormatAyahRef(s1, y1), relations.FormatAyahRef(s2, y2)),
+		"Description":      fmt.Sprintf("Side-by-side comparison of %s and %s with word-level highlights. See exactly where these similar Quran verses diverge.", relations.FormatAyahRef(s1, y1), relations.FormatAyahRef(s2, y2)),
 		"Ayah1":            ayah1,
 		"Ayah1Translation": s.translationFor(pageLang(r), s1, y1),
 		"Ayah2":            ayah2,
@@ -1202,7 +1206,7 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "surah.html", s.withCommonViewData(r, map[string]any{
 		"Title":            fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
-		"Description":      fmt.Sprintf("Browse mutashabihat relations in Surah %d — %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
+		"Description":      fmt.Sprintf("Browse mutashabihat relations in Surah %d: %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
 		"Surah":            surah,
 		"SurahName":        s.quran.SurahName(surah),
 		"SurahArabicName":  s.quran.ArabicName(surah),
@@ -1722,7 +1726,7 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	data["CanonicalURL"] = base + r.URL.Path
 	data["OGImageURL"] = base + "/static/og-image.png"
 	if _, ok := data["Description"]; !ok {
-		data["Description"] = "Master Quran mutashabihat — review similar verses and strengthen your memorization."
+		data["Description"] = "Master Quran mutashabihat: review similar verses and strengthen your memorization."
 	}
 	if s.umamiID != "" {
 		data["UmamiID"] = s.umamiID
@@ -1885,6 +1889,58 @@ func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading,
 		"Heading": heading,
 		"Message": message,
 	}))
+}
+
+func (s *server) handleRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	base := "https://" + r.Host
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	fmt.Fprintf(w, "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n", base)
+}
+
+func (s *server) handleSitemap(w http.ResponseWriter, r *http.Request) {
+	base := "https://" + r.Host
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>`)
+	fmt.Fprint(w, "\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
+
+	static := []string{"/", "/surah", "/juz", "/search", "/privacy", "/terms"}
+	for _, path := range static {
+		fmt.Fprintf(w, "  <url><loc>%s%s</loc></url>\n", base, path)
+	}
+	for i := 1; i <= 114; i++ {
+		fmt.Fprintf(w, "  <url><loc>%s/surah/%d</loc></url>\n", base, i)
+	}
+	for i := 1; i <= 30; i++ {
+		fmt.Fprintf(w, "  <url><loc>%s/juz/%d</loc></url>\n", base, i)
+	}
+
+	fmt.Fprint(w, "</urlset>\n")
+}
+
+func (s *server) handleLLMsTxt(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	fmt.Fprint(w, `# HifzLink
+> Open source tool for Quran memorization: find and compare mutashabihat (similar verses that confuse reciters during recitation).
+
+Author: Said Ramadhan
+Language: en
+Topics: Quran, mutashabihat, Quran memorization, hifz, Islamic tools, verse comparison
+Content-Type: interactive tool, verse database
+Update-Cadence: irregular
+
+## Key Pages
+- /: Home - overview and entry point
+- /surah: Browse mutashabihat pairs organized by surah
+- /juz: Browse mutashabihat pairs organized by juz
+- /search: Search by ayah reference (60:8), surah number, or surah name
+- /compare: Side-by-side verse comparison with word-level highlights
+
+## About
+HifzLink captures confusion patterns between nearly identical Quran verses (mutashabihat). It indexes all 6,236 ayahs and curates pairs where reciters commonly slip from one verse to another. Free to use, open source, no account required for browsing. Login with Quran Foundation to save pairs to personal collections.
+
+## Contact
+https://hifz.click
+`)
 }
 
 // wib is the Asia/Jakarta timezone (UTC+7).
