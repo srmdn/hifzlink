@@ -349,13 +349,64 @@
 
 /* ── Surah index ──────────────────────────────────────────────── */
 
+.surah-index-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.surah-index-sidebar {
+  position: sticky;
+  top: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.surah-filter-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #617488;
+  margin-bottom: 0.4rem;
+}
+
+.surah-filter-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+
+.surah-filter-input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: -1px;
+}
+
+.surah-index-stats {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.surah-index-stats p {
+  margin: 0 0 0.2rem;
+}
+
 .surah-index-list {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
   border: 1px solid var(--border);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: calc(100vh - 9rem);
 }
 
 .surah-index-row {
@@ -414,6 +465,19 @@
   font-size: 0.78rem;
   color: var(--border);
   text-align: right;
+}
+
+@media (max-width: 700px) {
+  .surah-index-layout {
+    grid-template-columns: 1fr;
+  }
+  .surah-index-sidebar {
+    position: static;
+  }
+  .surah-index-list {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
 
 /* ── Juz index ────────────────────────────────────────────────── */
