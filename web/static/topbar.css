@@ -225,10 +225,6 @@
   display: none !important;
 }
 
-.mobile-drawer-spacer {
-  flex: 1;
-}
-
 .mobile-account {
   border-top: 1px solid var(--border);
   padding-top: 0.9rem;
