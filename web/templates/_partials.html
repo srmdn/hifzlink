@@ -41,13 +41,6 @@
 <header class="topbar" data-mobile-nav-root>
   <div class="container topbar-inner">
     <div class="topbar-left">
-      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-toggle>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-          <rect y="3" width="18" height="2" rx="1" fill="currentColor"/>
-          <rect y="8" width="18" height="2" rx="1" fill="currentColor"/>
-          <rect y="13" width="18" height="2" rx="1" fill="currentColor"/>
-        </svg>
-      </button>
       <a class="brand" href="{{.HomeURL}}"><span class="brand-main">HifzLink</span></a>
       <nav class="primary-nav" aria-label="Primary">
         <a href="{{.HomeURL}}">Home</a>
@@ -102,6 +95,13 @@
         <button type="submit" class="auth-btn">Logout</button>
       </form>
       {{end}}
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-toggle>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <rect y="3" width="18" height="2" rx="1" fill="currentColor"/>
+          <rect y="8" width="18" height="2" rx="1" fill="currentColor"/>
+          <rect y="13" width="18" height="2" rx="1" fill="currentColor"/>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
