@@ -96,6 +96,7 @@ func (s *server) handleAuthLogin(w http.ResponseWriter, r *http.Request) {
 		"nonce":                 {nonce},
 		"code_challenge":        {pkceChallenge(verifier)},
 		"code_challenge_method": {"S256"},
+		"prompt":                {"login"},
 	}
 	http.Redirect(w, r, s.qfAuthEndpoint+"/oauth2/auth?"+params.Encode(), http.StatusFound)
 }
