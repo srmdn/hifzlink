@@ -36,7 +36,20 @@
       </aside>
 
       <div class="sp-main">
+        {{if .Ayahs}}
+        <div class="sp-pairs-head">
+          <h2>Browse Ayahs</h2>
+          <span class="sp-pairs-count">{{.AyahCount}} ayahs</span>
+        </div>
+        <div class="sp-ayah-grid">
+          {{range .Ayahs}}
+          <a class="sp-ayah-btn" href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.Ayah}}</a>
+          {{end}}
+        </div>
+        {{end}}
+
         {{if .Pairs}}
+        <div class="sp-section-sep"></div>
         <div class="sp-pairs-head">
           <h2>Mutashabihat Pairs</h2>
           <span class="sp-pairs-count">{{.PairCount}} pairs</span>

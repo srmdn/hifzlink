@@ -197,6 +197,41 @@
   line-height: 1.5;
 }
 
+/* Ayah grid */
+
+.sp-section-sep {
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.sp-ayah-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.sp-ayah-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.sp-ayah-btn:hover {
+  border-color: var(--accent);
+  background: #e8f4f2;
+  color: var(--accent-strong);
+}
+
 /* Empty state */
 
 .sp-empty {
