@@ -1204,7 +1204,7 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "surah.html", s.withCommonViewData(r, map[string]any{
+	data := map[string]any{
 		"Title":            fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
 		"Description":      fmt.Sprintf("Browse mutashabihat relations in Surah %d: %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
 		"Surah":            surah,
@@ -1213,7 +1213,17 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		"AyahCount":        s.quran.AyahCount(surah),
 		"RevelationPlace":  s.quran.RevelationPlace(surah),
 		"Pairs":            pairs,
-	}))
+		"PairCount":        len(pairs),
+	}
+	if surah > 1 {
+		data["PrevSurah"] = surah - 1
+		data["PrevSurahName"] = s.quran.SurahName(surah - 1)
+	}
+	if surah < 114 {
+		data["NextSurah"] = surah + 1
+		data["NextSurahName"] = s.quran.SurahName(surah + 1)
+	}
+	s.render(w, "surah-detail.html", s.withCommonViewData(r, data))
 }
 
 func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
