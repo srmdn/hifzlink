@@ -9,31 +9,29 @@
     <h1>Browse by Surah</h1>
     <p class="meta">114 surahs. Surahs with mutashabihat pairs are highlighted.</p>
 
-    <div class="surah-index-layout">
-      <aside class="surah-index-sidebar">
-        <div>
-          <label for="surah-filter" class="surah-filter-label">Filter</label>
-          <input id="surah-filter" class="surah-filter-input" type="search" placeholder="Name or number..." autocomplete="off">
-        </div>
-        <div class="surah-index-stats">
-          <p><strong id="surah-stat-shown">114</strong> shown</p>
-          <p id="surah-stat-pairs"></p>
-        </div>
-      </aside>
-
-      <div class="surah-index-list" id="surah-index-list">
-        {{range .Surahs}}
-        <a class="surah-index-row{{if gt .RelationCount 0}} has-pairs{{end}}" href="/surah/{{.Number}}?lang={{$.Lang}}">
-          <span class="surah-index-num">{{.Number}}</span>
-          <span class="surah-index-name">{{.Name}}</span>
-          {{if gt .RelationCount 0}}
-          <span class="surah-index-badge">{{.RelationCount}}</span>
-          {{else}}
-          <span class="surah-index-empty">0 pairs</span>
-          {{end}}
-        </a>
-        {{end}}
+    <div class="surah-filter-bar">
+      <div class="surah-filter-field">
+        <label for="surah-filter" class="surah-filter-label">Filter</label>
+        <input id="surah-filter" class="surah-filter-input" type="search" placeholder="Name or number..." autocomplete="off">
       </div>
+      <div class="surah-index-stats">
+        <p><strong id="surah-stat-shown">114</strong> shown</p>
+        <p id="surah-stat-pairs"></p>
+      </div>
+    </div>
+
+    <div class="surah-index-list" id="surah-index-list">
+      {{range .Surahs}}
+      <a class="surah-index-row{{if gt .RelationCount 0}} has-pairs{{end}}" href="/surah/{{.Number}}?lang={{$.Lang}}">
+        <span class="surah-index-num">{{.Number}}</span>
+        <span class="surah-index-name">{{.Name}}</span>
+        {{if gt .RelationCount 0}}
+        <span class="surah-index-badge">{{.RelationCount}}</span>
+        {{else}}
+        <span class="surah-index-empty">0 pairs</span>
+        {{end}}
+      </a>
+      {{end}}
     </div>
   </main>
 

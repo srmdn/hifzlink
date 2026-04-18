@@ -1,19 +1,11 @@
 /* ── Surah index ──────────────────────────────────────────────── */
 
-.surah-index-layout {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 1.5rem;
-  align-items: start;
-  margin-top: 1rem;
-}
-
-.surah-index-sidebar {
-  position: sticky;
-  top: 5.5rem;
+.surah-filter-bar {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin: 1rem 0 1.25rem;
+  flex-wrap: wrap;
 }
 
 .surah-filter-label {
@@ -27,7 +19,7 @@
 }
 
 .surah-filter-input {
-  width: 100%;
+  width: 220px;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -55,8 +47,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 0.5rem;
-  max-height: calc(100vh - 9rem);
-  overflow-y: auto;
 }
 
 .surah-index-row {
@@ -117,15 +107,15 @@
 }
 
 @media (max-width: 700px) {
-  .surah-index-layout {
-    grid-template-columns: 1fr;
+  .surah-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
   }
-  .surah-index-sidebar {
-    position: static;
+  .surah-filter-input {
+    width: 100%;
   }
   .surah-index-list {
-    max-height: none;
-    overflow-y: visible;
     grid-template-columns: 1fr;
   }
 }
