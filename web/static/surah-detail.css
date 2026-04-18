@@ -1,0 +1,349 @@
+/* ── Surah detail page (sp- prefix) ──────────────────────────── */
+
+.sp-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.sp-sidebar-inner {
+  position: sticky;
+  top: 5.5rem;
+}
+
+.sp-num {
+  display: block;
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.sp-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0.2rem 0 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.sp-arabic {
+  font-size: 2rem;
+  font-family: 'Amiri', 'Scheherazade New', serif;
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.sp-meta-list {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sp-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.84rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-meta-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sp-meta-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sp-nav {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sp-nav-link {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  text-decoration: none;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.sp-nav-link:hover {
+  border-color: #b8d8d3;
+  background: #e8f4f2;
+}
+
+/* Main content area */
+
+.sp-pairs-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.sp-pairs-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.sp-pairs-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sp-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sp-pair {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.sp-pair:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(14, 118, 110, 0.08);
+  transform: translateY(-1px);
+}
+
+.sp-pair-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.sp-pair-refs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.sp-pair-refs svg {
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.sp-chip {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: #e8f4f2;
+  border: 1px solid #b8d8d3;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #1a6b5e;
+}
+
+.sp-pair:hover .sp-chip {
+  background: #d0ece7;
+  border-color: #7bbdb5;
+}
+
+.sp-pair-action {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.sp-pair:hover .sp-pair-action {
+  opacity: 1;
+}
+
+.sp-pair-names {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.sp-pair-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Empty state */
+
+.sp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.sp-empty svg {
+  width: 3rem;
+  height: 3rem;
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin-bottom: 0.75rem;
+}
+
+.sp-empty p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.sp-empty-hint {
+  margin-top: 0.3rem !important;
+  font-size: 0.84rem !important;
+  opacity: 0.7;
+}
+
+/* Tablet: collapse sidebar above */
+@media (max-width: 860px) {
+  .sp-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .sp-sidebar-inner {
+    position: static;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 0 1.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+  }
+
+  .sp-num {
+    grid-row: 1 / 3;
+    align-self: center;
+    font-size: 2.6rem;
+  }
+
+  .sp-name {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  .sp-arabic {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .sp-meta-list {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .sp-meta-row {
+    flex: 1;
+    min-width: 100px;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    padding: 0 1rem 0 0;
+    margin-right: 1rem;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .sp-meta-row:last-child {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+  }
+
+  .sp-nav {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    margin-top: 1rem;
+  }
+
+  .sp-nav-link {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .sp-sidebar-inner {
+    padding: 1rem 1.1rem;
+    gap: 0 1rem;
+  }
+
+  .sp-num {
+    font-size: 2rem;
+  }
+
+  .sp-name {
+    font-size: 1.15rem;
+  }
+
+  .sp-arabic {
+    font-size: 1.3rem;
+  }
+
+  .sp-meta-list {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .sp-meta-row {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 0 0 0.35rem;
+    margin-right: 0;
+  }
+
+  .sp-meta-row:last-child {
+    border-bottom: none;
+  }
+
+  .sp-nav {
+    flex-direction: column;
+  }
+
+  .sp-pair-action {
+    opacity: 1;
+  }
+}

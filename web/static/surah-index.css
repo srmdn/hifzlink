@@ -1,0 +1,140 @@
+/* ── Surah index ──────────────────────────────────────────────── */
+
+.surah-index-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.surah-index-sidebar {
+  position: sticky;
+  top: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.surah-filter-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #617488;
+  margin-bottom: 0.4rem;
+}
+
+.surah-filter-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+
+.surah-filter-input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: -1px;
+}
+
+.surah-index-stats {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.surah-index-stats p {
+  margin: 0 0 0.2rem;
+}
+
+.surah-index-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.5rem;
+  max-height: calc(100vh - 9rem);
+  overflow-y: auto;
+}
+
+.surah-index-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-size: 0.9rem;
+}
+
+.surah-index-row:hover {
+  border-color: #b8d8d3;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.surah-index-row.has-pairs {
+  color: var(--text);
+}
+
+.surah-index-num {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.surah-index-name {
+  font-weight: 500;
+}
+
+.surah-index-row.has-pairs .surah-index-name {
+  font-weight: 600;
+}
+
+.surah-index-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.1em 0.55em;
+  min-width: 1.4em;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.surah-index-empty {
+  font-size: 0.78rem;
+  color: var(--border);
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .surah-index-layout {
+    grid-template-columns: 1fr;
+  }
+  .surah-index-sidebar {
+    position: static;
+  }
+  .surah-index-list {
+    max-height: none;
+    overflow-y: visible;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 701px) {
+  .surah-index-page {
+    max-width: 1200px;
+  }
+  .surah-index-page .surah-index-list {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
