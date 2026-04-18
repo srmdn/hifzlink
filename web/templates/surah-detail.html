@@ -36,38 +36,25 @@
       </aside>
 
       <div class="sp-main">
-        {{if .Ayahs}}
-        <div class="sp-pairs-head">
-          <h2>Browse Ayahs</h2>
-          <span class="sp-pairs-count">{{.AyahCount}} ayahs</span>
-        </div>
-        <div class="sp-ayah-grid">
-          {{range .Ayahs}}
-          <a class="sp-ayah-btn" href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.Ayah}}</a>
-          {{end}}
-        </div>
-        {{end}}
-
         {{if .Pairs}}
-        <div class="sp-section-sep"></div>
         <div class="sp-pairs-head">
           <h2>Mutashabihat Pairs</h2>
           <span class="sp-pairs-count">{{.PairCount}} pairs</span>
         </div>
         <div class="sp-pairs">
           {{range .Pairs}}
-          <a class="sp-pair" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">
+          <div class="sp-pair">
             <div class="sp-pair-top">
               <span class="sp-pair-refs">
-                <span class="sp-chip">{{.Ayah1}}</span>
+                <a class="sp-chip" href="{{.Ayah1URL}}?lang={{$.Lang}}">{{.Ayah1}}</a>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
-                <span class="sp-chip">{{.Ayah2}}</span>
+                <a class="sp-chip" href="{{.Ayah2URL}}?lang={{$.Lang}}">{{.Ayah2}}</a>
               </span>
-              <span class="sp-pair-action">Compare</span>
+              <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
             </div>
             <p class="sp-pair-names">{{.Ayah1Name}} · {{.Ayah2Name}}</p>
             {{if .Note}}<p class="sp-pair-note">{{.Note}}</p>{{end}}
-          </a>
+          </div>
           {{end}}
         </div>
         {{else}}

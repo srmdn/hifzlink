@@ -1212,7 +1212,6 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		"SurahArabicName":  s.quran.ArabicName(surah),
 		"AyahCount":        s.quran.AyahCount(surah),
 		"RevelationPlace":  s.quran.RevelationPlace(surah),
-		"Ayahs":            s.quran.BySurah(surah),
 		"Pairs":            pairs,
 		"PairCount":        len(pairs),
 	}

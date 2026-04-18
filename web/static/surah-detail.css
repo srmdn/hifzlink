@@ -116,14 +116,11 @@
 }
 
 .sp-pair {
-  display: block;
-  text-decoration: none;
-  color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.9rem 1.1rem;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .sp-pair:hover {
@@ -161,26 +158,12 @@
   font-size: 0.86rem;
   font-weight: 600;
   color: #1a6b5e;
+  text-decoration: none;
 }
 
-.sp-pair:hover .sp-chip {
+.sp-chip:hover {
   background: #d0ece7;
   border-color: #7bbdb5;
-}
-
-.sp-pair-action {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  opacity: 0;
-  transition: opacity 0.15s;
-  flex-shrink: 0;
-}
-
-.sp-pair:hover .sp-pair-action {
-  opacity: 1;
 }
 
 .sp-pair-names {
@@ -195,41 +178,6 @@
   color: var(--text-muted);
   font-style: italic;
   line-height: 1.5;
-}
-
-/* Ayah grid */
-
-.sp-section-sep {
-  border-top: 1px solid var(--border);
-  margin: 1.5rem 0;
-}
-
-.sp-ayah-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
-}
-
-.sp-ayah-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2.4rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text);
-  text-decoration: none;
-  transition: border-color 0.12s, background 0.12s, color 0.12s;
-}
-
-.sp-ayah-btn:hover {
-  border-color: var(--accent);
-  background: #e8f4f2;
-  color: var(--accent-strong);
 }
 
 /* Empty state */
