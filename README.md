@@ -104,9 +104,9 @@ go run ./scripts/seed_relations
 ## Admin UI
 
 - `GET /admin/relations` relation management page (add/list/edit/delete)
-- optional relation categories for grouping: `lafzi`, `maana`, `siyam`, `aqidah`, `adab`, `other`
+- relation categories (confusion-pattern taxonomy): `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`
 - category labels and usage hints are shown directly on the admin page
-- invalid category values are normalized to `Uncategorized`
+- invalid category values are normalized to `other`
 - admin routes and `POST /api/relations` require HTTP Basic Auth
 - set credentials via env:
   - `HIFZLINK_ADMIN_USER`
@@ -154,7 +154,7 @@ curl -X POST http://localhost:8080/api/relations \
 - `web/templates` server-rendered pages
 - `web/static` CSS
 - `data/quran.json` local Quran dataset
-- `data/relations.seed.json` starter relation pairs
+- `data/relations.seed.json` 150+ curated mutashabihat pairs across all juz
 - `scripts/import` imports full Quran text + metadata from Tanzil
 - `scripts/import_translations` imports `en` from Quran.com verse-route data (Clear Quran text shown on site), `id` from `rioastamal/quran-json`, and prepares Indonesian + English tafsir data
 - `scripts/validate` validates dataset contract
