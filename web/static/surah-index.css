@@ -5,11 +5,7 @@
 }
 
 .surah-filter-bar {
-  display: flex;
-  align-items: flex-end;
-  gap: 1.5rem;
-  margin: 1rem 0 1.25rem;
-  flex-wrap: wrap;
+  margin: 1.25rem 0 1.5rem;
 }
 
 .surah-filter-label {
@@ -23,8 +19,10 @@
 }
 
 .surah-filter-input {
-  width: 220px;
-  padding: 0.5rem 0.75rem;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.9rem;
@@ -39,17 +37,14 @@
 }
 
 .surah-index-stats {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-}
-
-.surah-index-stats p {
-  margin: 0 0 0.2rem;
+  margin: 0.4rem 0 0;
 }
 
 .surah-index-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.5rem;
 }
 
@@ -110,25 +105,20 @@
   text-align: right;
 }
 
-@media (max-width: 700px) {
-  .surah-filter-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-  .surah-filter-input {
-    width: 100%;
+@media (min-width: 600px) {
+  .surah-index-page {
+    padding: 2rem 4vw 4rem;
   }
   .surah-index-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
 
-@media (min-width: 701px) {
+@media (min-width: 1024px) {
   .surah-index-page {
-    padding: 2rem 2rem 4rem;
+    padding: 2.5rem 6vw 5rem;
   }
-  .surah-index-page .surah-index-list {
+  .surah-index-list {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 }

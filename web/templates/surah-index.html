@@ -10,14 +10,9 @@
     <p class="meta">114 surahs. Surahs with mutashabihat pairs are highlighted.</p>
 
     <div class="surah-filter-bar">
-      <div class="surah-filter-field">
-        <label for="surah-filter" class="surah-filter-label">Filter</label>
-        <input id="surah-filter" class="surah-filter-input" type="search" placeholder="Name or number..." autocomplete="off">
-      </div>
-      <div class="surah-index-stats">
-        <p><strong id="surah-stat-shown">114</strong> shown</p>
-        <p id="surah-stat-pairs"></p>
-      </div>
+      <label for="surah-filter" class="surah-filter-label">Filter</label>
+      <input id="surah-filter" class="surah-filter-input" type="search" placeholder="Name or number..." autocomplete="off">
+      <p class="surah-index-stats"><strong id="surah-stat-shown">114</strong> shown &middot; <span id="surah-stat-pairs"></span></p>
     </div>
 
     <div class="surah-index-list" id="surah-index-list">
@@ -51,7 +46,7 @@
         const name = row.querySelector('.surah-index-name').textContent.toLowerCase();
         const num = row.querySelector('.surah-index-num').textContent.trim();
         const match = !q || name.includes(q) || num.startsWith(q);
-        row.hidden = !match;
+        row.style.display = match ? '' : 'none';
         if (match) shown++;
       });
       statShown.textContent = shown;
