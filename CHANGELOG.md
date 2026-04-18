@@ -4,6 +4,67 @@ All notable changes to this project will be documented in this file.
 
 The format is inspired by Keep a Changelog.
 
+## [0.2.3] - 2026-04-18 — QF integration, practice tools, surah index redesign
+
+### Added
+
+- QF OAuth2 login flow with sessions; login/logout UI in topbar and dashboard
+- QF Content API: verse audio playback on compare page
+- QF User Bookmarks API: saved pairs from Quran.com shown on dashboard with richer display
+- Practice Mode on compare page: hide one verse and reveal on demand
+- Dashboard review prompt for saved pairs
+- Surah/juz metadata display on index and detail pages
+- SVG empty state icons on all no-content pages
+- Mark as mastered on saved pairs
+- Stats strip on homepage: total pair count, 114 surahs, 6236 ayahs
+- Surah index badge: relation count shown per surah row
+- Admin state indicator in topbar and mobile nav
+- Proper admin login page
+- Dedicated edit page for relations with live diff preview
+- Search filter on admin relations list
+- `updated_at` timestamp on compare page
+- robots.txt, sitemap.xml, llms.txt; improved meta tags for SEO
+
+### Changed
+
+- Surah index: removed sidebar, filter moved above list, full-width single-column layout
+- Surah index: filter input is now full-width with stats shown below
+- Surah CSS extracted into dedicated `surah-index.css` and `surah-detail.css` files
+- Surah detail: prev/next surah navigation
+- Landing page redesigned with pair count, SVG icons, scroll cue, and browse CTA
+- Mobile drawer restructured; account section pinned to bottom
+- Hamburger moved to right side of topbar; mobile padding added
+- QF bookmark items redesigned to distinguish two link destinations (Quran.com vs internal)
+- Tafsir section auto-expands on load
+- Collections scoped per user
+
+### Fixed
+
+- Surah index filter: rows were not hiding due to CSS specificity (`display: grid` overriding `[hidden]`); fixed via `style.display`
+- Mobile menu account section cut off on short viewports
+- Sticky footer and juz 8-column grid layout
+- Footer links and Tanzil attribution removed
+- QF OAuth2: nonce param, user scope, error logging
+- QF bookmark API: correct scope, mushafId, and pagination params
+- Timestamps displayed in WIB (UTC+7) with offset label
+- Dark floating dropdown; topbar auth links hidden at tablet/mobile breakpoints
+- Admin session cookie path set to `/` so topbar reflects admin state on all pages
+- Login button hidden when admin session is active
+- Logout uses POST; token exchange uses Basic Auth
+- Cache-Control header added to robots.txt
+
+### Security
+
+- Session expiry added
+- CSRF tokens on all state-changing forms
+- Request body size limits
+- Rate limiter memory pruning
+- Force re-authentication on every login (`prompt=login`)
+
+### Data
+
+- Seed expanded to 150+ curated pairs covering Juz 28-30, Al-Rahman, Al-Mursalat
+
 ## [0.2.2] - 2026-03-24 — Tafsir display
 
 ### Added
