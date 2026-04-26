@@ -311,7 +311,9 @@ func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highl
 func normalizeCategory(value string) string {
 	c := strings.ToLower(strings.TrimSpace(value))
 	switch c {
-	case "lafzi", "maana", "siyam", "aqidah", "adab", "other":
+	case "lafzi", "maana", "siyam", "aqidah", "adab", "other",
+		"word_swap", "addition_omission", "order_change",
+		"ending_variation", "pronoun_shift", "structural":
 		return c
 	default:
 		return ""

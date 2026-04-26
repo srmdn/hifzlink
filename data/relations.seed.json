@@ -1,162 +1,1706 @@
 [
-  {"ayah1": "60:8",  "ayah2": "60:9",   "category": "word_swap",        "note": "Both begin identically but 60:8 says 'lam yuqatilukum' (did not fight you) while 60:9 says 'qatalukum' (fought you), changing the ruling entirely."},
-
-  {"ayah1": "2:255", "ayah2": "3:2",    "category": "lafzi",            "note": "Both open with 'Allahu la ilaha illa huwa al-Hayy al-Qayyum' — word-for-word identical divine attribute declaration."},
-  {"ayah1": "2:255", "ayah2": "20:111", "category": "lafzi",            "note": "Both contain 'al-Hayy al-Qayyum' as paired divine names but in different contexts — Ayat al-Kursi vs. the Day of Judgment."},
-  {"ayah1": "3:2",   "ayah2": "20:111", "category": "lafzi",            "note": "Both contain 'al-Hayy al-Qayyum' — the third occurrence of this divine attribute pairing in the Quran."},
-
-  {"ayah1": "2:48",  "ayah2": "2:123",  "category": "order_change",     "note": "Both warn that no intercession or ransom will be accepted on the Day, but 2:48 places 'shafa'ah' before ''adl' while 2:123 reverses the order."},
-  {"ayah1": "2:58",  "ayah2": "7:161",  "category": "order_change",     "note": "Both command entering saying 'hittah' while prostrating, but the order of 'sujjadan' and 'hittah' is reversed between the two verses."},
-  {"ayah1": "2:60",  "ayah2": "7:160",  "category": "word_swap",        "note": "Both describe water springing from the rock for Moses but 2:60 uses 'infajarat' (burst strongly) while 7:160 uses 'inbajassat' (gushed forth)."},
-  {"ayah1": "2:136", "ayah2": "3:84",   "category": "word_swap",        "note": "Both declare belief in all the prophets with near-identical wording but differ in 'ilayna'/'alayna' and the phrasing of 'what was given to the prophets'."},
-  {"ayah1": "2:242", "ayah2": "3:103",  "category": "ending_variation", "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 2:242 ends with 'ta'qilun' (reason) and 3:103 ends with 'tahtadun' (be guided)."},
-  {"ayah1": "2:285", "ayah2": "2:286",  "category": "ending_variation", "note": "Closing verses of Al-Baqarah in the same passage — both are supplications but differ in ending: 2:285 ends with 'wa ilayka al-masir' and 2:286 ends with 'fansurna 'ala al-qawm al-kafirin'."},
-  {"ayah1": "3:3",   "ayah2": "5:48",   "category": "addition_omission","note": "Both describe the Quran as 'musaddiqan lima bayna yadayhi' but 5:48 adds 'wa muhaymina 'alayhi' (a guardian over it) which is absent in 3:3."},
-  {"ayah1": "3:47",  "ayah2": "19:35",  "category": "word_swap",        "note": "Both contain the divine command 'kun fayakun' in the context of miraculous creation but differ in the connecting particles and surrounding phrase structure."},
-  {"ayah1": "3:49",  "ayah2": "5:110",  "category": "pronoun_shift",    "note": "Both list the miracles of Isa in nearly identical language but 3:49 uses 'fihi' (masculine pronoun for the bird) while 5:110 uses 'fiha' (feminine)."},
-  {"ayah1": "3:103", "ayah2": "5:89",   "category": "ending_variation", "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 3:103 ends with 'tahtadun' (be guided) and 5:89 ends with 'tashkurun' (be grateful)."},
-  {"ayah1": "3:126", "ayah2": "8:10",   "category": "word_swap",        "note": "Both reassure believers that victory comes only from Allah and end with 'azizun hakim' but differ in the pronoun and the structure of the preceding clause."},
-  {"ayah1": "4:135", "ayah2": "5:8",    "category": "order_change",     "note": "Both command standing firmly for justice as witnesses for Allah, but 4:135 says 'qawwamina bi al-qist shuhada'a lillah' while 5:8 reverses to 'qawwamina lillahi shuhada'a bi al-qist'."},
-  {"ayah1": "6:50",  "ayah2": "11:31",  "category": "addition_omission","note": "Both have the prophet declaring 'I do not say I possess the treasures of Allah nor that I am an angel' but 6:50 adds 'lakum' (to you) in 'wa la aqulu lakum inni malak' while 11:31 omits it."},
-  {"ayah1": "6:151", "ayah2": "17:31",  "category": "word_swap",        "note": "Both forbid killing children out of poverty but 6:151 says 'min imlaq' (from current poverty) while 17:31 says 'khashyata imlaq' (fearing future poverty) — a significant difference in meaning."},
-  {"ayah1": "7:81",  "ayah2": "27:55",  "category": "ending_variation", "note": "Both describe Lot's people approaching men with desire but 7:81 ends with 'musrifun' (transgressors) while 27:55 ends with 'tajhalun' (acting ignorantly)."},
-  {"ayah1": "7:188", "ayah2": "10:49",  "category": "order_change",     "note": "Both have the Prophet saying he has no power over benefit or harm for himself, but 7:188 says 'naf'an wa la darran' while 10:49 reverses to 'darran wa la naf'an'."},
-  {"ayah1": "9:114", "ayah2": "11:75",  "category": "addition_omission","note": "Both describe Ibrahim as 'awwah halim' but 11:75 reverses the order to 'halim awwah' and adds 'munib' (ever-returning to Allah) at the end."},
-  {"ayah1": "15:1",  "ayah2": "27:1",   "category": "order_change",     "note": "15:1 says 'ayat al-kitabi wa Qur'anin mubin' while 27:1 says 'ayat al-Qur'ani wa kitabin mubin' — the words Quran and Kitab are swapped in position."},
-  {"ayah1": "16:66", "ayah2": "23:21",  "category": "pronoun_shift",    "note": "Both describe taking drink from the bellies of cattle but 16:66 uses the masculine 'butunihi' while 23:21 uses the feminine 'butuniha'."},
-  {"ayah1": "17:9",  "ayah2": "18:2",   "category": "word_swap",        "note": "Both end with giving glad tidings to the believers but 17:9 uses 'yubashiru' (indicative) while 18:2 uses 'yubashira' (subjunctive) — a single vowel difference in the verb form."},
-  {"ayah1": "18:72", "ayah2": "18:75",  "category": "addition_omission","note": "Khidr's repeated reproach to Musa — 18:72 says 'alam aqul innaka lan tastati'a' while 18:75 adds 'laka' after 'aqul', a single word difference tested in tajwid revision."},
-  {"ayah1": "19:15", "ayah2": "19:33",  "category": "pronoun_shift",    "note": "Both pronounce peace on the day of birth, death, and resurrection — 19:15 is Allah's third-person declaration about Yahya ('alayhi) while 19:33 is Isa speaking in first person ('alayya)."},
-  {"ayah1": "21:38", "ayah2": "36:48",  "category": "lafzi",            "note": "Both quote the disbelievers asking 'mata hadha al-wa'd in kuntum sadiqin' (When will this promise come, if you are truthful?) in near-verbatim wording across two surahs."},
-  {"ayah1": "21:91", "ayah2": "66:12",  "category": "pronoun_shift",    "note": "Both describe the divine spirit being breathed into Maryam but 21:91 uses 'fiha' (into her, feminine) while 66:12 uses 'fihi' (into it, masculine), referring to different grammatical antecedents."},
-  {"ayah1": "23:5",  "ayah2": "70:29",  "category": "lafzi",            "note": "Both use the identical phrase 'wa alladhina hum li furujihim hafizun' in parallel lists of believers' qualities — one in Al-Mu'minun and one in Al-Ma'arij."},
-  {"ayah1": "23:6",  "ayah2": "70:30",  "category": "lafzi",            "note": "The exception clause 'illa 'ala azwajihim aw ma malakat aymanuhum fa innahum ghayru malumun' appears word-for-word in both surahs immediately after the chastity verse."},
-  {"ayah1": "23:51", "ayah2": "34:11",  "category": "ending_variation", "note": "Both contain the command 'wa'malu salihan' (do righteous deeds) followed by a divine attribute but 23:51 ends with ''alim' (All-Knowing) while 34:11 ends with 'basir' (All-Seeing)."},
-  {"ayah1": "28:20", "ayah2": "36:20",  "category": "order_change",     "note": "Both say 'ja'a rajulun min aqsa al-madinah' but 28:20 places 'rajulun' before the location phrase while 36:20 places it after — 'min aqsa al-madinah rajulun'."},
-  {"ayah1": "29:62", "ayah2": "34:36",  "category": "ending_variation", "note": "Both state that Allah expands and restricts provision for whom He wills but 29:62 ends with 'bi kulli shay'in 'alim' while 34:36 ends with 'akthara al-nas la ya'lamun'."},
-  {"ayah1": "36:35", "ayah2": "36:73",  "category": "ending_variation", "note": "Both appear in Ya-Sin describing blessings from Allah's creation and end with 'afala yashkurun' — a within-surah lafzi pair that trips recitors mid-surah."},
-  {"ayah1": "37:47", "ayah2": "56:19",  "category": "word_swap",        "note": "Both describe the wine of Paradise as harmless but 37:47 uses 'la yunzafun' (they will not be drained/intoxicated) while 56:19 uses 'la yunzifun' — a root vowel shift changing the verb pattern."},
-  {"ayah1": "37:59", "ayah2": "44:35",  "category": "word_swap",        "note": "Both deny there is anything beyond the first death but 37:59 says 'mawtatana al-ula' while 44:35 says 'mawtatuna al-ula' — a single letter difference in the possessive suffix."},
-  {"ayah1": "38:74", "ayah2": "2:34",   "category": "addition_omission","note": "Both describe Iblis refusing to prostrate and being among the disbelievers but 38:74 adds 'istakbara' (acted arrogantly) before 'wa kana min al-kafirin', which 2:34 omits."},
-  {"ayah1": "40:56", "ayah2": "41:36",  "category": "ending_variation", "note": "Both counsel seeking refuge in Allah against arrogance or satanic whispers and end with 'al-Sami'' but 40:56 pairs it with 'al-Basir' while 41:36 pairs it with 'al-'Alim'."},
-  {"ayah1": "52:24", "ayah2": "56:17",  "category": "addition_omission","note": "Both describe immortal youths serving in Paradise but 52:24 adds the simile 'ka'annahum lu'lu'un maknun' (like preserved pearls) while 56:17 describes them without this simile."},
-
-  {"ayah1": "54:17", "ayah2": "54:22",  "category": "lafzi",            "note": "The refrain 'wa laqad yassarna al-Qur'ana lil-dhikri fa hal min muddakir' is repeated verbatim four times in Al-Qamar — 54:17 and 54:22 are the first two occurrences."},
-  {"ayah1": "54:32", "ayah2": "54:40",  "category": "lafzi",            "note": "54:32 and 54:40 are the third and fourth verbatim repetitions of the Al-Qamar refrain — sandwiching the stories of Thamud and Fir'awn."},
-
-  {"ayah1": "55:13", "ayah2": "55:16",  "category": "lafzi",            "note": "The refrain 'fa bi ayyi ala'i rabbikuma tukadhdhiban' is repeated 31 times in Al-Rahman — 55:13 and 55:16 are an adjacent pair."},
-  {"ayah1": "55:13", "ayah2": "55:18",  "category": "lafzi",            "note": "Repeated refrain of Al-Rahman — 55:13 and 55:18 are separated by two verses, testing whether the recitor continues or skips."},
-  {"ayah1": "55:13", "ayah2": "55:21",  "category": "lafzi",            "note": "Repeated refrain of Al-Rahman — 55:13 and 55:21."},
-  {"ayah1": "55:13", "ayah2": "55:23",  "category": "lafzi",            "note": "Repeated refrain of Al-Rahman — 55:13 and 55:23."},
-
-  {"ayah1": "56:8",  "ayah2": "56:27",  "category": "ending_variation", "note": "Both use the rhetorical question 'wa ashab al-yamin ma ashab al-yamin' but 56:8 introduces all three groups together while 56:27 begins the dedicated description of the Companions of the Right."},
-  {"ayah1": "56:74", "ayah2": "56:96",  "category": "lafzi",            "note": "The command 'fa sabbih bismi rabbika al-'azim' closes both the middle and the very end of Al-Waqi'ah in identical wording."},
-  {"ayah1": "56:74", "ayah2": "69:52",  "category": "lafzi",            "note": "The same closing command 'fa sabbih bismi rabbika al-'azim' appears identically at the end of Al-Waqi'ah and at the end of Al-Haqqah."},
-  {"ayah1": "59:23", "ayah2": "59:24",  "category": "ending_variation", "note": "Consecutive closing verses of Al-Hashr listing clusters of divine names — 59:23 ends with 'subhanallah 'amma yushrikun' while 59:24 ends with 'al-'aziz al-hakim'."},
-  {"ayah1": "67:3",  "ayah2": "71:15",  "category": "lafzi",            "note": "Both describe Allah creating seven heavens in layers using near-identical phrasing 'khalaqa sab'a samawatin tibaqan'."},
-  {"ayah1": "68:43", "ayah2": "70:44",  "category": "lafzi",            "note": "Both describe the disbelievers on the Day of Judgment with 'khashi'atan absaruhum tarhaquhum dhillah' in virtually identical wording across Al-Qalam and Al-Ma'arij."},
-  {"ayah1": "69:19", "ayah2": "84:7",   "category": "lafzi",            "note": "Both describe the person receiving their record in the right hand with 'fa amma man utiya kitabahu bi yaminihi' — the continuation differs between the two surahs."},
-  {"ayah1": "73:19", "ayah2": "74:54",  "category": "lafzi",            "note": "Both use 'fa man sha'a attakhadha ila rabbihi sabila' (let whoever wills take a path to his Lord) in near-verbatim form at the close of Al-Muzzammil and Al-Muddaththir."},
-  {"ayah1": "73:19", "ayah2": "76:29",  "category": "word_swap",        "note": "73:19 says 'fa man sha'a attakhadha ila rabbihi sabila' while 76:29 says 'fa man sha'a ittakhadha ila rabbihi sabila' — a subtle difference in verb form (attakhadha vs. ittakhadha)."},
-  {"ayah1": "74:54", "ayah2": "80:11",  "category": "pronoun_shift",    "note": "74:54 says 'innahu tadhkira' (masculine pronoun) while 80:11 says 'innaha tadhkira' (feminine) — a single letter that shifts the grammatical gender of the reference."},
-  {"ayah1": "78:4",  "ayah2": "78:5",   "category": "lafzi",            "note": "Consecutive verses both reading 'kalla sa ya'lamun' (No — they shall come to know) — an exact verbatim repetition used for rhetorical emphasis within the same surah."},
-  {"ayah1": "78:4",  "ayah2": "102:3",  "category": "word_swap",        "note": "Both use the 'kalla sa/sawfa ta'lamun' warning refrain but 78:4-5 uses 'sa ya'lamun' while 102:3-4 uses 'sawfa ta'lamun' with 'thumma kalla' escalating the second warning."},
-  {"ayah1": "81:6",  "ayah2": "82:3",   "category": "word_swap",        "note": "Both describe the seas at the Last Day but 81:6 says 'sujjirat' (set ablaze) while 82:3 says 'fujjirat' (made to burst forth) — same root structure, different verb."},
-  {"ayah1": "82:1",  "ayah2": "84:1",   "category": "word_swap",        "note": "Both describe the sky splitting open — 82:1 uses 'infatarat' while 84:1 uses 'inshaqqat' — two verbs from different roots with overlapping meaning."},
-  {"ayah1": "82:13", "ayah2": "83:22",  "category": "lafzi",            "note": "Both state 'inna al-abrar la fi na'im' (the righteous will indeed be in bliss) in identical wording across Al-Infitar and Al-Mutaffifin."},
-  {"ayah1": "83:7",  "ayah2": "83:19",  "category": "word_swap",        "note": "Both use the parallel rhetorical question 'wa ma adraka ma...' — 83:7-8 asks about Sijjin (record of the wicked) and 83:18-19 asks about 'Illiyyun (record of the righteous)."},
-  {"ayah1": "89:27", "ayah2": "89:28",  "category": "ending_variation", "note": "The address to the tranquil soul spans two short consecutive verses — 89:27 'ya ayyatuha al-nafs al-mutma'innah' and 89:28 'irji'i ila rabbiki radiyatan mardiyyah' — memorizers frequently merge or split them incorrectly."},
-  {"ayah1": "91:9",  "ayah2": "91:10",  "category": "word_swap",        "note": "Consecutive antithetical verses — 91:9 'qad aflaha man zakkaha' (successful is he who purifies it) and 91:10 'qad khaba man dassaha' (failed is he who buries it) — swapping them is a common error."},
-  {"ayah1": "93:6",  "ayah2": "93:8",   "category": "ending_variation", "note": "Verses 93:6, 93:7, and 93:8 form a trio of 'a lam yajidka' questions — the endings 'fa awa', 'fa hada', and 'fa aghna' are easy to mix up in sequence."},
-  {"ayah1": "94:5",  "ayah2": "94:6",   "category": "lafzi",            "note": "The promise 'fa inna ma'a al-'usri yusra' is repeated verbatim in back-to-back verses — one of the most cited consecutive lafzi pairs in all hifz instruction."},
-  {"ayah1": "101:6", "ayah2": "101:8",  "category": "word_swap",        "note": "Parallel conditional structures in Al-Qari'ah: 101:6 describes those with heavy scales entering a pleasing life while 101:8 describes those with light scales entering the Hawiyah — similar structure, opposite outcomes."},
-  {"ayah1": "102:3", "ayah2": "102:4",  "category": "addition_omission","note": "Both verses use 'kalla sawfa ta'lamun' but 102:4 adds 'thumma kalla' at the start, escalating the warning — omitting 'thumma' is a frequent recitation error."},
-  {"ayah1": "107:4", "ayah2": "107:5",  "category": "addition_omission","note": "107:4 says 'fa waylun lil-musallin' and 107:5 specifies 'alladhina hum 'an salatihim sahun' — memorizers often attach the qualifier from 107:5 directly to 107:4 or split them incorrectly."},
-  {"ayah1": "112:3", "ayah2": "112:4",  "category": "ending_variation", "note": "Final two verses of Al-Ikhlas — 112:3 'lam yalid wa lam yulad' and 112:4 'wa lam yakun lahu kufuwan ahad' — short and adjacent, often merged or their boundary misplaced."},
-
-  {"ayah1": "77:15", "ayah2": "77:19", "category": "lafzi", "note": "The refrain 'wa aylun yawma'idhin lil-mukadhdhibin' repeats 10 times in Al-Mursalat — 77:15 and 77:19 are the first two occurrences, following the cosmic signs of wind and water."},
-  {"ayah1": "77:19", "ayah2": "77:24", "category": "lafzi", "note": "Al-Mursalat refrain at 77:19 and 77:24 — the second and third repetitions, following the creation of the human from water."},
-  {"ayah1": "77:24", "ayah2": "77:28", "category": "lafzi", "note": "Al-Mursalat refrain at 77:24 and 77:28 — third and fourth occurrences, following the description of the lodging place on earth."},
-  {"ayah1": "77:28", "ayah2": "77:34", "category": "lafzi", "note": "Al-Mursalat refrain at 77:28 and 77:34 — the six-verse gap between these two occurrences makes it easy to resume the refrain at the wrong place."},
-  {"ayah1": "77:34", "ayah2": "77:37", "category": "lafzi", "note": "Al-Mursalat refrain at 77:34 and 77:37 — only three verses apart, making it easy to repeat the same occurrence twice in recitation."},
-  {"ayah1": "77:37", "ayah2": "77:40", "category": "lafzi", "note": "Al-Mursalat refrain at 77:37 and 77:40 — the seventh and eighth occurrences, surrounding the challenge 'fa in kana lakum kaydun fa kidun'."},
-  {"ayah1": "77:40", "ayah2": "77:45", "category": "lafzi", "note": "Al-Mursalat refrain at 77:40 and 77:45 — eighth and ninth occurrences, separated by the transitional command to the deniers."},
-  {"ayah1": "77:45", "ayah2": "77:47", "category": "lafzi", "note": "Al-Mursalat refrain at 77:45 and 77:47 — a two-verse gap, the tightest adjacency in the surah and a frequent source of merge errors."},
-  {"ayah1": "77:47", "ayah2": "77:49", "category": "lafzi", "note": "The final two occurrences of the Al-Mursalat refrain — 77:47 and 77:49, the ninth and tenth appearances, closing the surah's rhetorical structure."},
-
-  {"ayah1": "57:1",  "ayah2": "59:1",  "category": "word_swap",        "note": "57:1 opens 'sabbaha lillahi ma fi al-samawati wa al-ard' (no second 'ma fi') while 59:1 says 'wa ma fi al-ard' — a single-word insertion that is one of the most tested distinctions among the five Musabbihat surahs."},
-  {"ayah1": "59:1",  "ayah2": "61:1",  "category": "lafzi",            "note": "59:1 (Al-Hashr) and 61:1 (Al-Saff) are verbatim identical in their opening: 'sabbaha lillahi ma fi al-samawati wa ma fi al-ard wa huwa al-'aziz al-hakim'."},
-  {"ayah1": "62:1",  "ayah2": "64:1",  "category": "lafzi",            "note": "62:1 (Al-Jumu'ah) and 64:1 (Al-Taghabun) both open with 'yusabbihu lillahi ma fi al-samawati wa ma fi al-ard' using the present-tense form, in contrast to the past-tense 'sabbaha' of the other Musabbihat."},
-  {"ayah1": "57:1",  "ayah2": "62:1",  "category": "word_swap",        "note": "57:1 uses 'sabbaha' (past tense) while 62:1 uses 'yusabbihu' (present tense) — the tense shift across the Musabbihat surahs is a key awareness point for revision."},
-
-  {"ayah1": "55:16", "ayah2": "55:18", "category": "lafzi", "note": "Al-Rahman refrain at 55:16 and 55:18 — adjacent pair following the creation of humans and jinn from fire and clay."},
-  {"ayah1": "55:18", "ayah2": "55:21", "category": "lafzi", "note": "Al-Rahman refrain at 55:18 and 55:21 — following the description of the two easts and two wests."},
-  {"ayah1": "55:21", "ayah2": "55:23", "category": "lafzi", "note": "Al-Rahman refrain at 55:21 and 55:23 — following the description of pearls and coral from the two seas."},
-  {"ayah1": "55:23", "ayah2": "55:25", "category": "lafzi", "note": "Al-Rahman refrain at 55:23 and 55:25 — adjacent pair surrounding the description of the ships sailing like mountains."},
-  {"ayah1": "55:25", "ayah2": "55:28", "category": "lafzi", "note": "Al-Rahman refrain at 55:25 and 55:28 — following the declaration that all on earth will perish."},
-  {"ayah1": "55:28", "ayah2": "55:30", "category": "lafzi", "note": "Al-Rahman refrain at 55:28 and 55:30 — surrounding the verse about everything asking of Allah."},
-  {"ayah1": "55:30", "ayah2": "55:32", "category": "lafzi", "note": "Al-Rahman refrain at 55:30 and 55:32 — the refrain pair closest to the center of the surah, following the promise to attend to mankind and jinn."},
-  {"ayah1": "55:32", "ayah2": "55:34", "category": "lafzi", "note": "Al-Rahman refrain at 55:32 and 55:34 — following the challenge to pass beyond the regions of the heavens."},
-  {"ayah1": "55:34", "ayah2": "55:36", "category": "lafzi", "note": "Al-Rahman refrain at 55:34 and 55:36 — following the flames of fire and smoke sent against jinn and man."},
-  {"ayah1": "55:36", "ayah2": "55:38", "category": "lafzi", "note": "Al-Rahman refrain at 55:36 and 55:38 — following the splitting of the sky like red hide on the Day of Judgment."},
-  {"ayah1": "55:38", "ayah2": "55:40", "category": "lafzi", "note": "Al-Rahman refrain at 55:38 and 55:40 — following the questioning of man and jinn about their sins on the Day."},
-  {"ayah1": "55:40", "ayah2": "55:42", "category": "lafzi", "note": "Al-Rahman refrain at 55:40 and 55:42 — following the description of the criminals known by their marks."},
-  {"ayah1": "55:42", "ayah2": "55:45", "category": "lafzi", "note": "Al-Rahman refrain at 55:42 and 55:45 — following the description of Hell with its boiling water."},
-  {"ayah1": "55:45", "ayah2": "55:47", "category": "lafzi", "note": "Al-Rahman refrain at 55:45 and 55:47 — the transition into the Jannah sections of the surah."},
-  {"ayah1": "55:47", "ayah2": "55:49", "category": "lafzi", "note": "Al-Rahman refrain at 55:47 and 55:49 — within the first description of the two gardens and their spreading branches."},
-  {"ayah1": "55:49", "ayah2": "55:51", "category": "lafzi", "note": "Al-Rahman refrain at 55:49 and 55:51 — following the two flowing springs."},
-  {"ayah1": "55:51", "ayah2": "55:53", "category": "lafzi", "note": "Al-Rahman refrain at 55:51 and 55:53 — following the description of every kind of fruit in pairs."},
-  {"ayah1": "55:53", "ayah2": "55:55", "category": "lafzi", "note": "Al-Rahman refrain at 55:53 and 55:55 — following the description of the believers reclining on carpets."},
-  {"ayah1": "55:55", "ayah2": "55:57", "category": "lafzi", "note": "Al-Rahman refrain at 55:55 and 55:57 — following the description of the houris with averted gazes, untouched by man or jinn."},
-  {"ayah1": "55:57", "ayah2": "55:59", "category": "lafzi", "note": "Al-Rahman refrain at 55:57 and 55:59 — following the likening of the houris to rubies and coral."},
-  {"ayah1": "55:59", "ayah2": "55:61", "category": "lafzi", "note": "Al-Rahman refrain at 55:59 and 55:61 — following the verse stating that no reward for good is anything but good."},
-  {"ayah1": "55:61", "ayah2": "55:63", "category": "lafzi", "note": "Al-Rahman refrain at 55:61 and 55:63 — the transition into the second pair of gardens."},
-  {"ayah1": "55:63", "ayah2": "55:65", "category": "lafzi", "note": "Al-Rahman refrain at 55:63 and 55:65 — within the description of the two dark-green gardens."},
-  {"ayah1": "55:65", "ayah2": "55:67", "category": "lafzi", "note": "Al-Rahman refrain at 55:65 and 55:67 — following the two gushing springs."},
-  {"ayah1": "55:67", "ayah2": "55:69", "category": "lafzi", "note": "Al-Rahman refrain at 55:67 and 55:69 — following the fruits, palms, and pomegranates."},
-  {"ayah1": "55:69", "ayah2": "55:71", "category": "lafzi", "note": "Al-Rahman refrain at 55:69 and 55:71 — following the description of the good, beautiful companions."},
-  {"ayah1": "55:71", "ayah2": "55:73", "category": "lafzi", "note": "Al-Rahman refrain at 55:71 and 55:73 — following the houris secluded in pavilions."},
-  {"ayah1": "55:73", "ayah2": "55:75", "category": "lafzi", "note": "Al-Rahman refrain at 55:73 and 55:75 — following the houris untouched by man or jinn before them."},
-  {"ayah1": "55:75", "ayah2": "55:77", "category": "lafzi", "note": "Al-Rahman refrain at 55:75 and 55:77 — the final two occurrences, closing the description of the second pair of gardens and the surah itself."},
-
-  {"ayah1": "99:7",  "ayah2": "99:8",  "category": "word_swap",        "note": "Az-Zalzalah closes with a mirror pair: 99:7 'fa man ya'mal mithqal dharratin khayran yarahu' and 99:8 'wa man ya'mal mithqala dharratin sharran yarahu' — khayran vs sharran is the only change."},
-  {"ayah1": "109:2", "ayah2": "109:4", "category": "word_swap",        "note": "109:2 'la a'budu ma ta'budun' (verbal sentence) and 109:4 'wa la ana 'abidun ma 'abadtum' (nominal sentence) cover the same meaning in different grammatical forms — a subtle internal shift memorizers frequently conflate."},
-  {"ayah1": "109:3", "ayah2": "109:5", "category": "lafzi",            "note": "109:3 and 109:5 are verbatim identical: 'wa la antum 'abiduna ma a'bud' — a repeated verse within the same six-verse surah, easy to recite twice or skip entirely."},
-  {"ayah1": "113:1", "ayah2": "114:1", "category": "word_swap",        "note": "Both opening verses begin with 'qul a'udhu bi rabb' but differ in the next word: 'al-falaq' in Al-Falaq vs 'al-nas' in Al-Nas — reciting one opening with the other's continuation is a common error in nightly prayers."},
-  {"ayah1": "87:1",  "ayah2": "56:74", "category": "word_swap",        "note": "87:1 'sabbih isma rabbika al-a'la' and 56:74 'fa sabbih bismi rabbika al-'azim' both command glorifying the Lord's name but differ in the divine attribute: al-a'la (Most High) vs al-'azim (Most Great)."},
-  {"ayah1": "84:7",  "ayah2": "84:10", "category": "word_swap",        "note": "84:7 'fa amma man utiya kitabahu bi yaminihi' and 84:10 'wa amma man utiya kitabahu wara'a zahrihi' are the parallel conditionals in Al-Inshiqaq — right hand vs behind the back."},
-  {"ayah1": "88:1",  "ayah2": "79:15", "category": "word_swap",        "note": "88:1 'hal ataka hadith al-ghashiyah' and 79:15 'hal ataka hadith Musa' both use the rhetorical 'hal ataka hadith...' (Has the account of ... reached you?) formula — the same opening introducing different narratives."},
-  {"ayah1": "92:5",  "ayah2": "92:8",  "category": "word_swap",        "note": "92:5 'fa amma man a'ta wa ittaqa' and 92:8 'wa amma man bakhila wa istagh-na' form the antithetical frame of Al-Layl — fa amma / wa amma parallels with opposite consequences."},
-  {"ayah1": "95:4",  "ayah2": "95:5",  "category": "ending_variation", "note": "95:4 'la qad khalaqna al-insan fi ahsan taqwim' and 95:5 'thumma radadnahu asfala safilin' are the core antithetical pair of At-Tin — the boundary between these consecutive verses is frequently misplaced."},
-  {"ayah1": "96:1",  "ayah2": "96:3",  "category": "word_swap",        "note": "96:1 'iqra' bismi rabbika alladhi khalaq' and 96:3 'iqra' wa rabbuka al-akram' both begin with the command 'iqra'' but continue differently — the repeated command two verses apart with a different continuation."},
-  {"ayah1": "85:1",  "ayah2": "86:1",  "category": "word_swap",        "note": "85:1 'wa al-sama' dhati al-buruj' and 86:1 'wa al-sama' wa al-tariq' are back-to-back surah openings both beginning with an oath by the sky — al-buruj (the constellations) vs al-tariq (the night-comer)."},
-
-  {"ayah1": "36:82", "ayah2": "40:68", "category": "lafzi",            "note": "Both contain the identical phrase 'innama amruhu idha arada shay'an an yaqula lahu kun fa yakun' — a verbatim lafzi match across Ya-Sin and Ghafir."},
-  {"ayah1": "50:39", "ayah2": "20:130","category": "word_swap",        "note": "50:39 'fa isbir 'ala ma yaquluna wa sabbih bi hamdi rabbika qabla tuluu' al-shams wa qabla al-ghurub' and 20:130 are nearly identical but 20:130 adds 'qabla ghurubaha' with the feminine pronoun — a single-letter difference that recitors frequently miss."},
-  {"ayah1": "75:31", "ayah2": "75:32", "category": "word_swap",        "note": "75:31 'fa la saddaqa wa la salla' and 75:32 'wa lakin kadhdhaba wa tawalla' are a consecutive antithetical pair in Al-Qiyamah whose parallel structure makes the verse boundary easy to misplace."},
-  {"ayah1": "60:4",  "ayah2": "60:6",  "category": "word_swap",        "note": "60:4 'qad kanat lakum uswatun hasanatun fi Ibrahim' and 60:6 'laqad kana lakum fihim uswatun hasanatun' both invoke Ibrahim as an example in Al-Mumtahanah but differ in the introductory verb and preposition."},
-  {"ayah1": "2:62",  "ayah2": "5:69",  "category": "order_change",     "note": "Both list the four groups — believers, Jews, Christians, and Sabians — in an identical promise formula but 2:62 uses 'wa al-sabi'ina' while 5:69 shifts to 'wa al-sabi'una', a grammatical case change alongside the same sequence."},
-  {"ayah1": "2:146", "ayah2": "6:20",  "category": "lafzi",            "note": "Both contain the identical phrase 'ya'rifunahu kama ya'rifuna abna'ahum' (they recognize him as they recognize their own sons) — in 2:146 about recognizing the qiblah, in 6:20 about recognizing the Prophet."},
-  {"ayah1": "2:197", "ayah2": "3:97",  "category": "lafzi",            "note": "Both close their Hajj-obligation passages with the identical phrase 'wa Allahu ghaniyyun 'an al-'alamin' (Allah is self-sufficient from the worlds) — 2:197 in the context of the Hajj months, 3:97 after 'wa lillahi 'ala al-nas hijj al-bayt'."},
-  {"ayah1": "2:126", "ayah2": "14:35", "category": "word_swap",        "note": "2:126 'Rabbi aj'al hadha baladan aminan' uses the indefinite 'baladan' while 14:35 'Rabbi aj'al hadha al-balad aminan' uses the definite 'al-balad' — Ibrahim's prayer for Mecca appears twice with this single article difference."},
-  {"ayah1": "4:36",  "ayah2": "17:23", "category": "order_change",     "note": "Both command worshipping Allah alone and treating parents with goodness (ihsan) — 4:36 says 'u'budu Allah wa la tushrikuu bihi... wa bil-walidayni ihsana' while 17:23 says 'alla ta'budu illa iyyahu wa bil-walidayni ihsana' with a different construction."},
-  {"ayah1": "31:14", "ayah2": "46:15", "category": "word_swap",        "note": "31:14 'wa wasayna al-insana bi walidayhi' and 46:15 'wa wasayna al-insan bi walidayhi ihsana' both open with the same wasiyyah formula about parents — 46:15 adds 'ihsana' which 31:14 does not carry at that point."},
-  {"ayah1": "16:78", "ayah2": "23:78", "category": "lafzi",            "note": "Both list 'al-sam'a wa al-absar wa al-af'idah' as divine gifts — 16:78 says 'wa ja'ala lakum al-sam'a wa al-absar wa al-af'idah la'allakum tashkurun' and 23:78 uses 'qalilan ma tashkurun' instead — same triad, different closing."},
-  {"ayah1": "23:78", "ayah2": "32:9",  "category": "lafzi",            "note": "23:78 and 32:9 both list the hearing-sight-hearts triad with the identical ending 'qalilan ma tashkurun' — the same gift acknowledged with the same blame for ingratitude."},
-  {"ayah1": "32:9",  "ayah2": "67:23", "category": "lafzi",            "note": "32:9 and 67:23 both list 'al-sam'a wa al-absar wa al-af'idah qalilan ma tashkurun' in almost identical wording — a four-surah cluster (16, 23, 32, 67) that forms one of the Quran's most repeated triad phrases."},
-  {"ayah1": "4:13",  "ayah2": "4:14",  "category": "ending_variation", "note": "Consecutive antithetical verses — 4:13 ends with 'wa dhalika al-fawz al-'azim' (the great attainment) for those who obey Allah and 4:14 ends with 'wa lahu 'adhabun muhin' (a humiliating punishment) for those who disobey — parallel structure with opposite outcomes."},
-  {"ayah1": "54:22", "ayah2": "54:32", "category": "lafzi",            "note": "54:22 and 54:32 are the second and third occurrences of the Al-Qamar refrain — completing the middle pair and sandwiching the stories of 'Ad and Thamud between each repetition."},
-  {"ayah1": "3:8",   "ayah2": "3:9",   "category": "ending_variation", "note": "Consecutive Rabbana supplications in Ali Imran — 3:8 ends with 'innaka anta al-wahhab' and 3:9 ends with 'inna Allah la yukhlif al-mi'ad' — the two duas follow each other and their endings are easy to swap."},
-  {"ayah1": "3:191", "ayah2": "3:192", "category": "ending_variation", "note": "Consecutive Rabbana duas closing Ali Imran — 3:191 ends with 'fa qina 'adhab al-nar' and 3:192 ends with 'wa ma lil-zalimin min ansar' — short back-to-back supplications whose endings are a common memorization confusion."},
-  {"ayah1": "9:111", "ayah2": "61:10", "category": "word_swap",        "note": "9:111 'inna Allah ishtara mina al-mu'minin anfusahum wa amwalahum bi anna lahum al-jannah' and 61:10-11 both describe the divine exchange of lives and wealth for Paradise — the same 'anfus + amwal' pair appears in both, but with different wording and context."},
-  {"ayah1": "80:17", "ayah2": "74:19", "category": "word_swap",        "note": "80:17 'qutila al-insan ma akfarah' (cursed is man, how ungrateful he is) and 74:19 'qutila kayfa qaddar' (cursed is how he calculated) both use the exclamatory 'qutila' curse formula with different objects — man's ingratitude vs man's planning."},
-
-  {"ayah1": "2:40",  "ayah2": "5:20",  "category": "word_swap",        "note": "2:40 'ya bani Isra'il udhkuru ni'mati allati an'amtu 'alaykum' and 5:20 'ya qawmi udhkuru ni'mat Allah 'alaykum' both begin with the reminder of Allah's favor — the Baqarah address is to Bani Isra'il while Al-Ma'idah quotes Musa addressing his people."},
-  {"ayah1": "17:31", "ayah2": "6:151", "category": "word_swap",        "note": "Already indexed — this pair notes that 17:31 adds 'khashyata imlaq' (fearing poverty) while 6:151 says 'min imlaq' (from current poverty), reversing the emphasis on when the poverty occurs."},
-  {"ayah1": "2:233", "ayah2": "65:6",  "category": "word_swap",        "note": "2:233 and 65:6 both address nursing, child custody, and parental rights after separation using similar legal language — the primary Baqarah passage and the At-Talaq parallel share much of the same vocabulary."},
-  {"ayah1": "7:40",  "ayah2": "7:41",  "category": "ending_variation", "note": "Consecutive penalty verses for those who deny the signs — 7:40 ends with 'wa kadhalika najzi al-mujrimin' and 7:41 ends with 'wa kadhalika najzi al-zalimin' — a single word difference (mujrimin vs zalimin) in back-to-back verse endings."},
-  {"ayah1": "2:25",  "ayah2": "3:15",  "category": "word_swap",        "note": "2:25 describes the rivers of Paradise 'tajri min tahtiha al-anhar' in its reward promise for believers, while 3:15 echoes the same Paradise promise in nearly identical terms — both use 'jannatin tajri min tahtiha al-anhar' in a reward context."},
-  {"ayah1": "11:90", "ayah2": "85:14", "category": "lafzi",            "note": "11:90 'inna rabbi rahimun wadud' and 85:14 'wa huwa al-ghafur al-wadud' both pair Allah's name 'al-Wadud' (the Loving) with another attribute — 11:90 with 'rahimun' and 85:14 with 'al-ghafur' — making 'Wadud' the anchor word for both."},
-  {"ayah1": "69:19", "ayah2": "69:25", "category": "word_swap",        "note": "69:19 'fa amma man utiya kitabahu bi yaminihi' and 69:25 'wa amma man utiya kitabahu bi shimalihi' form the primary parallel pair of Al-Haqqah — right hand vs left hand, with the continuation of each differing entirely."},
-  {"ayah1": "18:29", "ayah2": "76:3",  "category": "word_swap",        "note": "18:29 'fa man sha'a fa l-yu'min wa man sha'a fa l-yakfur' and 76:3 'inna hadaynahu al-sabil imma shakiran wa imma kafura' both state that guidance is given and humans choose — one in a threat context, the other in a declaration of human freedom."}
+  {
+    "ayah1": "60:8",
+    "ayah2": "60:9",
+    "category": "word_swap",
+    "note": "Both begin identically but 60:8 says 'lam yuqatilukum' (did not fight you) while 60:9 says 'qatalukum' (fought you), changing the ruling entirely."
+  },
+  {
+    "ayah1": "2:255",
+    "ayah2": "3:2",
+    "category": "lafzi",
+    "note": "Both open with 'Allahu la ilaha illa huwa al-Hayy al-Qayyum' — word-for-word identical divine attribute declaration."
+  },
+  {
+    "ayah1": "2:255",
+    "ayah2": "20:111",
+    "category": "lafzi",
+    "note": "Both contain 'al-Hayy al-Qayyum' as paired divine names but in different contexts — Ayat al-Kursi vs. the Day of Judgment."
+  },
+  {
+    "ayah1": "3:2",
+    "ayah2": "20:111",
+    "category": "lafzi",
+    "note": "Both contain 'al-Hayy al-Qayyum' — the third occurrence of this divine attribute pairing in the Quran."
+  },
+  {
+    "ayah1": "2:48",
+    "ayah2": "2:123",
+    "category": "order_change",
+    "note": "Both warn that no intercession or ransom will be accepted on the Day, but 2:48 places 'shafa'ah' before ''adl' while 2:123 reverses the order."
+  },
+  {
+    "ayah1": "2:58",
+    "ayah2": "7:161",
+    "category": "order_change",
+    "note": "Both command entering saying 'hittah' while prostrating, but the order of 'sujjadan' and 'hittah' is reversed between the two verses."
+  },
+  {
+    "ayah1": "2:60",
+    "ayah2": "7:160",
+    "category": "word_swap",
+    "note": "Both describe water springing from the rock for Moses but 2:60 uses 'infajarat' (burst strongly) while 7:160 uses 'inbajassat' (gushed forth)."
+  },
+  {
+    "ayah1": "2:136",
+    "ayah2": "3:84",
+    "category": "word_swap",
+    "note": "Both declare belief in all the prophets with near-identical wording but differ in 'ilayna'/'alayna' and the phrasing of 'what was given to the prophets'."
+  },
+  {
+    "ayah1": "2:242",
+    "ayah2": "3:103",
+    "category": "ending_variation",
+    "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 2:242 ends with 'ta'qilun' (reason) and 3:103 ends with 'tahtadun' (be guided)."
+  },
+  {
+    "ayah1": "2:285",
+    "ayah2": "2:286",
+    "category": "ending_variation",
+    "note": "Closing verses of Al-Baqarah in the same passage — both are supplications but differ in ending: 2:285 ends with 'wa ilayka al-masir' and 2:286 ends with 'fansurna 'ala al-qawm al-kafirin'."
+  },
+  {
+    "ayah1": "3:3",
+    "ayah2": "5:48",
+    "category": "addition_omission",
+    "note": "Both describe the Quran as 'musaddiqan lima bayna yadayhi' but 5:48 adds 'wa muhaymina 'alayhi' (a guardian over it) which is absent in 3:3."
+  },
+  {
+    "ayah1": "3:47",
+    "ayah2": "19:35",
+    "category": "word_swap",
+    "note": "Both contain the divine command 'kun fayakun' in the context of miraculous creation but differ in the connecting particles and surrounding phrase structure."
+  },
+  {
+    "ayah1": "3:49",
+    "ayah2": "5:110",
+    "category": "pronoun_shift",
+    "note": "Both list the miracles of Isa in nearly identical language but 3:49 uses 'fihi' (masculine pronoun for the bird) while 5:110 uses 'fiha' (feminine)."
+  },
+  {
+    "ayah1": "3:103",
+    "ayah2": "5:89",
+    "category": "ending_variation",
+    "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 3:103 ends with 'tahtadun' (be guided) and 5:89 ends with 'tashkurun' (be grateful)."
+  },
+  {
+    "ayah1": "3:126",
+    "ayah2": "8:10",
+    "category": "word_swap",
+    "note": "Both reassure believers that victory comes only from Allah and end with 'azizun hakim' but differ in the pronoun and the structure of the preceding clause."
+  },
+  {
+    "ayah1": "4:135",
+    "ayah2": "5:8",
+    "category": "order_change",
+    "note": "Both command standing firmly for justice as witnesses for Allah, but 4:135 says 'qawwamina bi al-qist shuhada'a lillah' while 5:8 reverses to 'qawwamina lillahi shuhada'a bi al-qist'."
+  },
+  {
+    "ayah1": "6:50",
+    "ayah2": "11:31",
+    "category": "addition_omission",
+    "note": "Both have the prophet declaring 'I do not say I possess the treasures of Allah nor that I am an angel' but 6:50 adds 'lakum' (to you) in 'wa la aqulu lakum inni malak' while 11:31 omits it."
+  },
+  {
+    "ayah1": "6:151",
+    "ayah2": "17:31",
+    "category": "word_swap",
+    "note": "Both forbid killing children out of poverty but 6:151 says 'min imlaq' (from current poverty) while 17:31 says 'khashyata imlaq' (fearing future poverty) — a significant difference in meaning."
+  },
+  {
+    "ayah1": "7:81",
+    "ayah2": "27:55",
+    "category": "ending_variation",
+    "note": "Both describe Lot's people approaching men with desire but 7:81 ends with 'musrifun' (transgressors) while 27:55 ends with 'tajhalun' (acting ignorantly)."
+  },
+  {
+    "ayah1": "7:188",
+    "ayah2": "10:49",
+    "category": "order_change",
+    "note": "Both have the Prophet saying he has no power over benefit or harm for himself, but 7:188 says 'naf'an wa la darran' while 10:49 reverses to 'darran wa la naf'an'."
+  },
+  {
+    "ayah1": "9:114",
+    "ayah2": "11:75",
+    "category": "addition_omission",
+    "note": "Both describe Ibrahim as 'awwah halim' but 11:75 reverses the order to 'halim awwah' and adds 'munib' (ever-returning to Allah) at the end."
+  },
+  {
+    "ayah1": "15:1",
+    "ayah2": "27:1",
+    "category": "order_change",
+    "note": "15:1 says 'ayat al-kitabi wa Qur'anin mubin' while 27:1 says 'ayat al-Qur'ani wa kitabin mubin' — the words Quran and Kitab are swapped in position."
+  },
+  {
+    "ayah1": "16:66",
+    "ayah2": "23:21",
+    "category": "pronoun_shift",
+    "note": "Both describe taking drink from the bellies of cattle but 16:66 uses the masculine 'butunihi' while 23:21 uses the feminine 'butuniha'."
+  },
+  {
+    "ayah1": "17:9",
+    "ayah2": "18:2",
+    "category": "word_swap",
+    "note": "Both end with giving glad tidings to the believers but 17:9 uses 'yubashiru' (indicative) while 18:2 uses 'yubashira' (subjunctive) — a single vowel difference in the verb form."
+  },
+  {
+    "ayah1": "18:72",
+    "ayah2": "18:75",
+    "category": "addition_omission",
+    "note": "Khidr's repeated reproach to Musa — 18:72 says 'alam aqul innaka lan tastati'a' while 18:75 adds 'laka' after 'aqul', a single word difference tested in tajwid revision."
+  },
+  {
+    "ayah1": "19:15",
+    "ayah2": "19:33",
+    "category": "pronoun_shift",
+    "note": "Both pronounce peace on the day of birth, death, and resurrection — 19:15 is Allah's third-person declaration about Yahya ('alayhi) while 19:33 is Isa speaking in first person ('alayya)."
+  },
+  {
+    "ayah1": "21:38",
+    "ayah2": "36:48",
+    "category": "lafzi",
+    "note": "Both quote the disbelievers asking 'mata hadha al-wa'd in kuntum sadiqin' (When will this promise come, if you are truthful?) in near-verbatim wording across two surahs."
+  },
+  {
+    "ayah1": "21:91",
+    "ayah2": "66:12",
+    "category": "pronoun_shift",
+    "note": "Both describe the divine spirit being breathed into Maryam but 21:91 uses 'fiha' (into her, feminine) while 66:12 uses 'fihi' (into it, masculine), referring to different grammatical antecedents."
+  },
+  {
+    "ayah1": "23:5",
+    "ayah2": "70:29",
+    "category": "lafzi",
+    "note": "Both use the identical phrase 'wa alladhina hum li furujihim hafizun' in parallel lists of believers' qualities — one in Al-Mu'minun and one in Al-Ma'arij."
+  },
+  {
+    "ayah1": "23:6",
+    "ayah2": "70:30",
+    "category": "lafzi",
+    "note": "The exception clause 'illa 'ala azwajihim aw ma malakat aymanuhum fa innahum ghayru malumun' appears word-for-word in both surahs immediately after the chastity verse."
+  },
+  {
+    "ayah1": "23:51",
+    "ayah2": "34:11",
+    "category": "ending_variation",
+    "note": "Both contain the command 'wa'malu salihan' (do righteous deeds) followed by a divine attribute but 23:51 ends with ''alim' (All-Knowing) while 34:11 ends with 'basir' (All-Seeing)."
+  },
+  {
+    "ayah1": "28:20",
+    "ayah2": "36:20",
+    "category": "order_change",
+    "note": "Both say 'ja'a rajulun min aqsa al-madinah' but 28:20 places 'rajulun' before the location phrase while 36:20 places it after — 'min aqsa al-madinah rajulun'."
+  },
+  {
+    "ayah1": "29:62",
+    "ayah2": "34:36",
+    "category": "ending_variation",
+    "note": "Both state that Allah expands and restricts provision for whom He wills but 29:62 ends with 'bi kulli shay'in 'alim' while 34:36 ends with 'akthara al-nas la ya'lamun'."
+  },
+  {
+    "ayah1": "36:35",
+    "ayah2": "36:73",
+    "category": "ending_variation",
+    "note": "Both appear in Ya-Sin describing blessings from Allah's creation and end with 'afala yashkurun' — a within-surah lafzi pair that trips recitors mid-surah."
+  },
+  {
+    "ayah1": "37:47",
+    "ayah2": "56:19",
+    "category": "word_swap",
+    "note": "Both describe the wine of Paradise as harmless but 37:47 uses 'la yunzafun' (they will not be drained/intoxicated) while 56:19 uses 'la yunzifun' — a root vowel shift changing the verb pattern."
+  },
+  {
+    "ayah1": "37:59",
+    "ayah2": "44:35",
+    "category": "word_swap",
+    "note": "Both deny there is anything beyond the first death but 37:59 says 'mawtatana al-ula' while 44:35 says 'mawtatuna al-ula' — a single letter difference in the possessive suffix."
+  },
+  {
+    "ayah1": "38:74",
+    "ayah2": "2:34",
+    "category": "addition_omission",
+    "note": "Both describe Iblis refusing to prostrate and being among the disbelievers but 38:74 adds 'istakbara' (acted arrogantly) before 'wa kana min al-kafirin', which 2:34 omits."
+  },
+  {
+    "ayah1": "40:56",
+    "ayah2": "41:36",
+    "category": "ending_variation",
+    "note": "Both counsel seeking refuge in Allah against arrogance or satanic whispers and end with 'al-Sami'' but 40:56 pairs it with 'al-Basir' while 41:36 pairs it with 'al-'Alim'."
+  },
+  {
+    "ayah1": "52:24",
+    "ayah2": "56:17",
+    "category": "addition_omission",
+    "note": "Both describe immortal youths serving in Paradise but 52:24 adds the simile 'ka'annahum lu'lu'un maknun' (like preserved pearls) while 56:17 describes them without this simile."
+  },
+  {
+    "ayah1": "54:17",
+    "ayah2": "54:22",
+    "category": "lafzi",
+    "note": "The refrain 'wa laqad yassarna al-Qur'ana lil-dhikri fa hal min muddakir' is repeated verbatim four times in Al-Qamar — 54:17 and 54:22 are the first two occurrences."
+  },
+  {
+    "ayah1": "54:32",
+    "ayah2": "54:40",
+    "category": "lafzi",
+    "note": "54:32 and 54:40 are the third and fourth verbatim repetitions of the Al-Qamar refrain — sandwiching the stories of Thamud and Fir'awn."
+  },
+  {
+    "ayah1": "55:13",
+    "ayah2": "55:16",
+    "category": "lafzi",
+    "note": "The refrain 'fa bi ayyi ala'i rabbikuma tukadhdhiban' is repeated 31 times in Al-Rahman — 55:13 and 55:16 are an adjacent pair."
+  },
+  {
+    "ayah1": "55:13",
+    "ayah2": "55:18",
+    "category": "lafzi",
+    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:18 are separated by two verses, testing whether the recitor continues or skips."
+  },
+  {
+    "ayah1": "55:13",
+    "ayah2": "55:21",
+    "category": "lafzi",
+    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:21."
+  },
+  {
+    "ayah1": "55:13",
+    "ayah2": "55:23",
+    "category": "lafzi",
+    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:23."
+  },
+  {
+    "ayah1": "56:8",
+    "ayah2": "56:27",
+    "category": "ending_variation",
+    "note": "Both use the rhetorical question 'wa ashab al-yamin ma ashab al-yamin' but 56:8 introduces all three groups together while 56:27 begins the dedicated description of the Companions of the Right."
+  },
+  {
+    "ayah1": "56:74",
+    "ayah2": "56:96",
+    "category": "lafzi",
+    "note": "The command 'fa sabbih bismi rabbika al-'azim' closes both the middle and the very end of Al-Waqi'ah in identical wording."
+  },
+  {
+    "ayah1": "56:74",
+    "ayah2": "69:52",
+    "category": "lafzi",
+    "note": "The same closing command 'fa sabbih bismi rabbika al-'azim' appears identically at the end of Al-Waqi'ah and at the end of Al-Haqqah."
+  },
+  {
+    "ayah1": "59:23",
+    "ayah2": "59:24",
+    "category": "ending_variation",
+    "note": "Consecutive closing verses of Al-Hashr listing clusters of divine names — 59:23 ends with 'subhanallah 'amma yushrikun' while 59:24 ends with 'al-'aziz al-hakim'."
+  },
+  {
+    "ayah1": "67:3",
+    "ayah2": "71:15",
+    "category": "lafzi",
+    "note": "Both describe Allah creating seven heavens in layers using near-identical phrasing 'khalaqa sab'a samawatin tibaqan'."
+  },
+  {
+    "ayah1": "68:43",
+    "ayah2": "70:44",
+    "category": "lafzi",
+    "note": "Both describe the disbelievers on the Day of Judgment with 'khashi'atan absaruhum tarhaquhum dhillah' in virtually identical wording across Al-Qalam and Al-Ma'arij."
+  },
+  {
+    "ayah1": "69:19",
+    "ayah2": "84:7",
+    "category": "lafzi",
+    "note": "Both describe the person receiving their record in the right hand with 'fa amma man utiya kitabahu bi yaminihi' — the continuation differs between the two surahs."
+  },
+  {
+    "ayah1": "73:19",
+    "ayah2": "74:54",
+    "category": "lafzi",
+    "note": "Both use 'fa man sha'a attakhadha ila rabbihi sabila' (let whoever wills take a path to his Lord) in near-verbatim form at the close of Al-Muzzammil and Al-Muddaththir."
+  },
+  {
+    "ayah1": "73:19",
+    "ayah2": "76:29",
+    "category": "word_swap",
+    "note": "73:19 says 'fa man sha'a attakhadha ila rabbihi sabila' while 76:29 says 'fa man sha'a ittakhadha ila rabbihi sabila' — a subtle difference in verb form (attakhadha vs. ittakhadha)."
+  },
+  {
+    "ayah1": "74:54",
+    "ayah2": "80:11",
+    "category": "pronoun_shift",
+    "note": "74:54 says 'innahu tadhkira' (masculine pronoun) while 80:11 says 'innaha tadhkira' (feminine) — a single letter that shifts the grammatical gender of the reference."
+  },
+  {
+    "ayah1": "78:4",
+    "ayah2": "78:5",
+    "category": "lafzi",
+    "note": "Consecutive verses both reading 'kalla sa ya'lamun' (No — they shall come to know) — an exact verbatim repetition used for rhetorical emphasis within the same surah."
+  },
+  {
+    "ayah1": "78:4",
+    "ayah2": "102:3",
+    "category": "word_swap",
+    "note": "Both use the 'kalla sa/sawfa ta'lamun' warning refrain but 78:4-5 uses 'sa ya'lamun' while 102:3-4 uses 'sawfa ta'lamun' with 'thumma kalla' escalating the second warning."
+  },
+  {
+    "ayah1": "81:6",
+    "ayah2": "82:3",
+    "category": "word_swap",
+    "note": "Both describe the seas at the Last Day but 81:6 says 'sujjirat' (set ablaze) while 82:3 says 'fujjirat' (made to burst forth) — same root structure, different verb."
+  },
+  {
+    "ayah1": "82:1",
+    "ayah2": "84:1",
+    "category": "word_swap",
+    "note": "Both describe the sky splitting open — 82:1 uses 'infatarat' while 84:1 uses 'inshaqqat' — two verbs from different roots with overlapping meaning."
+  },
+  {
+    "ayah1": "82:13",
+    "ayah2": "83:22",
+    "category": "lafzi",
+    "note": "Both state 'inna al-abrar la fi na'im' (the righteous will indeed be in bliss) in identical wording across Al-Infitar and Al-Mutaffifin."
+  },
+  {
+    "ayah1": "83:7",
+    "ayah2": "83:19",
+    "category": "word_swap",
+    "note": "Both use the parallel rhetorical question 'wa ma adraka ma...' — 83:7-8 asks about Sijjin (record of the wicked) and 83:18-19 asks about 'Illiyyun (record of the righteous)."
+  },
+  {
+    "ayah1": "89:27",
+    "ayah2": "89:28",
+    "category": "ending_variation",
+    "note": "The address to the tranquil soul spans two short consecutive verses — 89:27 'ya ayyatuha al-nafs al-mutma'innah' and 89:28 'irji'i ila rabbiki radiyatan mardiyyah' — memorizers frequently merge or split them incorrectly."
+  },
+  {
+    "ayah1": "91:9",
+    "ayah2": "91:10",
+    "category": "word_swap",
+    "note": "Consecutive antithetical verses — 91:9 'qad aflaha man zakkaha' (successful is he who purifies it) and 91:10 'qad khaba man dassaha' (failed is he who buries it) — swapping them is a common error."
+  },
+  {
+    "ayah1": "93:6",
+    "ayah2": "93:8",
+    "category": "ending_variation",
+    "note": "Verses 93:6, 93:7, and 93:8 form a trio of 'a lam yajidka' questions — the endings 'fa awa', 'fa hada', and 'fa aghna' are easy to mix up in sequence."
+  },
+  {
+    "ayah1": "94:5",
+    "ayah2": "94:6",
+    "category": "lafzi",
+    "note": "The promise 'fa inna ma'a al-'usri yusra' is repeated verbatim in back-to-back verses — one of the most cited consecutive lafzi pairs in all hifz instruction."
+  },
+  {
+    "ayah1": "101:6",
+    "ayah2": "101:8",
+    "category": "word_swap",
+    "note": "Parallel conditional structures in Al-Qari'ah: 101:6 describes those with heavy scales entering a pleasing life while 101:8 describes those with light scales entering the Hawiyah — similar structure, opposite outcomes."
+  },
+  {
+    "ayah1": "102:3",
+    "ayah2": "102:4",
+    "category": "addition_omission",
+    "note": "Both verses use 'kalla sawfa ta'lamun' but 102:4 adds 'thumma kalla' at the start, escalating the warning — omitting 'thumma' is a frequent recitation error."
+  },
+  {
+    "ayah1": "107:4",
+    "ayah2": "107:5",
+    "category": "addition_omission",
+    "note": "107:4 says 'fa waylun lil-musallin' and 107:5 specifies 'alladhina hum 'an salatihim sahun' — memorizers often attach the qualifier from 107:5 directly to 107:4 or split them incorrectly."
+  },
+  {
+    "ayah1": "112:3",
+    "ayah2": "112:4",
+    "category": "ending_variation",
+    "note": "Final two verses of Al-Ikhlas — 112:3 'lam yalid wa lam yulad' and 112:4 'wa lam yakun lahu kufuwan ahad' — short and adjacent, often merged or their boundary misplaced."
+  },
+  {
+    "ayah1": "77:15",
+    "ayah2": "77:19",
+    "category": "lafzi",
+    "note": "The refrain 'wa aylun yawma'idhin lil-mukadhdhibin' repeats 10 times in Al-Mursalat — 77:15 and 77:19 are the first two occurrences, following the cosmic signs of wind and water."
+  },
+  {
+    "ayah1": "77:19",
+    "ayah2": "77:24",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:19 and 77:24 — the second and third repetitions, following the creation of the human from water."
+  },
+  {
+    "ayah1": "77:24",
+    "ayah2": "77:28",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:24 and 77:28 — third and fourth occurrences, following the description of the lodging place on earth."
+  },
+  {
+    "ayah1": "77:28",
+    "ayah2": "77:34",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:28 and 77:34 — the six-verse gap between these two occurrences makes it easy to resume the refrain at the wrong place."
+  },
+  {
+    "ayah1": "77:34",
+    "ayah2": "77:37",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:34 and 77:37 — only three verses apart, making it easy to repeat the same occurrence twice in recitation."
+  },
+  {
+    "ayah1": "77:37",
+    "ayah2": "77:40",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:37 and 77:40 — the seventh and eighth occurrences, surrounding the challenge 'fa in kana lakum kaydun fa kidun'."
+  },
+  {
+    "ayah1": "77:40",
+    "ayah2": "77:45",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:40 and 77:45 — eighth and ninth occurrences, separated by the transitional command to the deniers."
+  },
+  {
+    "ayah1": "77:45",
+    "ayah2": "77:47",
+    "category": "lafzi",
+    "note": "Al-Mursalat refrain at 77:45 and 77:47 — a two-verse gap, the tightest adjacency in the surah and a frequent source of merge errors."
+  },
+  {
+    "ayah1": "77:47",
+    "ayah2": "77:49",
+    "category": "lafzi",
+    "note": "The final two occurrences of the Al-Mursalat refrain — 77:47 and 77:49, the ninth and tenth appearances, closing the surah's rhetorical structure."
+  },
+  {
+    "ayah1": "57:1",
+    "ayah2": "59:1",
+    "category": "word_swap",
+    "note": "57:1 opens 'sabbaha lillahi ma fi al-samawati wa al-ard' (no second 'ma fi') while 59:1 says 'wa ma fi al-ard' — a single-word insertion that is one of the most tested distinctions among the five Musabbihat surahs."
+  },
+  {
+    "ayah1": "59:1",
+    "ayah2": "61:1",
+    "category": "lafzi",
+    "note": "59:1 (Al-Hashr) and 61:1 (Al-Saff) are verbatim identical in their opening: 'sabbaha lillahi ma fi al-samawati wa ma fi al-ard wa huwa al-'aziz al-hakim'."
+  },
+  {
+    "ayah1": "62:1",
+    "ayah2": "64:1",
+    "category": "lafzi",
+    "note": "62:1 (Al-Jumu'ah) and 64:1 (Al-Taghabun) both open with 'yusabbihu lillahi ma fi al-samawati wa ma fi al-ard' using the present-tense form, in contrast to the past-tense 'sabbaha' of the other Musabbihat."
+  },
+  {
+    "ayah1": "57:1",
+    "ayah2": "62:1",
+    "category": "word_swap",
+    "note": "57:1 uses 'sabbaha' (past tense) while 62:1 uses 'yusabbihu' (present tense) — the tense shift across the Musabbihat surahs is a key awareness point for revision."
+  },
+  {
+    "ayah1": "55:16",
+    "ayah2": "55:18",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:16 and 55:18 — adjacent pair following the creation of humans and jinn from fire and clay."
+  },
+  {
+    "ayah1": "55:18",
+    "ayah2": "55:21",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:18 and 55:21 — following the description of the two easts and two wests."
+  },
+  {
+    "ayah1": "55:21",
+    "ayah2": "55:23",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:21 and 55:23 — following the description of pearls and coral from the two seas."
+  },
+  {
+    "ayah1": "55:23",
+    "ayah2": "55:25",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:23 and 55:25 — adjacent pair surrounding the description of the ships sailing like mountains."
+  },
+  {
+    "ayah1": "55:25",
+    "ayah2": "55:28",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:25 and 55:28 — following the declaration that all on earth will perish."
+  },
+  {
+    "ayah1": "55:28",
+    "ayah2": "55:30",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:28 and 55:30 — surrounding the verse about everything asking of Allah."
+  },
+  {
+    "ayah1": "55:30",
+    "ayah2": "55:32",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:30 and 55:32 — the refrain pair closest to the center of the surah, following the promise to attend to mankind and jinn."
+  },
+  {
+    "ayah1": "55:32",
+    "ayah2": "55:34",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:32 and 55:34 — following the challenge to pass beyond the regions of the heavens."
+  },
+  {
+    "ayah1": "55:34",
+    "ayah2": "55:36",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:34 and 55:36 — following the flames of fire and smoke sent against jinn and man."
+  },
+  {
+    "ayah1": "55:36",
+    "ayah2": "55:38",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:36 and 55:38 — following the splitting of the sky like red hide on the Day of Judgment."
+  },
+  {
+    "ayah1": "55:38",
+    "ayah2": "55:40",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:38 and 55:40 — following the questioning of man and jinn about their sins on the Day."
+  },
+  {
+    "ayah1": "55:40",
+    "ayah2": "55:42",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:40 and 55:42 — following the description of the criminals known by their marks."
+  },
+  {
+    "ayah1": "55:42",
+    "ayah2": "55:45",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:42 and 55:45 — following the description of Hell with its boiling water."
+  },
+  {
+    "ayah1": "55:45",
+    "ayah2": "55:47",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:45 and 55:47 — the transition into the Jannah sections of the surah."
+  },
+  {
+    "ayah1": "55:47",
+    "ayah2": "55:49",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:47 and 55:49 — within the first description of the two gardens and their spreading branches."
+  },
+  {
+    "ayah1": "55:49",
+    "ayah2": "55:51",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:49 and 55:51 — following the two flowing springs."
+  },
+  {
+    "ayah1": "55:51",
+    "ayah2": "55:53",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:51 and 55:53 — following the description of every kind of fruit in pairs."
+  },
+  {
+    "ayah1": "55:53",
+    "ayah2": "55:55",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:53 and 55:55 — following the description of the believers reclining on carpets."
+  },
+  {
+    "ayah1": "55:55",
+    "ayah2": "55:57",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:55 and 55:57 — following the description of the houris with averted gazes, untouched by man or jinn."
+  },
+  {
+    "ayah1": "55:57",
+    "ayah2": "55:59",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:57 and 55:59 — following the likening of the houris to rubies and coral."
+  },
+  {
+    "ayah1": "55:59",
+    "ayah2": "55:61",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:59 and 55:61 — following the verse stating that no reward for good is anything but good."
+  },
+  {
+    "ayah1": "55:61",
+    "ayah2": "55:63",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:61 and 55:63 — the transition into the second pair of gardens."
+  },
+  {
+    "ayah1": "55:63",
+    "ayah2": "55:65",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:63 and 55:65 — within the description of the two dark-green gardens."
+  },
+  {
+    "ayah1": "55:65",
+    "ayah2": "55:67",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:65 and 55:67 — following the two gushing springs."
+  },
+  {
+    "ayah1": "55:67",
+    "ayah2": "55:69",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:67 and 55:69 — following the fruits, palms, and pomegranates."
+  },
+  {
+    "ayah1": "55:69",
+    "ayah2": "55:71",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:69 and 55:71 — following the description of the good, beautiful companions."
+  },
+  {
+    "ayah1": "55:71",
+    "ayah2": "55:73",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:71 and 55:73 — following the houris secluded in pavilions."
+  },
+  {
+    "ayah1": "55:73",
+    "ayah2": "55:75",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:73 and 55:75 — following the houris untouched by man or jinn before them."
+  },
+  {
+    "ayah1": "55:75",
+    "ayah2": "55:77",
+    "category": "lafzi",
+    "note": "Al-Rahman refrain at 55:75 and 55:77 — the final two occurrences, closing the description of the second pair of gardens and the surah itself."
+  },
+  {
+    "ayah1": "99:7",
+    "ayah2": "99:8",
+    "category": "word_swap",
+    "note": "Az-Zalzalah closes with a mirror pair: 99:7 'fa man ya'mal mithqal dharratin khayran yarahu' and 99:8 'wa man ya'mal mithqala dharratin sharran yarahu' — khayran vs sharran is the only change."
+  },
+  {
+    "ayah1": "109:2",
+    "ayah2": "109:4",
+    "category": "word_swap",
+    "note": "109:2 'la a'budu ma ta'budun' (verbal sentence) and 109:4 'wa la ana 'abidun ma 'abadtum' (nominal sentence) cover the same meaning in different grammatical forms — a subtle internal shift memorizers frequently conflate."
+  },
+  {
+    "ayah1": "109:3",
+    "ayah2": "109:5",
+    "category": "lafzi",
+    "note": "109:3 and 109:5 are verbatim identical: 'wa la antum 'abiduna ma a'bud' — a repeated verse within the same six-verse surah, easy to recite twice or skip entirely."
+  },
+  {
+    "ayah1": "113:1",
+    "ayah2": "114:1",
+    "category": "word_swap",
+    "note": "Both opening verses begin with 'qul a'udhu bi rabb' but differ in the next word: 'al-falaq' in Al-Falaq vs 'al-nas' in Al-Nas — reciting one opening with the other's continuation is a common error in nightly prayers."
+  },
+  {
+    "ayah1": "87:1",
+    "ayah2": "56:74",
+    "category": "word_swap",
+    "note": "87:1 'sabbih isma rabbika al-a'la' and 56:74 'fa sabbih bismi rabbika al-'azim' both command glorifying the Lord's name but differ in the divine attribute: al-a'la (Most High) vs al-'azim (Most Great)."
+  },
+  {
+    "ayah1": "84:7",
+    "ayah2": "84:10",
+    "category": "word_swap",
+    "note": "84:7 'fa amma man utiya kitabahu bi yaminihi' and 84:10 'wa amma man utiya kitabahu wara'a zahrihi' are the parallel conditionals in Al-Inshiqaq — right hand vs behind the back."
+  },
+  {
+    "ayah1": "88:1",
+    "ayah2": "79:15",
+    "category": "word_swap",
+    "note": "88:1 'hal ataka hadith al-ghashiyah' and 79:15 'hal ataka hadith Musa' both use the rhetorical 'hal ataka hadith...' (Has the account of ... reached you?) formula — the same opening introducing different narratives."
+  },
+  {
+    "ayah1": "92:5",
+    "ayah2": "92:8",
+    "category": "word_swap",
+    "note": "92:5 'fa amma man a'ta wa ittaqa' and 92:8 'wa amma man bakhila wa istagh-na' form the antithetical frame of Al-Layl — fa amma / wa amma parallels with opposite consequences."
+  },
+  {
+    "ayah1": "95:4",
+    "ayah2": "95:5",
+    "category": "ending_variation",
+    "note": "95:4 'la qad khalaqna al-insan fi ahsan taqwim' and 95:5 'thumma radadnahu asfala safilin' are the core antithetical pair of At-Tin — the boundary between these consecutive verses is frequently misplaced."
+  },
+  {
+    "ayah1": "96:1",
+    "ayah2": "96:3",
+    "category": "word_swap",
+    "note": "96:1 'iqra' bismi rabbika alladhi khalaq' and 96:3 'iqra' wa rabbuka al-akram' both begin with the command 'iqra'' but continue differently — the repeated command two verses apart with a different continuation."
+  },
+  {
+    "ayah1": "85:1",
+    "ayah2": "86:1",
+    "category": "word_swap",
+    "note": "85:1 'wa al-sama' dhati al-buruj' and 86:1 'wa al-sama' wa al-tariq' are back-to-back surah openings both beginning with an oath by the sky — al-buruj (the constellations) vs al-tariq (the night-comer)."
+  },
+  {
+    "ayah1": "36:82",
+    "ayah2": "40:68",
+    "category": "lafzi",
+    "note": "Both contain the identical phrase 'innama amruhu idha arada shay'an an yaqula lahu kun fa yakun' — a verbatim lafzi match across Ya-Sin and Ghafir."
+  },
+  {
+    "ayah1": "50:39",
+    "ayah2": "20:130",
+    "category": "word_swap",
+    "note": "50:39 'fa isbir 'ala ma yaquluna wa sabbih bi hamdi rabbika qabla tuluu' al-shams wa qabla al-ghurub' and 20:130 are nearly identical but 20:130 adds 'qabla ghurubaha' with the feminine pronoun — a single-letter difference that recitors frequently miss."
+  },
+  {
+    "ayah1": "75:31",
+    "ayah2": "75:32",
+    "category": "word_swap",
+    "note": "75:31 'fa la saddaqa wa la salla' and 75:32 'wa lakin kadhdhaba wa tawalla' are a consecutive antithetical pair in Al-Qiyamah whose parallel structure makes the verse boundary easy to misplace."
+  },
+  {
+    "ayah1": "60:4",
+    "ayah2": "60:6",
+    "category": "word_swap",
+    "note": "60:4 'qad kanat lakum uswatun hasanatun fi Ibrahim' and 60:6 'laqad kana lakum fihim uswatun hasanatun' both invoke Ibrahim as an example in Al-Mumtahanah but differ in the introductory verb and preposition."
+  },
+  {
+    "ayah1": "2:62",
+    "ayah2": "5:69",
+    "category": "order_change",
+    "note": "Both list the four groups — believers, Jews, Christians, and Sabians — in an identical promise formula but 2:62 uses 'wa al-sabi'ina' while 5:69 shifts to 'wa al-sabi'una', a grammatical case change alongside the same sequence."
+  },
+  {
+    "ayah1": "2:146",
+    "ayah2": "6:20",
+    "category": "lafzi",
+    "note": "Both contain the identical phrase 'ya'rifunahu kama ya'rifuna abna'ahum' (they recognize him as they recognize their own sons) — in 2:146 about recognizing the qiblah, in 6:20 about recognizing the Prophet."
+  },
+  {
+    "ayah1": "2:197",
+    "ayah2": "3:97",
+    "category": "lafzi",
+    "note": "Both close their Hajj-obligation passages with the identical phrase 'wa Allahu ghaniyyun 'an al-'alamin' (Allah is self-sufficient from the worlds) — 2:197 in the context of the Hajj months, 3:97 after 'wa lillahi 'ala al-nas hijj al-bayt'."
+  },
+  {
+    "ayah1": "2:126",
+    "ayah2": "14:35",
+    "category": "word_swap",
+    "note": "2:126 'Rabbi aj'al hadha baladan aminan' uses the indefinite 'baladan' while 14:35 'Rabbi aj'al hadha al-balad aminan' uses the definite 'al-balad' — Ibrahim's prayer for Mecca appears twice with this single article difference."
+  },
+  {
+    "ayah1": "4:36",
+    "ayah2": "17:23",
+    "category": "order_change",
+    "note": "Both command worshipping Allah alone and treating parents with goodness (ihsan) — 4:36 says 'u'budu Allah wa la tushrikuu bihi... wa bil-walidayni ihsana' while 17:23 says 'alla ta'budu illa iyyahu wa bil-walidayni ihsana' with a different construction."
+  },
+  {
+    "ayah1": "31:14",
+    "ayah2": "46:15",
+    "category": "word_swap",
+    "note": "31:14 'wa wasayna al-insana bi walidayhi' and 46:15 'wa wasayna al-insan bi walidayhi ihsana' both open with the same wasiyyah formula about parents — 46:15 adds 'ihsana' which 31:14 does not carry at that point."
+  },
+  {
+    "ayah1": "16:78",
+    "ayah2": "23:78",
+    "category": "lafzi",
+    "note": "Both list 'al-sam'a wa al-absar wa al-af'idah' as divine gifts — 16:78 says 'wa ja'ala lakum al-sam'a wa al-absar wa al-af'idah la'allakum tashkurun' and 23:78 uses 'qalilan ma tashkurun' instead — same triad, different closing."
+  },
+  {
+    "ayah1": "23:78",
+    "ayah2": "32:9",
+    "category": "lafzi",
+    "note": "23:78 and 32:9 both list the hearing-sight-hearts triad with the identical ending 'qalilan ma tashkurun' — the same gift acknowledged with the same blame for ingratitude."
+  },
+  {
+    "ayah1": "32:9",
+    "ayah2": "67:23",
+    "category": "lafzi",
+    "note": "32:9 and 67:23 both list 'al-sam'a wa al-absar wa al-af'idah qalilan ma tashkurun' in almost identical wording — a four-surah cluster (16, 23, 32, 67) that forms one of the Quran's most repeated triad phrases."
+  },
+  {
+    "ayah1": "4:13",
+    "ayah2": "4:14",
+    "category": "ending_variation",
+    "note": "Consecutive antithetical verses — 4:13 ends with 'wa dhalika al-fawz al-'azim' (the great attainment) for those who obey Allah and 4:14 ends with 'wa lahu 'adhabun muhin' (a humiliating punishment) for those who disobey — parallel structure with opposite outcomes."
+  },
+  {
+    "ayah1": "54:22",
+    "ayah2": "54:32",
+    "category": "lafzi",
+    "note": "54:22 and 54:32 are the second and third occurrences of the Al-Qamar refrain — completing the middle pair and sandwiching the stories of 'Ad and Thamud between each repetition."
+  },
+  {
+    "ayah1": "3:8",
+    "ayah2": "3:9",
+    "category": "ending_variation",
+    "note": "Consecutive Rabbana supplications in Ali Imran — 3:8 ends with 'innaka anta al-wahhab' and 3:9 ends with 'inna Allah la yukhlif al-mi'ad' — the two duas follow each other and their endings are easy to swap."
+  },
+  {
+    "ayah1": "3:191",
+    "ayah2": "3:192",
+    "category": "ending_variation",
+    "note": "Consecutive Rabbana duas closing Ali Imran — 3:191 ends with 'fa qina 'adhab al-nar' and 3:192 ends with 'wa ma lil-zalimin min ansar' — short back-to-back supplications whose endings are a common memorization confusion."
+  },
+  {
+    "ayah1": "9:111",
+    "ayah2": "61:10",
+    "category": "word_swap",
+    "note": "9:111 'inna Allah ishtara mina al-mu'minin anfusahum wa amwalahum bi anna lahum al-jannah' and 61:10-11 both describe the divine exchange of lives and wealth for Paradise — the same 'anfus + amwal' pair appears in both, but with different wording and context."
+  },
+  {
+    "ayah1": "80:17",
+    "ayah2": "74:19",
+    "category": "word_swap",
+    "note": "80:17 'qutila al-insan ma akfarah' (cursed is man, how ungrateful he is) and 74:19 'qutila kayfa qaddar' (cursed is how he calculated) both use the exclamatory 'qutila' curse formula with different objects — man's ingratitude vs man's planning."
+  },
+  {
+    "ayah1": "2:40",
+    "ayah2": "5:20",
+    "category": "word_swap",
+    "note": "2:40 'ya bani Isra'il udhkuru ni'mati allati an'amtu 'alaykum' and 5:20 'ya qawmi udhkuru ni'mat Allah 'alaykum' both begin with the reminder of Allah's favor — the Baqarah address is to Bani Isra'il while Al-Ma'idah quotes Musa addressing his people."
+  },
+  {
+    "ayah1": "17:31",
+    "ayah2": "6:151",
+    "category": "word_swap",
+    "note": "Already indexed — this pair notes that 17:31 adds 'khashyata imlaq' (fearing poverty) while 6:151 says 'min imlaq' (from current poverty), reversing the emphasis on when the poverty occurs."
+  },
+  {
+    "ayah1": "2:233",
+    "ayah2": "65:6",
+    "category": "word_swap",
+    "note": "2:233 and 65:6 both address nursing, child custody, and parental rights after separation using similar legal language — the primary Baqarah passage and the At-Talaq parallel share much of the same vocabulary."
+  },
+  {
+    "ayah1": "7:40",
+    "ayah2": "7:41",
+    "category": "ending_variation",
+    "note": "Consecutive penalty verses for those who deny the signs — 7:40 ends with 'wa kadhalika najzi al-mujrimin' and 7:41 ends with 'wa kadhalika najzi al-zalimin' — a single word difference (mujrimin vs zalimin) in back-to-back verse endings."
+  },
+  {
+    "ayah1": "2:25",
+    "ayah2": "3:15",
+    "category": "word_swap",
+    "note": "2:25 describes the rivers of Paradise 'tajri min tahtiha al-anhar' in its reward promise for believers, while 3:15 echoes the same Paradise promise in nearly identical terms — both use 'jannatin tajri min tahtiha al-anhar' in a reward context."
+  },
+  {
+    "ayah1": "11:90",
+    "ayah2": "85:14",
+    "category": "lafzi",
+    "note": "11:90 'inna rabbi rahimun wadud' and 85:14 'wa huwa al-ghafur al-wadud' both pair Allah's name 'al-Wadud' (the Loving) with another attribute — 11:90 with 'rahimun' and 85:14 with 'al-ghafur' — making 'Wadud' the anchor word for both."
+  },
+  {
+    "ayah1": "69:19",
+    "ayah2": "69:25",
+    "category": "word_swap",
+    "note": "69:19 'fa amma man utiya kitabahu bi yaminihi' and 69:25 'wa amma man utiya kitabahu bi shimalihi' form the primary parallel pair of Al-Haqqah — right hand vs left hand, with the continuation of each differing entirely."
+  },
+  {
+    "ayah1": "18:29",
+    "ayah2": "76:3",
+    "category": "word_swap",
+    "note": "18:29 'fa man sha'a fa l-yu'min wa man sha'a fa l-yakfur' and 76:3 'inna hadaynahu al-sabil imma shakiran wa imma kafura' both state that guidance is given and humans choose — one in a threat context, the other in a declaration of human freedom."
+  },
+  {
+    "ayah1": "2:2",
+    "ayah2": "27:2",
+    "category": "word_swap",
+    "note": "Both describe the Quran as 'huda' — 2:2 ends 'hudal lil muttaqin' while 27:2 says 'hudal wa bushra lil mu'minin,' swapping 'muttaqin' for 'mu'minin' and adding 'wa bushra.'"
+  },
+  {
+    "ayah1": "2:2",
+    "ayah2": "31:3",
+    "category": "word_swap",
+    "note": "Both describe the Quran as 'huda' — 2:2 ends 'hudal lil muttaqin' while 31:3 says 'hudal wa rahmatan lil muhsinin,' replacing 'muttaqin' with 'muhsinin' and adding 'wa rahmatan.'"
+  },
+  {
+    "ayah1": "2:4",
+    "ayah2": "31:4",
+    "category": "addition_omission",
+    "note": "Both end with certainty in the Hereafter — 2:4 ends 'wa bil akhirati hum yuqinun' while 31:4 ends 'wa hum bil akhirati hum yuqinun,' inserting an extra 'hum' before the phrase."
+  },
+  {
+    "ayah1": "2:22",
+    "ayah2": "14:32",
+    "category": "lafzi",
+    "note": "Both enumerate Allah's blessings including 'He sent down from the sky water and brought forth thereby fruits as provision for you'; 2:22 is in the opening argument for monotheism, 14:32 is in Ibrahim's prayer listing divine favors."
+  },
+  {
+    "ayah1": "2:23",
+    "ayah2": "2:278",
+    "category": "structural",
+    "note": "Both end with an 'in kuntum X' conditional — 2:23 challenges doubters with 'in kuntum sadiqin' (if you are truthful) while 2:278 addresses believers with 'in kuntum mu'minin' (if you truly believe), same challenge structure with a swapped qualifier."
+  },
+  {
+    "ayah1": "2:27",
+    "ayah2": "13:25",
+    "category": "lafzi",
+    "note": "Both describe those who break Allah's covenant, sever what He commanded to be joined, and spread corruption. 2:27 ends 'they are the losers'; 13:25 ends 'theirs is the curse and the evil abode.'"
+  },
+  {
+    "ayah1": "2:34",
+    "ayah2": "20:116",
+    "category": "lafzi",
+    "note": "Both relate the command to the angels to prostrate to Adam and Iblees's refusal with identical wording up to 'aba'; 2:34 adds 'he was arrogant and became of the disbelievers,' 20:116 adds 'he disobeyed the command of his Lord.'"
+  },
+  {
+    "ayah1": "2:35",
+    "ayah2": "7:19",
+    "category": "lafzi",
+    "note": "Both contain the command to Adam and his wife in the garden: 'wherever you wish, but do not approach this tree lest you be among the wrongdoers'; 2:35 is the brief account, 7:19 comes in the expanded garden narrative."
+  },
+  {
+    "ayah1": "2:36",
+    "ayah2": "7:24",
+    "category": "lafzi",
+    "note": "Both contain the expulsion command after Adam's disobedience: 'descend, some of you enemies to others; in the earth is a place of settlement and provision for a time'; 2:36 is the brief account, 7:24 is within the expanded narrative."
+  },
+  {
+    "ayah1": "2:37",
+    "ayah2": "20:122",
+    "category": "word_swap",
+    "note": "Both describe Allah accepting Adam's repentance — 2:37 says 'fa taba 'alayhi innahu huwa al-tawwab al-rahim' while 20:122 says 'fa taba 'alayhi wa hada,' both share 'taba 'alayhi' but end differently: forgiveness and mercy in 2:37, guidance in 20:122."
+  },
+  {
+    "ayah1": "2:47",
+    "ayah2": "2:122",
+    "category": "lafzi",
+    "note": "Identical call to Bani Israel to remember Allah's favor and their elevation above all peoples, repeated within Al-Baqarah."
+  },
+  {
+    "ayah1": "2:49",
+    "ayah2": "7:141",
+    "category": "lafzi",
+    "note": "Both describe Pharaoh's oppression with the shared clause 'killing your sons and sparing your women, and in that was a great trial from your Lord'; the surrounding context differs (2:49 in a sequence of blessings, 7:141 recounting the rescue)."
+  },
+  {
+    "ayah1": "2:62",
+    "ayah2": "2:274",
+    "category": "lafzi",
+    "note": "Verbatim within Al-Baqarah: 'for them is their reward with their Lord, and no fear will there be upon them, nor will they grieve'; 2:62 is the reward for sincere believers of any community, 2:274 is the reward for those who spend in charity."
+  },
+  {
+    "ayah1": "2:63",
+    "ayah2": "2:93",
+    "category": "lafzi",
+    "note": "Verbatim within Al-Baqarah: 'when We took your covenant and raised the mountain above you: hold firmly to what We have given you'; 2:63 recounts the Sinai covenant, 2:93 repeats the same event as part of a longer indictment of Bani Israel's broken promises."
+  },
+  {
+    "ayah1": "2:120",
+    "ayah2": "13:37",
+    "category": "lafzi",
+    "note": "Both warn that following disbelievers after knowledge has come means 'you would have from Allah neither protector nor helper'; 2:120 is addressed to the Prophet regarding the Jews and Christians, 13:37 is about following desires against the revelation."
+  },
+  {
+    "ayah1": "2:134",
+    "ayah2": "2:141",
+    "category": "lafzi",
+    "note": "Identical verse repeated within Al-Baqarah: each nation is accountable for its own deeds and will not be asked about what others did."
+  },
+  {
+    "ayah1": "2:144",
+    "ayah2": "2:150",
+    "category": "lafzi",
+    "note": "The qibla command repeated twice within Al-Baqarah: 'turn your face toward Masjid al-Haram, and wherever you are turn your faces toward it'; 2:144 addresses the Prophet directly, 2:150 restates it as a universal rule."
+  },
+  {
+    "ayah1": "2:170",
+    "ayah2": "31:21",
+    "category": "lafzi",
+    "note": "Verbatim: 'when it is said to them, follow what Allah has revealed, they say: rather we will follow what we found our fathers doing'; 2:170 addresses the Meccan disbelievers, 31:21 occurs in the Luqman wisdom context with identical wording."
+  },
+  {
+    "ayah1": "2:173",
+    "ayah2": "16:115",
+    "category": "lafzi",
+    "note": "Both enumerate the same four prohibitions (dead animals, blood, swine flesh, what is dedicated to other than Allah) plus the same duress exception; the only difference is word order: 2:173 says 'ma uhilla bihi li-ghayri Allah,' 16:115 says 'ma uhilla li-ghayri Allah bihi.'"
+  },
+  {
+    "ayah1": "2:243",
+    "ayah2": "40:61",
+    "category": "lafzi",
+    "note": "Verbatim: 'indeed Allah is full of bounty to the people but most people do not give thanks'; 2:243 follows the story of those who fled their homes fearing death, 40:61 follows a list of Allah's cosmic favors."
+  },
+  {
+    "ayah1": "2:262",
+    "ayah2": "2:277",
+    "category": "lafzi",
+    "note": "Verbatim within Al-Baqarah: 'for them is their reward with their Lord, and no fear will there be upon them, nor will they grieve'; 2:262 rewards charitable givers who do not follow charity with harm, 2:277 is the general reward for believers; see also 2:62/2:274 (batch 7)."
+  },
+  {
+    "ayah1": "3:10",
+    "ayah2": "3:116",
+    "category": "lafzi",
+    "note": "Near-identical opening within the same surah: 'indeed those who disbelieve -- their wealth and children will never avail them against Allah'; 3:10 ends 'fuel of the Fire,' 3:116 ends 'companions of the Fire, abiding therein eternally.'"
+  },
+  {
+    "ayah1": "3:41",
+    "ayah2": "19:10",
+    "category": "lafzi",
+    "note": "Both record Zakariyya's request for a sign and the identical divine response: 'your sign is that you shall not speak to the people for three days'; 3:41 adds 'except by gesture,' 19:10 specifies 'three nights while sound.'"
+  },
+  {
+    "ayah1": "3:44",
+    "ayah2": "12:102",
+    "category": "lafzi",
+    "note": "Both use the 'news of the unseen' formula: 'that is from the reports of the unseen which We reveal to you; you were not present with them when...'; 3:44 follows the Maryam/Zakariyya story, 12:102 follows the Yusuf story."
+  },
+  {
+    "ayah1": "3:89",
+    "ayah2": "24:5",
+    "category": "lafzi",
+    "note": "Verbatim exception clause: 'except those who repent afterward and reform; indeed Allah is Forgiving, Merciful'; 3:89 follows the condemnation of apostates, 24:5 follows the prescribed punishment for false accusers of chastity."
+  },
+  {
+    "ayah1": "3:164",
+    "ayah2": "62:2",
+    "category": "lafzi",
+    "note": "Both describe the Prophet's mission with the same four verbs: reciting verses, purifying souls, and teaching the Book and wisdom; 3:164 frames it as a favor upon the believers, 62:2 frames it as a sending among the unlettered (al-ummiyyin)."
+  },
+  {
+    "ayah1": "4:13",
+    "ayah2": "48:17",
+    "category": "lafzi",
+    "note": "Both contain 'whoever obeys Allah and His Messenger, He will admit him to gardens beneath which rivers flow'; 4:13 follows the limits of inheritance, 48:17 follows the exemption of the disabled from military duty."
+  },
+  {
+    "ayah1": "4:43",
+    "ayah2": "5:6",
+    "category": "lafzi",
+    "note": "Both contain the tayammum clause for travelers, the ill, or the ritually impure; 4:43 is the earlier, shorter mention tied to prayer while impure, 5:6 is the full wudu + tayammum passage."
+  },
+  {
+    "ayah1": "4:48",
+    "ayah2": "4:116",
+    "category": "lafzi",
+    "note": "Both state Allah does not forgive shirk but forgives lesser sins for whom He wills. The mushrik in 4:48 has invented a tremendous sin (إِثْمًا عَظِيمًا); in 4:116 has strayed far astray (ضَلَّ ضَلَالًا بَعِيدًا)."
+  },
+  {
+    "ayah1": "4:57",
+    "ayah2": "4:122",
+    "category": "lafzi",
+    "note": "Near-identical opening within An-Nisa: 'those who believe and do righteous deeds, We will admit them to gardens beneath which rivers flow, abiding forever'; 4:57 adds purified spouses and shade, 4:122 adds 'the promise of Allah, true.'"
+  },
+  {
+    "ayah1": "4:61",
+    "ayah2": "5:104",
+    "category": "lafzi",
+    "note": "Both share the call: 'when it is said to them, come to what Allah has revealed and to the Messenger'; 4:61 is the hypocrites who turn away when called to Allah's judgment, 5:104 is the pagans who cling to their forefathers' ways."
+  },
+  {
+    "ayah1": "5:3",
+    "ayah2": "16:115",
+    "category": "lafzi",
+    "note": "Both share the core prohibition list (dead animals, blood, swine, what is dedicated to other than Allah); see also 2:173/16:115 (batch 4) and 6:145/16:115 (batch 7) -- 5:3 is the most expansive version adding strangled, beaten, fallen animals, 16:115 is the standard shorter form."
+  },
+  {
+    "ayah1": "5:17",
+    "ayah2": "5:72",
+    "category": "lafzi",
+    "note": "Near-identical refutation within the same surah: 'those who say Allah is the Messiah son of Mary have certainly disbelieved'; 5:17 is the broader refutation, 5:72 is specifically the response to the Christian position on Jesus."
+  },
+  {
+    "ayah1": "5:64",
+    "ayah2": "5:68",
+    "category": "lafzi",
+    "note": "Verbatim within Al-Ma'idah: 'it will surely increase many of them in transgression and disbelief, what has been revealed to you from your Lord'; 5:64 follows the Jews' claim that Allah's hand is fettered, 5:68 follows the assertion that the People of the Book have no foundation without their scriptures."
+  },
+  {
+    "ayah1": "5:119",
+    "ayah2": "98:8",
+    "category": "lafzi",
+    "note": "Both share 'gardens with rivers flowing, abiding forever; Allah is pleased with them and they with Him'; 5:119 is the statement of the truthful (Isa affirming), 98:8 is the reward for believers from the People of the Book."
+  },
+  {
+    "ayah1": "6:4",
+    "ayah2": "36:46",
+    "category": "lafzi",
+    "note": "Verbatim: 'there comes not to them a sign from the signs of their Lord except that they turn away from it'; 6:4 is in Al-An'am describing the Meccan disbelievers, 36:46 makes the same statement in Yasin."
+  },
+  {
+    "ayah1": "6:10",
+    "ayah2": "21:41",
+    "category": "lafzi",
+    "note": "Identical verse: previous messengers were mocked, but the mockers were enveloped by what they ridiculed."
+  },
+  {
+    "ayah1": "6:17",
+    "ayah2": "10:107",
+    "category": "lafzi",
+    "note": "Verbatim: 'if Allah touches you with harm, there is no remover of it except Him, and if He wills good for you, there is no repeller of His bounty'; 6:17 is in the context of tawhid argument, 10:107 closes a passage on trust in Allah."
+  },
+  {
+    "ayah1": "6:21",
+    "ayah2": "10:17",
+    "category": "lafzi",
+    "note": "Nearly identical: who is more unjust than one who fabricates lies against Allah or denies His signs? 6:21 (وَمَنْ) ends with الظَّالِمُونَ; 10:17 (فَمَنْ) ends with الْمُجْرِمُونَ."
+  },
+  {
+    "ayah1": "6:30",
+    "ayah2": "46:34",
+    "category": "lafzi",
+    "note": "Both quote a courtroom-like scene: 'is this not the truth? They say: yes, by our Lord. He says: then taste the punishment for what you used to deny'; 6:30 is at resurrection, 46:34 is directed at those who rejected the Quran."
+  },
+  {
+    "ayah1": "6:56",
+    "ayah2": "40:66",
+    "category": "lafzi",
+    "note": "Both are the Prophet's declaration 'I am forbidden to worship those you invoke besides Allah'; 6:56 is a direct rejection of the Meccan deities, 40:66 adds 'since the clear proofs have come to me from my Lord.'"
+  },
+  {
+    "ayah1": "6:143",
+    "ayah2": "6:144",
+    "category": "lafzi",
+    "note": "Adjacent verses in Al-An'am applying the identical rhetorical challenge -- 'is it the two males He has forbidden or the two females or what the wombs of the two females contain?' -- first to sheep and goats (6:143) then to camels and cattle (6:144)."
+  },
+  {
+    "ayah1": "6:145",
+    "ayah2": "16:115",
+    "category": "lafzi",
+    "note": "Both share the duress exception clause for the same list of prohibitions; see also 2:173/16:115 (batch 4) -- 6:145 frames the list as a response to 'what has Allah forbidden you,' 16:115 is the direct restatement."
+  },
+  {
+    "ayah1": "6:152",
+    "ayah2": "17:34",
+    "category": "lafzi",
+    "note": "Both contain 'do not approach the orphan's property except in the best way until he reaches maturity'; 6:152 appears in a ten-command ethical list at the end of Al-An'am, 17:34 stands as a standalone injunction with the same wording."
+  },
+  {
+    "ayah1": "6:164",
+    "ayah2": "39:7",
+    "category": "lafzi",
+    "note": "Both contain 'no bearer of burdens will bear the burden of another, then to your Lord is your return and He will inform you of what you used to do'; 6:164 closes the chapter's ethical commands, 39:7 is embedded in an address on gratitude."
+  },
+  {
+    "ayah1": "7:12",
+    "ayah2": "38:76",
+    "category": "lafzi",
+    "note": "Verbatim quote of Iblees's arrogance: 'He said: I am better than him; You created me from fire and created him from clay'; 7:12 is in the Al-A'raf account of the prostration, 38:76 reprises the same dialogue in Sad."
+  },
+  {
+    "ayah1": "7:37",
+    "ayah2": "10:17",
+    "category": "lafzi",
+    "note": "Verbatim rhetorical question: 'who is more unjust than one who invents a lie about Allah or denies His signs?'; 7:37 condemns those who reject the messengers, 10:17 addresses the accusation that the Prophet fabricated the Quran."
+  },
+  {
+    "ayah1": "7:45",
+    "ayah2": "11:19",
+    "category": "lafzi",
+    "note": "Shared description: 'those who obstruct Allah's path and seek to make it crooked, and who disbelieve in the Hereafter'; 7:45 places them at the Fire scene, 11:19 introduces them as those who turn away from Allah's mercy."
+  },
+  {
+    "ayah1": "7:54",
+    "ayah2": "10:3",
+    "category": "lafzi",
+    "note": "Both open with Allah creating the heavens and earth in six days then establishing on the Throne. 7:54 continues with the night covering the day in swift pursuit; 10:3 continues with 'He directs all affairs' (يُدَبِّرُ الْأَمْرَ)."
+  },
+  {
+    "ayah1": "7:54",
+    "ayah2": "57:4",
+    "category": "lafzi",
+    "note": "Both open with 'who created the heavens and earth in six days then established Himself above the Throne'; see also 10:3/57:4 and the 25:59/32:4 pair (batch 4) for the wider cluster of this creation formula."
+  },
+  {
+    "ayah1": "7:63",
+    "ayah2": "7:69",
+    "category": "lafzi",
+    "note": "Adjacent prophet-stories within Al-A'raf sharing the same surprised-people formula: 'do you wonder that a reminder came to you from your Lord upon a man from among you to warn you?'; 7:63 is Nuh's response to his people, 7:69 is Hud's."
+  },
+  {
+    "ayah1": "7:65",
+    "ayah2": "11:50",
+    "category": "lafzi",
+    "note": "Both narrate Hud's call to Ad to worship Allah alone. 7:65 ends 'will you not fear?' (أَفَلَا تَتَّقُونَ); 11:50 ends 'you are only fabricators' (إِنْ أَنتُمْ إِلَّا مُفْتَرُونَ)."
+  },
+  {
+    "ayah1": "7:73",
+    "ayah2": "7:85",
+    "category": "lafzi",
+    "note": "Salih (to Thamud) and Shu'ayb (to Madyan) both open with the same call: worship Allah alone, a clear proof has come from your Lord. Each continues with prophet-specific content."
+  },
+  {
+    "ayah1": "7:73",
+    "ayah2": "11:61",
+    "category": "lafzi",
+    "note": "Both introduce Salih sent to Thamud with the same opening call to worship Allah alone; 7:73 continues with the she-camel as a sign, 11:61 continues with 'He produced you from the earth and settled you in it.'"
+  },
+  {
+    "ayah1": "7:73",
+    "ayah2": "11:64",
+    "category": "lafzi",
+    "note": "Both warn Thamud about the she-camel of Allah as a sign for them. 7:73 threatens 'a painful punishment' (عَذَابٌ أَلِيمٌ); 11:64 threatens 'an imminent punishment' (عَذَابٌ قَرِيبٌ)."
+  },
+  {
+    "ayah1": "7:78",
+    "ayah2": "7:91",
+    "category": "lafzi",
+    "note": "The earthquake-destruction formula: 'the earthquake seized them and they became in their dwelling lying prone (jathameen)'; 7:78 is the fate of Thamud after rejecting Salih, 7:91 is the identical fate of Madyan after rejecting Shu'ayb."
+  },
+  {
+    "ayah1": "7:78",
+    "ayah2": "29:37",
+    "category": "lafzi",
+    "note": "The earthquake-destruction formula: 'the earthquake seized them and they became in their dwelling lying prone'; 7:78 is Thamud/Salih, 29:37 is Madyan/Shu'ayb; see also 7:91/29:37 and 7:78/7:91 (batch 6)."
+  },
+  {
+    "ayah1": "7:85",
+    "ayah2": "11:84",
+    "category": "lafzi",
+    "note": "Both introduce Shu'ayb sent to Madyan with the same call to worship Allah alone; 7:85 continues with commands to fill the measure and scale justly, 11:84 echoes the same economic injunctions."
+  },
+  {
+    "ayah1": "7:91",
+    "ayah2": "29:37",
+    "category": "lafzi",
+    "note": "Both describe Madyan's destruction: 7:91 uses rajfa for Shu'ayb's people in Al-A'raf, 29:37 also uses rajfa for the same event in Al-Ankabut; completes the three-way set with 7:78/7:91 (batch 6) and 7:78/29:37."
+  },
+  {
+    "ayah1": "9:33",
+    "ayah2": "48:28",
+    "category": "lafzi",
+    "note": "Both open with the Prophet's mission to make truth prevail over all religion; 9:33 (also 61:9) ends 'even if the polytheists dislike it,' while 48:28 ends 'and sufficient is Allah as witness' -- same mission, different closing."
+  },
+  {
+    "ayah1": "9:33",
+    "ayah2": "61:9",
+    "category": "lafzi",
+    "note": "Identical verse about Allah sending His Messenger with guidance and the religion of truth to make it prevail over all religions."
+  },
+  {
+    "ayah1": "9:70",
+    "ayah2": "30:9",
+    "category": "lafzi",
+    "note": "Both share the nations-wronging-themselves formula: 'their messengers came to them with clear proofs, and Allah was not going to wrong them, but they were wronging themselves'; 9:70 is in a list of destroyed nations, 30:9 closes the travel-and-observe invitation."
+  },
+  {
+    "ayah1": "9:73",
+    "ayah2": "66:9",
+    "category": "lafzi",
+    "note": "Identical command to the Prophet to strive against disbelievers and hypocrites and be stern with them; their abode is Hell."
+  },
+  {
+    "ayah1": "9:94",
+    "ayah2": "62:8",
+    "category": "lafzi",
+    "note": "Verbatim: 'then you will be returned to the Knower of the unseen and the seen, and He will inform you of what you used to do'; 9:94 is addressed to the hypocrites who stayed behind from Tabuk, 62:8 responds to those who flee from death."
+  },
+  {
+    "ayah1": "10:3",
+    "ayah2": "57:4",
+    "category": "lafzi",
+    "note": "Both open with 'who created the heavens and earth in six days then established Himself above the Throne'; see also 7:54/57:4 (this batch) and 25:59/32:4 (batch 4) for the wider creation-formula cluster."
+  },
+  {
+    "ayah1": "10:24",
+    "ayah2": "18:45",
+    "category": "lafzi",
+    "note": "Both use the same parable: 'the example of worldly life is like rain We send down from the sky; the vegetation of the earth mingles with it then it withers'; 10:24 develops the metaphor fully, 18:45 gives a compressed version."
+  },
+  {
+    "ayah1": "10:38",
+    "ayah2": "11:13",
+    "category": "lafzi",
+    "note": "Both contain the Quran challenge ending with 'call upon whom you can besides Allah if you are truthful'; 10:38 challenges to bring one surah like it, 11:13 challenges to bring ten fabricated surahs."
+  },
+  {
+    "ayah1": "10:61",
+    "ayah2": "34:3",
+    "category": "lafzi",
+    "note": "Both contain 'not the weight of a speck escapes your Lord in the earth or in the sky, nor anything smaller or larger, except that it is in a clear register'; 10:61 is addressed to the Prophet, 34:3 refutes the disbelievers' denial of the Hour."
+  },
+  {
+    "ayah1": "10:93",
+    "ayah2": "45:17",
+    "category": "lafzi",
+    "note": "Verbatim: 'your Lord will judge between them on the Day of Resurrection concerning that wherein they used to differ'; 10:93 follows the settlement of Bani Israel in Egypt, 45:17 follows a description of the Israelites' divisions after receiving clear proofs."
+  },
+  {
+    "ayah1": "11:28",
+    "ayah2": "11:63",
+    "category": "lafzi",
+    "note": "Both use the same prophetic rhetorical opening within Hud: 'do you see, if I am on clear evidence from my Lord and He has given me...'; 11:28 is Nuh addressing his people, 11:63 is Salih addressing his -- the shared formula marks a recurring prophetic speech pattern."
+  },
+  {
+    "ayah1": "11:40",
+    "ayah2": "23:27",
+    "category": "lafzi",
+    "note": "Both contain the ark-loading command: 'take into it from every kind two mates and your family, except those against whom the word has already gone'; 11:40 is the direct command to Nuh, 23:27 is the retelling of the same command."
+  },
+  {
+    "ayah1": "11:107",
+    "ayah2": "11:108",
+    "category": "lafzi",
+    "note": "Adjacent verses within Hud sharing the formula 'abiding therein as long as the heavens and earth endure, except what your Lord wills'; 11:107 applies it to the people of the Fire, 11:108 applies the same phrase to the people of Paradise."
+  },
+  {
+    "ayah1": "11:110",
+    "ayah2": "41:45",
+    "category": "lafzi",
+    "note": "Nearly identical: Moses was given the Book and people disputed over it; but for a prior divine word, judgment would have been passed. Differs only in the pause mark after the first clause."
+  },
+  {
+    "ayah1": "12:22",
+    "ayah2": "28:14",
+    "category": "lafzi",
+    "note": "Identical formula applied to two prophets reaching maturity: 'We gave him judgment and knowledge; and thus do We reward the doers of good'; 12:22 is Yusuf, 28:14 is Musa."
+  },
+  {
+    "ayah1": "12:40",
+    "ayah2": "53:23",
+    "category": "lafzi",
+    "note": "Both dismiss false deities as 'nothing but names you and your forefathers invented; Allah sent down no authority for them'; 12:40 is Yusuf's argument to his fellow prisoners, 53:23 addresses the pagan goddesses al-Lat, al-Uzza, and Manat."
+  },
+  {
+    "ayah1": "12:43",
+    "ayah2": "12:46",
+    "category": "lafzi",
+    "note": "The king's dream (seven fat cows eaten by seven lean, seven green ears and others dry) stated verbatim in 12:43 and then repeated word-for-word in 12:46 when the minister asks Yusuf for the interpretation."
+  },
+  {
+    "ayah1": "12:109",
+    "ayah2": "30:9",
+    "category": "lafzi",
+    "note": "Final pair completing the ten-way travel-and-observe cluster (12:109, 30:9, 35:44, 40:82, 47:10 -- all C(5,2)=10 combinations now curated): 'have they not traveled the earth and observed how was the end of those before them?'"
+  },
+  {
+    "ayah1": "12:109",
+    "ayah2": "35:44",
+    "category": "lafzi",
+    "note": "Part of the travel-and-observe formula cluster (12:109, 30:9, 35:44, 40:82, 47:10 all share this phrase); this pair is 12:109 and 35:44."
+  },
+  {
+    "ayah1": "12:109",
+    "ayah2": "40:82",
+    "category": "lafzi",
+    "note": "Both contain 'have they not traveled the earth and observed how was the end of those before them?'; see also 30:9/40:82 (batch 5) and 12:109/47:10 for the wider cluster of this formula."
+  },
+  {
+    "ayah1": "12:109",
+    "ayah2": "47:10",
+    "category": "lafzi",
+    "note": "Both contain 'have they not traveled the earth and observed how was the end of those before them?'; see also 12:109/40:82 (this batch) for the wider cluster."
+  },
+  {
+    "ayah1": "14:21",
+    "ayah2": "40:47",
+    "category": "lafzi",
+    "note": "Both quote the weak followers addressing the arrogant in the Hereafter: 'we were your followers, can you now spare us any of Allah's punishment?'; 14:21 is in Ibrahim's prayer, 40:47 is a direct scene in Hell."
+  },
+  {
+    "ayah1": "15:29",
+    "ayah2": "38:72",
+    "category": "lafzi",
+    "note": "Identical divine command: when Allah has fashioned Adam and breathed His spirit into him, the angels must prostrate."
+  },
+  {
+    "ayah1": "16:43",
+    "ayah2": "21:7",
+    "category": "lafzi",
+    "note": "Verbatim: 'We sent before you only men to whom We revealed; so ask the people of knowledge if you do not know'; 16:43 responds to objections about the Prophet's humanity, 21:7 makes the same point in the opening of Al-Anbiya."
+  },
+  {
+    "ayah1": "16:61",
+    "ayah2": "35:45",
+    "category": "lafzi",
+    "note": "Verbatim: 'if Allah were to punish people for what they have earned He would not leave upon the earth any creature, but He defers them to an appointed term'; 16:61 is among Allah's attributes of forbearance, 35:45 makes the same point closing Fatir."
+  },
+  {
+    "ayah1": "16:125",
+    "ayah2": "53:30",
+    "category": "lafzi",
+    "note": "Completes the three-way set (see 16:125/68:7 batch 5 and 53:30/68:7 this batch): 'your Lord knows best who has gone astray from His way and He knows best the rightly guided'; 16:125 is in the call-to-wisdom context, 53:30 closes a description of those who turn away."
+  },
+  {
+    "ayah1": "16:125",
+    "ayah2": "68:7",
+    "category": "lafzi",
+    "note": "Verbatim closing: 'your Lord knows best who has gone astray from His way and He knows best the rightly guided'; 16:125 follows the command to call to Allah's path with wisdom, 68:7 follows a prohibition against obeying the disbelievers."
+  },
+  {
+    "ayah1": "17:83",
+    "ayah2": "41:51",
+    "category": "lafzi",
+    "note": "Verbatim: 'when We bestow favor upon man, he turns away and withdraws to the side; and when evil touches him, he is in despair'; both observe human ingratitude and despair as a recurring flaw -- 17:83 in Al-Isra, 41:51 in Fussilat."
+  },
+  {
+    "ayah1": "18:110",
+    "ayah2": "41:6",
+    "category": "lafzi",
+    "note": "Verbatim opening: 'say: I am only a man like you, to whom it has been revealed that your God is one God'; 18:110 closes Al-Kahf, 41:6 opens a passage in Fussilat -- both assert the Prophet's humanity alongside strict monotheism."
+  },
+  {
+    "ayah1": "20:71",
+    "ayah2": "26:49",
+    "category": "lafzi",
+    "note": "Both quote Pharaoh's response to the believing magicians: 'did you believe him before I gave you permission? Indeed he is your leader who taught you magic'; both follow with the threat of crucifixion on palm trunks."
+  },
+  {
+    "ayah1": "20:128",
+    "ayah2": "32:26",
+    "category": "lafzi",
+    "note": "Both ask 'does it not guide them how many We destroyed before them of nations whose dwellings they walk through?'; 20:128 opens with 'a-fa-lam' and 32:26 with 'a-wa-lam' -- the single letter change is the key difference."
+  },
+  {
+    "ayah1": "22:8",
+    "ayah2": "31:20",
+    "category": "lafzi",
+    "note": "Verbatim: 'of the people is one who disputes about Allah without knowledge, guidance, or an illuminating book'; 22:8 continues with the arrogant disputer misleading others, 31:20 contrasts with a call to reflect on Allah's bestowed favors."
+  },
+  {
+    "ayah1": "22:14",
+    "ayah2": "22:23",
+    "category": "lafzi",
+    "note": "Verbatim repetition within Surah Al-Hajj at 22:14 and 22:23: 'indeed Allah will admit those who believe and do righteous deeds to gardens beneath which rivers flow'; see also 22:14/47:12 and 22:23/47:12 for the three-way repeat."
+  },
+  {
+    "ayah1": "22:14",
+    "ayah2": "47:12",
+    "category": "lafzi",
+    "note": "Part of a three-way repeat (see 22:14/22:23 and 22:23/47:12): 'Allah will admit those who believe and do righteous deeds to gardens beneath which rivers flow'; 47:12 contrasts this with the cattle-like eating of disbelievers."
+  },
+  {
+    "ayah1": "22:23",
+    "ayah2": "35:33",
+    "category": "lafzi",
+    "note": "Verbatim paradise adornment: 'they will be adorned therein with bracelets of gold and pearl, and their garments therein will be silk'; 22:23 is part of the reward for believers in Al-Hajj (see also 22:14/22:23), 35:33 is in the inheritance of paradise passage in Fatir."
+  },
+  {
+    "ayah1": "22:23",
+    "ayah2": "47:12",
+    "category": "lafzi",
+    "note": "Third pair in the three-way repeat (see 22:14/22:23 and 22:14/47:12): 'Allah will admit those who believe and do righteous deeds to gardens beneath which rivers flow'; 22:23 adds golden bracelets and silk, 47:12 contrasts with cattle-like disbelievers."
+  },
+  {
+    "ayah1": "22:62",
+    "ayah2": "31:30",
+    "category": "lafzi",
+    "note": "Verbatim identical: 'that is because Allah is the Truth and what they call upon besides Him is falsehood, and because Allah is the Most High, the Grand'; 22:62 follows cosmic signs, 31:30 follows a statement about seeking shade from the sun."
+  },
+  {
+    "ayah1": "23:82",
+    "ayah2": "37:16",
+    "category": "lafzi",
+    "note": "Verbatim denial of resurrection: 'when we have died and become dust and bones, shall we indeed be resurrected?'; 23:82 is in a list of disbeliever objections, 37:16 is the Quraysh mocking the promise of resurrection."
+  },
+  {
+    "ayah1": "24:61",
+    "ayah2": "48:17",
+    "category": "lafzi",
+    "note": "Verbatim shared clause: 'there is no blame on the blind, no blame on the lame, no blame on the ill'; 24:61 grants them exception from eating etiquette rules, 48:17 excuses them from the obligation of military expedition."
+  },
+  {
+    "ayah1": "25:59",
+    "ayah2": "32:4",
+    "category": "lafzi",
+    "note": "Both open with 'who created the heavens, earth, and what is between them in six days then established Himself above the Throne'; 25:59 directs to ask one well-informed (al-Rahman), 32:4 emphasizes no intercessor without His leave."
+  },
+  {
+    "ayah1": "26:109",
+    "ayah2": "26:127",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Nuh and Hud."
+  },
+  {
+    "ayah1": "26:109",
+    "ayah2": "26:145",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Nuh and Salih."
+  },
+  {
+    "ayah1": "26:109",
+    "ayah2": "26:164",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Nuh and Lut."
+  },
+  {
+    "ayah1": "26:109",
+    "ayah2": "26:180",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Nuh and Shu'ayb."
+  },
+  {
+    "ayah1": "26:127",
+    "ayah2": "26:145",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Hud and Salih."
+  },
+  {
+    "ayah1": "26:127",
+    "ayah2": "26:164",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Hud and Lut."
+  },
+  {
+    "ayah1": "26:127",
+    "ayah2": "26:180",
+    "category": "lafzi",
+    "note": "Both are instances of the prophetic refrain repeated across five stories in Surah Al-Shu'ara: 'I ask you for no payment; my reward is only from the Lord of the worlds'; 26:127 is Hud's refrain, 26:180 is Shu'ayb's."
+  },
+  {
+    "ayah1": "26:145",
+    "ayah2": "26:164",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Salih and Lut."
+  },
+  {
+    "ayah1": "26:145",
+    "ayah2": "26:180",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Salih and Shu'ayb."
+  },
+  {
+    "ayah1": "26:164",
+    "ayah2": "26:180",
+    "category": "lafzi",
+    "note": "Part of the Al-Shu'ara prophetic refrain: 'I ask you for no payment; my reward is only from the Lord of the worlds' -- appears five times in the surah (26:109 Nuh, 26:127 Hud, 26:145 Salih, 26:164 Lut, 26:180 Shu'ayb); this pair is Lut and Shu'ayb."
+  },
+  {
+    "ayah1": "26:173",
+    "ayah2": "27:58",
+    "category": "lafzi",
+    "note": "Verbatim: 'and We rained upon them a rain; evil was the rain of those who were warned'; both describe the punishment rain on the people of Lut -- 26:173 in the Al-Shu'ara account, 27:58 in the Al-Naml account."
+  },
+  {
+    "ayah1": "27:3",
+    "ayah2": "31:4",
+    "category": "lafzi",
+    "note": "Identical description of believers: they establish prayer, give zakat, and have firm certainty in the Hereafter. Repeated in Al-Naml (27) and Luqman (31)."
+  },
+  {
+    "ayah1": "27:10",
+    "ayah2": "28:31",
+    "category": "lafzi",
+    "note": "Both describe Moses seeing his staff writhe like a jinn (jann) and fleeing without looking back; 27:10 is the first encounter at the burning bush, 28:31 reprises the same scene when Moses is formally commissioned."
+  },
+  {
+    "ayah1": "27:19",
+    "ayah2": "46:15",
+    "category": "lafzi",
+    "note": "Both contain the supplication: 'Lord, inspire me to thank Your favor upon me and my parents and to do righteous deeds.' 27:19 (Sulayman) ends asking to be admitted among the righteous; 46:15 (a believer at 40) adds asking for righteous offspring."
+  },
+  {
+    "ayah1": "27:81",
+    "ayah2": "30:53",
+    "category": "lafzi",
+    "note": "Nearly identical: the Prophet cannot guide the blind from misguidance; only those who believe in Allah's signs will hear. Minor orthographic variant: بِهَادِي (27:81) vs بِهَادِ (30:53)."
+  },
+  {
+    "ayah1": "27:87",
+    "ayah2": "39:68",
+    "category": "lafzi",
+    "note": "Both describe the Trumpet blast causing all in the heavens and earth to swoon, 'except whom Allah wills'; 27:87 is the first mention, 39:68 elaborates with the second blow that causes the resurrection."
+  },
+  {
+    "ayah1": "28:46",
+    "ayah2": "32:3",
+    "category": "lafzi",
+    "note": "Both describe the Quran's purpose as warning a people who received no warner before; 28:46 is embedded in the Moses narrative, 32:3 directly responds to the accusation that the Prophet invented the revelation."
+  },
+  {
+    "ayah1": "28:62",
+    "ayah2": "28:74",
+    "category": "lafzi",
+    "note": "Verbatim repetition within Surah Al-Qasas: 'and the Day He calls to them saying, where are My partners that you used to claim?'; the same call appears at 28:62 and again at 28:74 with the identical wording."
+  },
+  {
+    "ayah1": "30:9",
+    "ayah2": "35:44",
+    "category": "lafzi",
+    "note": "Both contain 'have they not traveled the earth and observed how was the end of those before them?'; see also 30:9/40:82 (batch 5) and 12:109/40:82 for the wider cluster."
+  },
+  {
+    "ayah1": "30:9",
+    "ayah2": "40:82",
+    "category": "lafzi",
+    "note": "Both open with 'have they not traveled the earth and observed how was the end of those before them?'; 30:9 notes the predecessors were stronger and cultivated the land more, 40:82 uses the same rhetorical opening for a parallel point."
+  },
+  {
+    "ayah1": "30:9",
+    "ayah2": "47:10",
+    "category": "lafzi",
+    "note": "Part of the travel-and-observe formula cluster (12:109, 30:9, 35:44, 40:82, 47:10 all share this phrase); this pair is 30:9 and 47:10."
+  },
+  {
+    "ayah1": "30:37",
+    "ayah2": "39:52",
+    "category": "lafzi",
+    "note": "Verbatim: 'Allah extends provision for whom He wills and restricts it; indeed in that are signs for a people who believe'; 30:37 follows a command on generosity to relatives, 39:52 is a rhetorical question to those who claim Allah wronged them."
+  },
+  {
+    "ayah1": "30:43",
+    "ayah2": "42:47",
+    "category": "lafzi",
+    "note": "Both warn: 'before there comes a Day from Allah of which there is no repelling'; 30:43 calls to establish yourself toward the upright religion, 42:47 calls to respond to your Lord before an irrevocable day."
+  },
+  {
+    "ayah1": "31:29",
+    "ayah2": "35:13",
+    "category": "lafzi",
+    "note": "Both describe the merging of night and day and the subjugation of the sun and moon running to an appointed term; 31:29 closes 'Allah is aware of what you do,' 35:13 closes 'Allah is the Free of need, the Praiseworthy.'"
+  },
+  {
+    "ayah1": "31:33",
+    "ayah2": "35:5",
+    "category": "lafzi",
+    "note": "Verbatim: 'the promise of Allah is truth, so let not the worldly life delude you and let not the Deceiver deceive you about Allah'; 31:33 and 35:5 are addressed identically to mankind with no variation in the shared text."
+  },
+  {
+    "ayah1": "34:2",
+    "ayah2": "57:4",
+    "category": "lafzi",
+    "note": "Both describe Allah's knowledge of what enters and exits the earth and heavens. 34:2 closes with 'the Merciful, the Forgiving'; 57:4 closes with 'He is with you wherever you are.'"
+  },
+  {
+    "ayah1": "35:40",
+    "ayah2": "46:4",
+    "category": "lafzi",
+    "note": "Both challenge polytheists: show what their deities created on earth or their share in the heavens. 35:40 names their 'partners' explicitly; 46:4 ends with a demand for a prior scripture or trace of knowledge."
+  },
+  {
+    "ayah1": "35:44",
+    "ayah2": "40:82",
+    "category": "lafzi",
+    "note": "Part of the travel-and-observe formula cluster (12:109, 30:9, 35:44, 40:82, 47:10 all share this phrase); this pair is 35:44 and 40:82."
+  },
+  {
+    "ayah1": "35:44",
+    "ayah2": "47:10",
+    "category": "lafzi",
+    "note": "Part of the travel-and-observe formula cluster (12:109, 30:9, 35:44, 40:82, 47:10 all share this phrase); this pair is 35:44 and 47:10."
+  },
+  {
+    "ayah1": "39:72",
+    "ayah2": "40:76",
+    "category": "lafzi",
+    "note": "Verbatim: 'enter the gates of Hell, abiding therein eternally; wretched is the residence of the arrogant'; 39:72 addresses those given their record in the left hand, 40:76 follows description of the proud disbelievers."
+  },
+  {
+    "ayah1": "40:82",
+    "ayah2": "47:10",
+    "category": "lafzi",
+    "note": "Both contain 'have they not traveled the earth and observed how was the end of those before them?'; completes the cluster with 12:109/40:82, 12:109/47:10, 30:9/40:82, and 30:9/35:44."
+  },
+  {
+    "ayah1": "41:25",
+    "ayah2": "46:18",
+    "category": "lafzi",
+    "note": "Both affirm the divine word fell upon certain people as it did on earlier nations of jinn and humans, and that they are the losers. 41:25 adds context about companions who beautified their deeds."
+  },
+  {
+    "ayah1": "43:83",
+    "ayah2": "70:42",
+    "category": "lafzi",
+    "note": "Verbatim: 'leave them to converse vainly and amuse themselves until they meet their Day which they are promised'; 43:83 follows mockery of the Hour, 70:42 follows the description of those who hasten the punishment."
+  },
+  {
+    "ayah1": "48:28",
+    "ayah2": "61:9",
+    "category": "lafzi",
+    "note": "Third pair in the three-way set (see 9:33/48:28 and 9:33/61:9): all three share the opening about the Prophet sent with guidance to prevail over all religion; 9:33 and 61:9 are verbatim identical, while 48:28 ends 'sufficient is Allah as witness' instead of 'even if the polytheists dislike it.'"
+  },
+  {
+    "ayah1": "53:30",
+    "ayah2": "68:7",
+    "category": "lafzi",
+    "note": "Part of a three-way set (see 16:125/68:7 batch 5 and 16:125/53:30 this batch): 'your Lord knows best who has gone astray from His way and He knows best the rightly guided'; 53:30 closes a passage on those who avoid major sins, 68:7 follows a command not to obey disbelievers."
+  },
+  {
+    "ayah1": "57:21",
+    "ayah2": "62:4",
+    "category": "lafzi",
+    "note": "Verbatim closing formula: 'that is the bounty of Allah which He gives to whom He wills; Allah is the possessor of great bounty'; 57:21 closes the call to race toward Allah's forgiveness, 62:4 follows the description of the Prophet sent among the unlettered."
+  }
 ]
