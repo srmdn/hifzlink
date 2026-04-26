@@ -166,6 +166,51 @@
   letter-spacing: 0.04em;
 }
 
+.source-badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.16rem 0.52rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.source-seed {
+  border: 1px solid #c3d9c0;
+  background: #edf7eb;
+  color: #2a5426;
+}
+
+.source-manual {
+  border: 1px solid #d9c3c3;
+  background: #f7ebed;
+  color: #54262a;
+}
+
+.admin-filter-bar {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.admin-filter-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.22rem 0.72rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-filter-btn.active {
+  border-color: #2d4558;
+  background: #2d4558;
+  color: #fff;
+}
+
 .word-picker-section {
   grid-column: 1 / -1;
   margin-top: 0.4rem;

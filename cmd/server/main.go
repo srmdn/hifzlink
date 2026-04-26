@@ -1327,7 +1327,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
 			note := strings.TrimSpace(r.FormValue("note"))
 			category := strings.TrimSpace(r.FormValue("category"))
-			if err := s.rels.AddWithCategory(ayah1, ayah2, note, category); err != nil {
+			if err := s.rels.AddWithCategory(ayah1, ayah2, note, category, "manual"); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
 					"AdminError":   adminErrorMessage(err),
 					"FormAyah1":    ayah1,

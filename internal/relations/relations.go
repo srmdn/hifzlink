@@ -39,6 +39,7 @@ type AdminRelationView struct {
 	Category   string
 	Highlights string
 	UpdatedAt  string
+	Source     string // "seed" or "manual"
 }
 
 type Service struct {
@@ -74,10 +75,10 @@ func FormatAyahRef(surah, ayah int) string {
 }
 
 func (s *Service) Add(ayah1Ref, ayah2Ref, note string) error {
-	return s.AddWithCategory(ayah1Ref, ayah2Ref, note, "")
+	return s.AddWithCategory(ayah1Ref, ayah2Ref, note, "", "manual")
 }
 
-func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category string) error {
+func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category, source string) error {
 	s1, a1, err := ParseAyahRef(ayah1Ref)
 	if err != nil {
 		return fmt.Errorf("ayah1: %w", err)
@@ -108,6 +109,7 @@ func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category string) err
 		Ayah2Ayah:  a2,
 		Note:       strings.TrimSpace(note),
 		Category:   normalizeCategory(category),
+		Source:     normalizeSource(source),
 	})
 	if err != nil {
 		return err
@@ -224,6 +226,7 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 			Category:   rel.Category,
 			Highlights: rel.Highlights,
 			UpdatedAt:  rel.UpdatedAt,
+			Source:     rel.Source,
 		})
 	}
 	return out, nil
@@ -244,6 +247,7 @@ func (s *Service) RelationByID(id int64) (AdminRelationView, bool, error) {
 		Category:   rel.Category,
 		Highlights: rel.Highlights,
 		UpdatedAt:  rel.UpdatedAt,
+		Source:     rel.Source,
 	}, true, nil
 }
 
@@ -306,6 +310,13 @@ func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highl
 		return err
 	}
 	return nil
+}
+
+func normalizeSource(value string) string {
+	if strings.ToLower(strings.TrimSpace(value)) == "seed" {
+		return "seed"
+	}
+	return "manual"
 }
 
 func normalizeCategory(value string) string {

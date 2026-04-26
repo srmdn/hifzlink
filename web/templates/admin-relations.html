@@ -59,17 +59,23 @@
           autofocus
         />
       </div>
+      <div class="admin-filter-bar">
+        <button class="admin-filter-btn active" data-filter="all">All</button>
+        <button class="admin-filter-btn" data-filter="seed">Seeded</button>
+        <button class="admin-filter-btn" data-filter="manual">Manual</button>
+      </div>
 
       {{if .Relations}}
       <ul class="admin-relations-list" id="relations-list">
         {{range .Relations}}
-        <li class="admin-relation-item" data-search="{{.Ayah1}} {{.Ayah2}} {{.Ayah1Name}} {{.Ayah2Name}} {{.Category}} {{.Note}}">
+        <li class="admin-relation-item" data-search="{{.Ayah1}} {{.Ayah2}} {{.Ayah1Name}} {{.Ayah2Name}} {{.Category}} {{.Note}}" data-source="{{.Source}}">
           <div class="line-head">
             <div class="admin-relation-refs">
               <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
               <span class="meta">{{.Ayah1Name}} / {{.Ayah2Name}}</span>
             </div>
             <div class="admin-row-actions">
+              {{if eq .Source "seed"}}<span class="source-badge source-seed">Seeded</span>{{else if eq .Source "manual"}}<span class="source-badge source-manual">Manual</span>{{end}}
               {{if .Category}}<span class="category-badge">{{index $.CategoryLabelMap .Category}}</span>{{end}}
               <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
               <a class="btn-outline" href="/admin/relations/{{.ID}}/edit?lang={{$.Lang}}">Edit</a>
@@ -123,21 +129,35 @@
     });
     if (cancelBtn && dialog) cancelBtn.addEventListener("click", () => dialog.close());
 
-    // Search
+    // Search + source filter
     const input = document.getElementById("relation-search");
     const list = document.getElementById("relations-list");
     const noResults = document.getElementById("no-results");
     if (!input || !list) return;
 
-    input.addEventListener("input", () => {
+    let activeFilter = "all";
+
+    function applyFilters() {
       const q = input.value.trim().toLowerCase();
       let visible = 0;
       list.querySelectorAll(".admin-relation-item").forEach((item) => {
-        const match = !q || (item.dataset.search || "").toLowerCase().includes(q);
-        item.hidden = !match;
-        if (match) visible++;
+        const matchSearch = !q || (item.dataset.search || "").toLowerCase().includes(q);
+        const matchSource = activeFilter === "all" || (item.dataset.source || "") === activeFilter;
+        item.hidden = !(matchSearch && matchSource);
+        if (!item.hidden) visible++;
       });
-      if (noResults) noResults.hidden = visible > 0 || !q;
+      if (noResults) noResults.hidden = visible > 0 || !!(q || activeFilter !== "all");
+    }
+
+    input.addEventListener("input", applyFilters);
+
+    document.querySelectorAll(".admin-filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".admin-filter-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter || "all";
+        applyFilters();
+      });
     });
   })();
 </script>
