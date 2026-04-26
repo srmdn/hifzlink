@@ -166,26 +166,66 @@
   letter-spacing: 0.04em;
 }
 
-.source-badge {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 0.16rem 0.52rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.admin-relations-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.source-seed {
+.admin-relations-header h2 {
+  margin: 0;
+}
+
+.review-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.review-count-pending {
+  background: #fff3cd;
+  color: #7a5a00;
+  border: 1px solid #f0d070;
+}
+
+.review-count-done {
+  background: #edf7eb;
+  color: #2a5426;
   border: 1px solid #c3d9c0;
+}
+
+.btn-review {
+  border: 1px solid #d0a020;
+  background: #fff8e1;
+  color: #7a5a00;
+  border-radius: 999px;
+  padding: 0.16rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.btn-review:hover {
+  background: #ffedb0;
+}
+
+.btn-review-done {
+  border-color: #c3d9c0;
   background: #edf7eb;
   color: #2a5426;
 }
 
-.source-manual {
-  border: 1px solid #d9c3c3;
-  background: #f7ebed;
-  color: #54262a;
+.btn-review-done:hover {
+  background: #d6efd3;
+}
+
+.btn-review:disabled {
+  opacity: 0.5;
+  cursor: wait;
 }
 
 .admin-filter-bar {

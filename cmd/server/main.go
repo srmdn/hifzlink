@@ -1366,6 +1366,25 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			}
 			http.Redirect(w, r, withLang("/admin/relations?status=edited", lang), http.StatusSeeOther)
 			return
+		case "set_reviewed":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprint(w, `{"error":"invalid id"}`)
+				return
+			}
+			reviewed := r.FormValue("reviewed") == "1"
+			if err := s.rels.SetReviewed(id, reviewed); err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprint(w, `{"error":"update failed"}`)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"ok":true,"reviewed":%v}`, reviewed)
+			return
 		case "delete":
 			idValue := strings.TrimSpace(r.FormValue("id"))
 			id, err := strconv.ParseInt(idValue, 10, 64)

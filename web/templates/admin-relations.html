@@ -48,7 +48,10 @@
     </section>
 
     <section class="card">
-      <h2>Existing Relations</h2>
+      <div class="admin-relations-header">
+        <h2>Existing Relations</h2>
+        {{if .Relations}}<span class="review-count" id="review-count"></span>{{end}}
+      </div>
       <div class="admin-search-wrap">
         <input
           type="search"
@@ -61,21 +64,23 @@
       </div>
       <div class="admin-filter-bar">
         <button class="admin-filter-btn active" data-filter="all">All</button>
-        <button class="admin-filter-btn" data-filter="seed">Seeded</button>
-        <button class="admin-filter-btn" data-filter="manual">Manual</button>
+        <button class="admin-filter-btn" data-filter="0">Needs Review</button>
+        <button class="admin-filter-btn" data-filter="1">Reviewed</button>
       </div>
 
       {{if .Relations}}
-      <ul class="admin-relations-list" id="relations-list">
+      <ul class="admin-relations-list" id="relations-list" data-csrf="{{.AdminCSRFToken}}">
         {{range .Relations}}
-        <li class="admin-relation-item" data-search="{{.Ayah1}} {{.Ayah2}} {{.Ayah1Name}} {{.Ayah2Name}} {{.Category}} {{.Note}}" data-source="{{.Source}}">
+        <li class="admin-relation-item" data-id="{{.ID}}" data-search="{{.Ayah1}} {{.Ayah2}} {{.Ayah1Name}} {{.Ayah2Name}} {{.Category}} {{.Note}}" data-reviewed="{{if .Reviewed}}1{{else}}0{{end}}">
           <div class="line-head">
             <div class="admin-relation-refs">
               <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
               <span class="meta">{{.Ayah1Name}} / {{.Ayah2Name}}</span>
             </div>
             <div class="admin-row-actions">
-              {{if eq .Source "seed"}}<span class="source-badge source-seed">Seeded</span>{{else if eq .Source "manual"}}<span class="source-badge source-manual">Manual</span>{{end}}
+              <button class="btn-review js-toggle-reviewed" type="button" data-id="{{.ID}}" data-reviewed="{{if .Reviewed}}1{{else}}0{{end}}">
+                {{if .Reviewed}}Reviewed{{else}}Needs Review{{end}}
+              </button>
               {{if .Category}}<span class="category-badge">{{index $.CategoryLabelMap .Category}}</span>{{end}}
               <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
               <a class="btn-outline" href="/admin/relations/{{.ID}}/edit?lang={{$.Lang}}">Edit</a>
@@ -129,21 +134,30 @@
     });
     if (cancelBtn && dialog) cancelBtn.addEventListener("click", () => dialog.close());
 
-    // Search + source filter
+    // Search + reviewed filter
     const input = document.getElementById("relation-search");
     const list = document.getElementById("relations-list");
     const noResults = document.getElementById("no-results");
+    const reviewCount = document.getElementById("review-count");
     if (!input || !list) return;
 
+    const csrf = list.dataset.csrf || "";
     let activeFilter = "all";
+
+    function updateReviewCount() {
+      if (!reviewCount) return;
+      const pending = list.querySelectorAll('.admin-relation-item[data-reviewed="0"]').length;
+      reviewCount.textContent = pending > 0 ? `${pending} left to review` : "all reviewed";
+      reviewCount.className = "review-count " + (pending > 0 ? "review-count-pending" : "review-count-done");
+    }
 
     function applyFilters() {
       const q = input.value.trim().toLowerCase();
       let visible = 0;
       list.querySelectorAll(".admin-relation-item").forEach((item) => {
         const matchSearch = !q || (item.dataset.search || "").toLowerCase().includes(q);
-        const matchSource = activeFilter === "all" || (item.dataset.source || "") === activeFilter;
-        item.hidden = !(matchSearch && matchSource);
+        const matchFilter = activeFilter === "all" || (item.dataset.reviewed || "0") === activeFilter;
+        item.hidden = !(matchSearch && matchFilter);
         if (!item.hidden) visible++;
       });
       if (noResults) noResults.hidden = visible > 0 || !!(q || activeFilter !== "all");
@@ -159,6 +173,51 @@
         applyFilters();
       });
     });
+
+    // Toggle reviewed via fetch
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".js-toggle-reviewed");
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+      const currentlyReviewed = btn.dataset.reviewed === "1";
+      const newReviewed = !currentlyReviewed;
+
+      btn.disabled = true;
+
+      const body = new URLSearchParams({
+        csrf_token: csrf,
+        action: "set_reviewed",
+        id: id,
+        reviewed: newReviewed ? "1" : "0",
+      });
+
+      fetch("/admin/relations", { method: "POST", body })
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.ok) throw new Error("server error");
+          const val = newReviewed ? "1" : "0";
+          btn.dataset.reviewed = val;
+          btn.textContent = newReviewed ? "Reviewed" : "Needs Review";
+          btn.classList.toggle("btn-review-done", newReviewed);
+
+          // Update parent item's data-reviewed so filter works
+          const item = btn.closest(".admin-relation-item");
+          if (item) item.dataset.reviewed = val;
+
+          updateReviewCount();
+          applyFilters();
+        })
+        .catch(() => {
+          alert("Failed to update. Please reload.");
+        })
+        .finally(() => {
+          btn.disabled = false;
+        });
+    });
+
+    updateReviewCount();
+    applyFilters();
   })();
 </script>
 </body>

@@ -40,6 +40,7 @@ type AdminRelationView struct {
 	Highlights string
 	UpdatedAt  string
 	Source     string // "seed" or "manual"
+	Reviewed   bool
 }
 
 type Service struct {
@@ -110,6 +111,7 @@ func (s *Service) AddWithCategory(ayah1Ref, ayah2Ref, note, category, source str
 		Note:       strings.TrimSpace(note),
 		Category:   normalizeCategory(category),
 		Source:     normalizeSource(source),
+		Reviewed:   normalizeSource(source) == "manual",
 	})
 	if err != nil {
 		return err
@@ -227,6 +229,7 @@ func (s *Service) AllRelations() ([]AdminRelationView, error) {
 			Highlights: rel.Highlights,
 			UpdatedAt:  rel.UpdatedAt,
 			Source:     rel.Source,
+			Reviewed:   rel.Reviewed,
 		})
 	}
 	return out, nil
@@ -248,7 +251,21 @@ func (s *Service) RelationByID(id int64) (AdminRelationView, bool, error) {
 		Highlights: rel.Highlights,
 		UpdatedAt:  rel.UpdatedAt,
 		Source:     rel.Source,
+		Reviewed:   rel.Reviewed,
 	}, true, nil
+}
+
+func (s *Service) SetReviewed(id int64, reviewed bool) error {
+	if id <= 0 {
+		return fmt.Errorf("invalid relation id")
+	}
+	if err := s.db.SetReviewed(id, reviewed); err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("relation not found")
+		}
+		return err
+	}
+	return nil
 }
 
 func (s *Service) DeleteByID(id int64) error {
