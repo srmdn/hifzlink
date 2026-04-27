@@ -44,6 +44,14 @@
   margin-top: 1rem;
 }
 
+.compare-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.6;
+}
+
 .compare-login-nudge {
   margin: 0;
   font-size: 0.92rem;

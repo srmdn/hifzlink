@@ -631,6 +631,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	if relFound {
 		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
 		compareData["RelationUpdatedAt"] = formatUpdatedAt(rel.UpdatedAt)
+		compareData["RelationNote"] = rel.Note
 	}
 	s.render(w, "compare.html", s.withCommonViewData(r, compareData))
 }

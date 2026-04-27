@@ -39,6 +39,10 @@
       </article>
     </section>
 
+    {{if .RelationNote}}
+    <p class="compare-note">{{.RelationNote}}</p>
+    {{end}}
+
     {{if .QFEnabled}}
     <section class="card compare-save-card">
       {{if .CurrentUser}}
