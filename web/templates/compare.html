@@ -22,6 +22,8 @@
       <button type="button" class="btn-outline" id="practice-exit">Exit Practice</button>
     </div>
 
+    <p class="highlight-legend"><mark class="word-unique">highlighted</mark> words differ between verses</p>
+
     <section class="compare-grid">
       <article class="card verse-card">
         <p class="meta">{{.Ref1}} · {{.Ayah1.SurahName}} · Juz {{.Ayah1.Juz}}</p>
@@ -107,10 +109,12 @@
   (() => {
     const btn = document.getElementById("toggle-highlights");
     const grid = document.querySelector(".compare-grid");
+    const legend = document.querySelector(".highlight-legend");
     if (!btn || !grid) return;
     btn.addEventListener("click", () => {
       const hidden = grid.classList.toggle("no-highlights");
       btn.textContent = hidden ? "Show highlights" : "Hide highlights";
+      if (legend) legend.style.display = hidden ? "none" : "";
     });
   })();
 

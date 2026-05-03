@@ -59,6 +59,12 @@
   text-align: center;
 }
 
+.highlight-legend {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
