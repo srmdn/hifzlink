@@ -13,7 +13,8 @@ func (s *server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		s.render(w, "admin-login.html", s.withCommonViewData(r, map[string]any{
-			"Title":      "Admin Login — HifzLink",
+			"Title":      "Admin Login - HifzLink",
+			"NoIndex":    true,
 			"LoginError": r.URL.Query().Get("error") == "1",
 		}))
 	case http.MethodPost:

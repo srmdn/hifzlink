@@ -298,6 +298,7 @@ func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 		"Title":       "hifzlink: Quran mutashabihat review",
 		"Description": "hifzlink helps you identify and review mutashabihat: similar Quran verses that are easy to confuse during memorization. Try it yourself at hifz.click.",
 		"PairCount":   count,
+		"JSONLD":      websiteJSONLD("https://" + r.Host),
 	}))
 }
 
@@ -511,7 +512,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "ayah.html", s.withCommonViewData(r, map[string]any{
 		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
-		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
+		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat - similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
 		"Ayah":            a,
 		"AyahTranslation": ayahTranslation,
@@ -522,6 +523,11 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		"Collections":     collections,
 		"SaveStatus":      collectionStatusMessage(r.URL.Query().Get("saved")),
 		"QFAudioURL":      qfAudioURL,
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: a.SurahName, Path: fmt.Sprintf("/surah/%d", surah)},
+			{Name: relations.FormatAyahRef(surah, ayah), Path: fmt.Sprintf("/ayah/%d/%d", surah, ayah)},
+		}),
 	}))
 }
 
@@ -611,15 +617,21 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		addRelated(rels2)
 	}
 
+	ref1str := relations.FormatAyahRef(s1, y1)
+	ref2str := relations.FormatAyahRef(s2, y2)
 	compareData := map[string]any{
-		"Title":            fmt.Sprintf("Compare %s vs %s | hifzlink", relations.FormatAyahRef(s1, y1), relations.FormatAyahRef(s2, y2)),
-		"Description":      fmt.Sprintf("Side-by-side comparison of %s and %s with word-level highlights. See exactly where these similar Quran verses diverge.", relations.FormatAyahRef(s1, y1), relations.FormatAyahRef(s2, y2)),
+		"Title":       fmt.Sprintf("Compare %s vs %s | hifzlink", ref1str, ref2str),
+		"Description": fmt.Sprintf("Side-by-side comparison of %s and %s with word-level highlights. See exactly where these similar Quran verses diverge.", ref1str, ref2str),
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: fmt.Sprintf("%s vs %s", ref1str, ref2str), Path: fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1str, ref2str)},
+		}),
 		"Ayah1":            ayah1,
 		"Ayah1Translation": s.translationFor(pageLang(r), s1, y1),
 		"Ayah2":            ayah2,
 		"Ayah2Translation": s.translationFor(pageLang(r), s2, y2),
-		"Ref1":             relations.FormatAyahRef(s1, y1),
-		"Ref2":             relations.FormatAyahRef(s2, y2),
+		"Ref1":             ref1str,
+		"Ref2":             ref2str,
 		"DiffText1":        diff1,
 		"DiffText2":        diff2,
 		"Collections":       collections,
@@ -757,6 +769,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	s.render(w, "dashboard.html", s.withCommonViewData(r, map[string]any{
 		"Title":             "Dashboard",
+		"NoIndex":           true,
 		"RecentCollections": toCollectionViews(collections),
 		"AllCollections":    toCollectionViews(allCollections),
 		"RecentItems":       items,
@@ -785,6 +798,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 		}
 		s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 			"Title":        "Collections",
+			"NoIndex":      true,
 			"Collections":  toCollectionViews(collections),
 			"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
 		}))
@@ -806,6 +820,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			collections, _ := s.db.Collections(sess.UserID)
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
+				"NoIndex":         true,
 				"Collections":     toCollectionViews(collections),
 				"StatusNotice":    "",
 				"CollectionError": "Collection name is required.",
@@ -820,6 +835,7 @@ func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
 			collections, _ := s.db.Collections(sess.UserID)
 			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Collections",
+				"NoIndex":         true,
 				"Collections":     toCollectionViews(collections),
 				"CollectionError": "Collection name already exists or is invalid.",
 				"FormName":        name,
@@ -943,6 +959,7 @@ func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Reque
 
 	s.render(w, "collection-detail.html", s.withCommonViewData(r, map[string]any{
 		"Title":        collection.Name,
+		"NoIndex":      true,
 		"Collection":   toCollectionView(collection),
 		"Items":        viewItems,
 		"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
@@ -1139,7 +1156,8 @@ func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "surah-index.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "Browse by Surah",
 		"Description": "Browse all 114 surahs and their mutashabihat relations. Try it yourself at hifz.click.",
-		"Surahs": items,
+		"Surahs":      items,
+		"JSONLD":      breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{{Name: "Home", Path: "/"}, {Name: "Surah", Path: "/surah"}}),
 	}))
 }
 
@@ -1184,7 +1202,8 @@ func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "juz-index.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "Browse by Juz",
 		"Description": "Browse mutashabihat relations across all 30 juz of the Quran. Try it yourself at hifz.click.",
-		"Juzs":  items,
+		"Juzs":        items,
+		"JSONLD":      breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{{Name: "Home", Path: "/"}, {Name: "Juz", Path: "/juz"}}),
 	}))
 }
 
@@ -1206,15 +1225,20 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]any{
-		"Title":            fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
-		"Description":      fmt.Sprintf("Browse mutashabihat relations in Surah %d: %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
-		"Surah":            surah,
-		"SurahName":        s.quran.SurahName(surah),
-		"SurahArabicName":  s.quran.ArabicName(surah),
-		"AyahCount":        s.quran.AyahCount(surah),
-		"RevelationPlace":  s.quran.RevelationPlace(surah),
-		"Pairs":            pairs,
-		"PairCount":        len(pairs),
+		"Title":           fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Description":     fmt.Sprintf("Browse mutashabihat relations in Surah %d: %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
+		"Surah":           surah,
+		"SurahName":       s.quran.SurahName(surah),
+		"SurahArabicName": s.quran.ArabicName(surah),
+		"AyahCount":       s.quran.AyahCount(surah),
+		"RevelationPlace": s.quran.RevelationPlace(surah),
+		"Pairs":           pairs,
+		"PairCount":       len(pairs),
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: "Surah", Path: "/surah"},
+			{Name: s.quran.SurahName(surah), Path: fmt.Sprintf("/surah/%d", surah)},
+		}),
 	}
 	if surah > 1 {
 		data["PrevSurah"] = surah - 1
@@ -1255,6 +1279,11 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 		"JuzStartAyah":  juzStartAyah,
 		"JuzStartName":  juzStartName,
 		"Pairs":         pairs,
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: "Juz", Path: "/juz"},
+			{Name: fmt.Sprintf("Juz %d", juz), Path: fmt.Sprintf("/juz/%d", juz)},
+		}),
 	}))
 }
 
@@ -1475,17 +1504,18 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 
 		categoryOptions := adminCategoryOptions()
 		s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
-			"Title":           "Edit Relation",
-			"Relation":        rel,
+			"Title":             "Edit Relation",
+			"NoIndex":           true,
+			"Relation":          rel,
 			"RelationUpdatedAt": formatUpdatedAt(rel.UpdatedAt),
-			"DiffText1":       diff1,
-			"DiffText2":       diff2,
-			"Ayah1Words":      w1,
-			"Ayah2Words":      w2,
-			"CategoryOptions": categoryOptions,
-			"BackURL":         backURL,
-			"ReturnCategory":  returnCategory,
-			"AdminError":      "",
+			"DiffText1":         diff1,
+			"DiffText2":         diff2,
+			"Ayah1Words":        w1,
+			"Ayah2Words":        w2,
+			"CategoryOptions":   categoryOptions,
+			"BackURL":           backURL,
+			"ReturnCategory":    returnCategory,
+			"AdminError":        "",
 		}))
 
 	case http.MethodPost:
@@ -1531,6 +1561,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 			}
 			s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
 				"Title":           "Edit Relation",
+				"NoIndex":         true,
 				"Relation":        rel,
 				"Ayah1Words":      w1,
 				"Ayah2Words":      w2,
@@ -2058,6 +2089,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 
 	data := map[string]any{
 		"Title":            "Admin Relations",
+		"NoIndex":          true,
 		"Relations":        rows,
 		"StatusNotice":     adminStatusMessage(r.URL.Query().Get("status")),
 		"FormAyah1":        "",
@@ -2073,6 +2105,51 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 	}
 
 	s.render(w, "admin-relations.html", s.withCommonViewData(r, data))
+}
+
+type breadcrumbItem struct {
+	Name string
+	Path string
+}
+
+func websiteJSONLD(base string) template.JS {
+	type ld struct {
+		Context     string `json:"@context"`
+		Type        string `json:"@type"`
+		ID          string `json:"@id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		URL         string `json:"url"`
+	}
+	b, _ := json.Marshal(ld{
+		Context:     "https://schema.org",
+		Type:        "WebSite",
+		ID:          base + "/#website",
+		Name:        "hifzlink",
+		Description: "Open source Quran mutashabihat review tool for huffaz",
+		URL:         base,
+	})
+	return template.JS(b)
+}
+
+func breadcrumbJSONLD(base string, crumbs []breadcrumbItem) template.JS {
+	type listItem struct {
+		Type     string `json:"@type"`
+		Position int    `json:"position"`
+		Name     string `json:"name"`
+		Item     string `json:"item"`
+	}
+	type ld struct {
+		Context  string     `json:"@context"`
+		Type     string     `json:"@type"`
+		ItemList []listItem `json:"itemListElement"`
+	}
+	items := make([]listItem, len(crumbs))
+	for i, c := range crumbs {
+		items[i] = listItem{Type: "ListItem", Position: i + 1, Name: c.Name, Item: base + c.Path}
+	}
+	b, _ := json.Marshal(ld{Context: "https://schema.org", Type: "BreadcrumbList", ItemList: items})
+	return template.JS(b)
 }
 
 // loadDotEnv reads key=value pairs from path and sets them via os.Setenv,
