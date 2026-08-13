@@ -51,6 +51,46 @@ Follow the project structure defined in `docs/ARCHITECTURE.md`.
 
 Do not change folder layout without good reason.
 
+## Local-First Workflow
+
+This project now uses a local-first workflow.
+
+Public branch model:
+
+- `staging` is the daily development branch.
+- `production` is the release branch.
+- `main` and `qf-api` are historical branches.
+
+Develop and test changes locally before deploying to any server.
+
+Use the VPS only as a deploy and verification target. Do not edit code directly
+on the VPS except for emergency hotfixes. If an emergency VPS edit happens,
+sync the exact change back to Git immediately.
+
+Private runtime files must stay out of this public repo:
+
+- no `.env` files
+- no live `data/relations.db`
+- no local DB snapshots
+- no server-only paths or secrets
+
+Promotion flow:
+
+1. Edit and test locally in `staging`.
+2. Push the `staging` branch.
+3. Deploy VPS staging.
+4. Verify `https://staging.hifz.click`.
+5. Merge `staging` into `production`.
+6. Deploy VPS production.
+7. Verify `https://hifz.click`.
+
+The `quran-mutashabihat` repo is a separate source dataset project. Do not mix
+generated candidate files, raw private state, or local absolute paths into this
+HifzLink repo.
+
+If `AGENTS.local.md` exists, read it for machine-specific paths and operational
+helper commands. `AGENTS.local.md` must remain untracked.
+
 ## Code Quality
 
 Code must be:

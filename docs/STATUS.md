@@ -1,23 +1,32 @@
-# Project Status
+# Project status
 
-Last updated: 2026-03-24 (session 7)
+Last updated: August 13, 2026
 
-## Current State
+## Current state
 
-HifzLink v0.2.2. Tafsir display complete. The public-facing site is fully functional and styled for open source use.
+HifzLink is in active post-v0.2.3 development. The public browsing,
+mutashabihat comparison, account, collection, and administration workflows are
+implemented.
 
 - full Quran Arabic dataset loaded locally (`6236` ayahs)
 - local SQLite relation storage working with migration system
-- server-rendered pages: home, ayah, compare, surah index, juz index, search, collections, dashboard, admin
+- server-rendered pages: home, ayah, compare, surah index, juz index, search,
+  collections, dashboard, and admin
 - EN/ID translation toggle implemented (`ar`, `en`, `id`)
-- landing page redesigned as SaaS-style public page (hero, story, diff example, features, how-it-works, browse CTA)
-- topbar restructured: Search links to `/search`; Dashboard hidden until auth is implemented
+- landing page with product overview, live statistics, and browse actions
+- Quran Foundation OAuth2 login with expiring local sessions
+- Quran Foundation bookmark synchronization and audio integration
+- user collections, saved pairs, mastery state, and dashboard
 - CSS split into focused files: `base.css`, `topbar.css`, `components.css`, `admin.css`, `pages.css`
-- responsive button system (`.btn`, `.btn-sm`, `.btn-outline`, `.btn-danger`) with mobile touch targets
-- full mobile layout pass: hero centering, search row stacking, diff example collapse, consistent top spacing
+- responsive button system (`.btn`, `.btn-sm`, `.btn-outline`, `.btn-danger`)
+  with mobile touch targets
+- full mobile layout pass: hero centering, search row stacking, diff example
+  collapse, and consistent top spacing
 - search page at `/search` supports ayah ref, surah number, surah name, and category filter
 - compare page shows related pairs (all pairs sharing either ayah) instead of sequential prev/next
-- category taxonomy revised to confusion-pattern only: `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`
+- category taxonomy revised to confusion-pattern only: `lafzi`,
+  `addition_omission`, `word_swap`, `ending_variation`, `order_change`,
+  `pronoun_shift`, and `other`
 - old thematic category values migrated to `other` on startup via DB migration
 - admin auth auto-loaded from `.env` at startup (no shell export needed for local dev)
 - em dashes removed from all visitor-facing templates; replaced with natural sentence structure
@@ -36,14 +45,29 @@ HifzLink v0.2.2. Tafsir display complete. The public-facing site is fully functi
 - collections: create, save ayah/pair, remove item, browse
 - dashboard: quick resume links, recent collections, recent saved items
 - admin relation management: add, edit, delete, category filter, word picker for highlights
-- admin protected by HTTP Basic Auth (`HIFZLINK_ADMIN_USER` / `HIFZLINK_ADMIN_PASS`)
-- tafsir display on ayah pages: collapsible section for `lang=en` (Ibn Kathir) and `lang=id` (Kemenag RI)
+- admin protected by a separate cookie-based session initialized from
+  `HIFZLINK_ADMIN_USER` and `HIFZLINK_ADMIN_PASS`
+- tafsir display on ayah pages: collapsible section for `lang=en` (Ibn
+  Kathir) and `lang=id` (Kemenag RI)
+- SEO metadata, canonical URLs, structured data, sitemap, `robots.txt`, and
+  `llms.txt`
+- private and administration pages excluded from indexing
 
-## Data And Scripts
+## Branch model
+
+- `staging` is the daily development and staging deployment branch.
+- `production` is the release branch for `hifz.click`.
+- `main` is a historical branch and is not a deployment source.
+
+Develop and test locally on `staging`. Promote the verified staging commit to
+`production` without rewriting shared history.
+
+## Data and scripts
 
 - Arabic import: `go run ./scripts/import`
 - Translation import: `go run ./scripts/import_translations`
-- Translation validation: `go run ./scripts/validate_translations` (use `-report` for per-language coverage)
+- Translation validation: `go run ./scripts/validate_translations` (use
+  `-report` for per-language coverage)
 - Dataset validation: `go run ./scripts/validate`
 - Relation seed: `go run ./scripts/seed_relations`
 
@@ -57,25 +81,34 @@ Local data files:
 - `data/relations.seed.json`
 - `data/relations.db` (generated locally)
 
-## Known Gaps
+The seed contains 283 unique curated mutashabihat pairs. The separate
+`quran-mutashabihat` repository tracks curated, pending, and dropped dataset
+entries. Only curated pairs belong in the application seed.
 
-- `relations.seed.json` is minimal — curating a real starter set is M3 work
-- no production deployment docs yet
-- faceted filters beyond category (surah, juz, has_note) deferred
-- account/auth system deferred to post-MVP
+## Known gaps
 
-## Important Decisions
+- Automated CI remains deferred. Run the local test and validation commands
+  before every push.
+- Additional search facets remain deferred until the curated relation set
+  requires them.
+- The external dataset still contains pending pairs that need human review.
 
-- local-first architecture (no runtime external API dependency)
+## Important decisions
+
+- Quran text, translations, tafsir, and relations use local-first data.
+- Account login, bookmark synchronization, audio, and selected content features
+  use Quran Foundation APIs when configured.
 - Quran text source: Tanzil
 - translation sources:
-  - English: Quran.com default verse-route translation (Clear Quran / Dr. Mustafa Khattab)
+  - English: Quran.com default verse-route translation (Clear Quran / Dr.
+    Mustafa Khattab)
   - Indonesian: `rioastamal/quran-json` (Kemenag-based source)
-- Arabic text is always primary; translations are secondary and shown beneath
-- minimal dependencies: Go standard library + SQLite driver only
-- single confusion-pattern category field per relation (multi-tag deferred)
+- Arabic text is always primary; translations are secondary and shown beneath.
+- Minimal dependencies: Go standard library and a SQLite driver.
+- Each relation uses one confusion-pattern category. Multi-tag support remains
+  deferred.
 
-## Quick Verification
+## Quick verification
 
 ```bash
 go test ./...
@@ -85,10 +118,10 @@ go run ./cmd/server
 
 Manual smoke URLs:
 
-- `/` — landing page
-- `/search?q=60:8` — search by ayah ref
-- `/search?q=60` — search by surah number
-- `/search?q=mumtahanah` — search by surah name
+- `/`: landing page
+- `/search?q=60:8`: search by ayah ref
+- `/search?q=60`: search by surah number
+- `/search?q=mumtahanah`: search by surah name
 - `/ayah/60/8?lang=en`
 - `/compare?ayah1=60:8&ayah2=60:9&lang=id`
 - `/surah/60?lang=ar`
@@ -97,7 +130,7 @@ Manual smoke URLs:
 - `/collections?lang=ar`
 - `/dashboard?lang=ar`
 
-## Handoff Notes For Other Agents
+## Handoff notes for other agents
 
 Start with these files in order:
 

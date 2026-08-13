@@ -154,7 +154,7 @@ curl -X POST http://localhost:8080/api/relations \
 - `web/templates` server-rendered pages
 - `web/static` CSS
 - `data/quran.json` local Quran dataset
-- `data/relations.seed.json` 150+ curated mutashabihat pairs across all juz
+- `data/relations.seed.json` 283 unique curated mutashabihat pairs across all juz
 - `scripts/import` imports full Quran text + metadata from Tanzil
 - `scripts/import_translations` imports `en` from Quran.com verse-route data (Clear Quran text shown on site), `id` from `rioastamal/quran-json`, and prepares Indonesian + English tafsir data
 - `scripts/validate` validates dataset contract
