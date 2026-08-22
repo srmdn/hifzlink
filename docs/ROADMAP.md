@@ -78,10 +78,13 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 - run `go test ./...`
 - run dataset/translation validation scripts
 
-2. protected branch workflow: [in progress]
-- feature branches merge into `staging` through pull requests
-- verified `staging` merges into production (`main`) through a pull request
-- migrate the VPS checkout from legacy `production` to `main`
+2. pull-request production workflow: [in progress]
+- [done] feature branches merge into `staging` through pull requests
+- [done] verified `staging` merges into production (`main`) through a pull request
+- [done] migrate the VPS checkout from legacy `production` to `main`
+- configure GitHub branch protection for `main` and `staging`
+- preserve local changes and update the local `production/` worktree to `main`
+- archive the frozen legacy `production` branch after explicit approval
 
 3. release flow: [done]
 - tag-based releases

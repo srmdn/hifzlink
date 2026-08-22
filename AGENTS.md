@@ -62,7 +62,8 @@ Public branch model:
 - `staging` is the integration branch.
 - `main` is the production branch and receives verified `staging` changes by
   pull request.
-- `production` is the legacy release branch and is frozen during migration.
+- `production` is the legacy release branch and is frozen after the VPS
+  migration.
 - `qf-api` is a historical branch and is not part of the active workflow.
 
 Never commit or push directly to `main`, `staging`, or `production`. Start a
@@ -74,10 +75,10 @@ request, and release procedure.
 
 Develop and test changes locally before deploying to any server.
 
-Use the VPS only as a production deployment and verification target. Until the
-branch migration is complete, the VPS still uses the legacy `production`
-branch. Do not edit code directly on the VPS except for emergency hotfixes. If
-an emergency VPS edit happens, sync the exact change back to Git immediately.
+Use the VPS only as a production deployment and verification target. The VPS
+production checkout now uses `main`. Do not edit code directly on the VPS
+except for emergency hotfixes. If an emergency VPS edit happens, sync the
+exact change back to Git immediately.
 
 Private runtime files must stay out of this public repo:
 
@@ -86,7 +87,7 @@ Private runtime files must stay out of this public repo:
 - no local DB snapshots
 - no server-only paths or secrets
 
-Promotion flow after migration:
+Promotion flow:
 
 1. Create a feature branch from `staging`.
 2. Open and merge a pull request from the feature branch into `staging`.

@@ -13,8 +13,9 @@ The format is inspired by Keep a Changelog.
 
 ### Changed
 
-- Defined the protected `feature -> staging -> main` workflow and marked the
+- Defined the pull-request `feature -> staging -> main` workflow and marked the
   legacy `production` branch for retirement after the VPS migration
+- Recorded the verified production VPS migration from `production` to `main`.
 
 ## [0.2.3] - 2026-04-18 — QF integration, practice tools, surah index redesign
 
