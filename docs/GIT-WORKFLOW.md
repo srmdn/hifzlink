@@ -11,14 +11,12 @@ documentation change.
   target `staging`.
 - `main` is the production branch. Pull requests from `staging` target
   `main` for release.
-- `production` is the legacy release branch. Keep it frozen and do not create
-  new commits there.
+- `archive/production-2026-08-22` is the archive tag for the former legacy
+  `production` branch. Do not recreate that branch.
 - `qf-api` is historical and is not part of the active workflow.
 
-The production VPS checkout uses `main`. The legacy `production` branch is not
-a deployment source. The local `production/` worktree remains on the legacy
-branch until its uncommitted changes are preserved and it can be switched
-safely.
+The production VPS checkout and local `production/` worktree both use `main`.
+The archived legacy source is not a deployment source.
 
 ## Start a change
 
@@ -73,7 +71,7 @@ After staging verification:
 Do not edit application source directly on the VPS. Emergency changes require
 explicit approval and must be synchronized back to Git immediately.
 
-## Migration record and remaining cleanup
+## Migration record
 
 The VPS migration is complete:
 
@@ -82,12 +80,8 @@ The VPS migration is complete:
 3. Switch the production VPS checkout from `production` to `main` through the
    normal deployment procedure.
 4. Verify the binary, service, and `https://hifz.click`.
-
-Remaining cleanup:
-
-- Configure GitHub branch protection for `main` and `staging`. The project
-  workflow requires pull requests even before those settings are configured.
-- Preserve local changes, then update the local `production/` worktree to
-  `main`.
-- Archive or delete the legacy `production` branch only after explicit
-  approval.
+5. Configure GitHub branch protection for `main` and `staging`.
+6. Preserve local changes, then update the local `production/` worktree to
+   `main`.
+7. Archive the legacy source under
+   `archive/production-2026-08-22`, then delete the legacy `production` branch.

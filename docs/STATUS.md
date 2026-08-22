@@ -61,16 +61,16 @@ implemented.
 - Feature branches target `staging` through pull requests.
 - `staging` is the integration branch and local verification target.
 - `main` is the production branch and current source for `hifz.click`.
-- `production` is the legacy release branch and is frozen.
+- the legacy `production` branch is archived under
+  `archive/production-2026-08-22` and is no longer an active branch
 - `qf-api` is historical and is not part of the active workflow.
 
 Develop and test locally on feature branches based on `staging`. Promote the
 verified `staging` commit to `main` through a pull request. The local
-`production/` worktree remains on the legacy branch until its local changes
-are preserved and it can be switched safely.
+`production/` worktree tracks `main`.
 
 See [`docs/GIT-WORKFLOW.md`](./GIT-WORKFLOW.md) for the release procedure and
-remaining cleanup.
+migration record.
 
 ## Data and scripts
 
