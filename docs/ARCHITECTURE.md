@@ -163,8 +163,9 @@ go run ./cmd/server
 The same Go binary serves staging and production. Each environment uses its own
 configuration and SQLite database. Develop on a feature branch, merge through
 `staging`, verify the result, and promote the verified commit to `main` through
-a pull request. The production VPS uses `main` after the branch migration is
-complete.
+a pull request. The production VPS runs the verified binary built from `main`.
+The local `production/` worktree remains a frozen legacy checkout until its
+local changes are preserved and it can be switched safely.
 
 ## Design philosophy
 
