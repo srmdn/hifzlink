@@ -1,8 +1,8 @@
 # Git workflow
 
-HifzLink uses protected branch workflows. Agents and contributors must use a
-short-lived feature branch and a pull request for every code or documentation
-change.
+HifzLink uses a pull-request branch workflow. Agents and contributors must use
+a short-lived feature branch and a pull request for every code or
+documentation change.
 
 ## Branch roles
 
@@ -11,13 +11,14 @@ change.
   target `staging`.
 - `main` is the production branch. Pull requests from `staging` target
   `main` for release.
-- `production` is the legacy release branch. Freeze it during the migration
-  and do not create new commits there.
+- `production` is the legacy release branch. Keep it frozen and do not create
+  new commits there.
 - `qf-api` is historical and is not part of the active workflow.
 
-The current VPS checkout still uses the legacy `production` branch. Do not
-deploy `main` until the migration checklist is complete and the live source
-has been verified.
+The production VPS checkout uses `main`. The legacy `production` branch is not
+a deployment source. The local `production/` worktree remains on the legacy
+branch until its uncommitted changes are preserved and it can be switched
+safely.
 
 ## Start a change
 
@@ -61,7 +62,7 @@ verified on `staging`, open a second pull request from `staging` to `main`.
 
 ## Release from `main`
 
-After the branch migration is complete:
+After staging verification:
 
 1. Merge the verified `staging` pull request into `main`.
 2. Confirm the production binary matches the `main` source commit.
@@ -72,14 +73,21 @@ After the branch migration is complete:
 Do not edit application source directly on the VPS. Emergency changes require
 explicit approval and must be synchronized back to Git immediately.
 
-## Branch migration checklist
+## Migration record and remaining cleanup
 
-Complete these steps before treating `main` as the live source:
+The VPS migration is complete:
 
 1. Merge the verified application state into `main` through a pull request.
-2. Set `main` as the GitHub default branch and protect `main` and `staging`.
+2. Set `main` as the GitHub default branch.
 3. Switch the production VPS checkout from `production` to `main` through the
    normal deployment procedure.
 4. Verify the binary, service, and `https://hifz.click`.
-5. Update the local release worktree to `main`.
-6. Archive or delete the legacy `production` branch only after verification.
+
+Remaining cleanup:
+
+- Configure GitHub branch protection for `main` and `staging`. The project
+  workflow requires pull requests even before those settings are configured.
+- Preserve local changes, then update the local `production/` worktree to
+  `main`.
+- Archive or delete the legacy `production` branch only after explicit
+  approval.

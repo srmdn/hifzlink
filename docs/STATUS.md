@@ -33,6 +33,7 @@ implemented.
 - unit and handler tests passing (`go test ./...`)
 - GitHub Actions CI runs tests, dataset validation, translation validation, and
   the server build for `staging` and `main` changes
+- production VPS migration from legacy `production` to `main` is complete
 
 ## Implemented Features
 
@@ -59,15 +60,17 @@ implemented.
 
 - Feature branches target `staging` through pull requests.
 - `staging` is the integration branch and local verification target.
-- `main` is the target production branch for `hifz.click`.
-- `production` is the legacy release branch and is frozen during migration.
+- `main` is the production branch and current source for `hifz.click`.
+- `production` is the legacy release branch and is frozen.
 - `qf-api` is historical and is not part of the active workflow.
 
 Develop and test locally on feature branches based on `staging`. Promote the
-verified `staging` commit to `main` through a pull request. The VPS remains on
-the legacy `production` branch until the migration checklist is complete.
+verified `staging` commit to `main` through a pull request. The local
+`production/` worktree remains on the legacy branch until its local changes
+are preserved and it can be switched safely.
 
-See [`docs/GIT-WORKFLOW.md`](./GIT-WORKFLOW.md) for the migration checklist.
+See [`docs/GIT-WORKFLOW.md`](./GIT-WORKFLOW.md) for the release procedure and
+remaining cleanup.
 
 ## Data and scripts
 
