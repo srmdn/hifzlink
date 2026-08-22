@@ -289,15 +289,46 @@ func main() {
 	}
 }
 
+type homeDemoView struct {
+	Ref1       string
+	Ref2       string
+	Ayah1      search.Ayah
+	Ayah2      search.Ayah
+	DiffText1  template.HTML
+	DiffText2  template.HTML
+	CompareURL string
+}
+
 func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 	count, err := s.db.CountRelations()
 	if err != nil {
 		count = 0
 	}
+
+	lang := pageLang(r)
+	var demo *homeDemoView
+	if ayah1, ok := s.quran.Get(60, 8); ok {
+		if ayah2, ok := s.quran.Get(60, 9); ok {
+			diff1, diff2 := diffHighlight(ayah1.TextAR, ayah2.TextAR)
+			ref1 := relations.FormatAyahRef(ayah1.Surah, ayah1.Ayah)
+			ref2 := relations.FormatAyahRef(ayah2.Surah, ayah2.Ayah)
+			demo = &homeDemoView{
+				Ref1:       ref1,
+				Ref2:       ref2,
+				Ayah1:      ayah1,
+				Ayah2:      ayah2,
+				DiffText1:  diff1,
+				DiffText2:  diff2,
+				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+			}
+		}
+	}
+
 	s.render(w, "home.html", s.withCommonViewData(r, map[string]any{
 		"Title":       "hifzlink: Quran mutashabihat review",
 		"Description": "hifzlink helps you identify and review mutashabihat: similar Quran verses that are easy to confuse during memorization. Try it yourself at hifz.click.",
 		"PairCount":   count,
+		"HomeDemo":    demo,
 		"JSONLD":      websiteJSONLD("https://" + r.Host),
 	}))
 }
@@ -451,14 +482,14 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "search.html", s.withCommonViewData(r, map[string]any{
-		"Title":          "Search pairs",
-		"Description":    "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
-		"Query":          q,
-		"QueryLabel":     queryLabel,
-		"Results":        results,
-		"ErrMsg":         errMsg,
-		"FilterPills":    filterPills,
-		"CategoryFilter": categoryFilter,
+		"Title":            "Search pairs",
+		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
+		"Query":            q,
+		"QueryLabel":       queryLabel,
+		"Results":          results,
+		"ErrMsg":           errMsg,
+		"FilterPills":      filterPills,
+		"CategoryFilter":   categoryFilter,
 		"CategoryLabelMap": categoryLabelMap,
 	}))
 }
@@ -626,14 +657,14 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 			{Name: "Home", Path: "/"},
 			{Name: fmt.Sprintf("%s vs %s", ref1str, ref2str), Path: fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1str, ref2str)},
 		}),
-		"Ayah1":            ayah1,
-		"Ayah1Translation": s.translationFor(pageLang(r), s1, y1),
-		"Ayah2":            ayah2,
-		"Ayah2Translation": s.translationFor(pageLang(r), s2, y2),
-		"Ref1":             ref1str,
-		"Ref2":             ref2str,
-		"DiffText1":        diff1,
-		"DiffText2":        diff2,
+		"Ayah1":             ayah1,
+		"Ayah1Translation":  s.translationFor(pageLang(r), s1, y1),
+		"Ayah2":             ayah2,
+		"Ayah2Translation":  s.translationFor(pageLang(r), s2, y2),
+		"Ref1":              ref1str,
+		"Ref2":              ref2str,
+		"DiffText1":         diff1,
+		"DiffText2":         diff2,
 		"Collections":       collections,
 		"SaveStatus":        collectionStatusMessage(r.URL.Query().Get("saved")),
 		"RelatedPairs":      relatedPairs,

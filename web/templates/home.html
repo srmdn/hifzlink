@@ -1,195 +1,273 @@
 <!doctype html>
 <html lang="en">
 {{template "head" .}}
-<body>
+<body class="home-page">
 {{template "topbar" .}}
 
   <main class="lp-main">
-
-    {{/* ── Hero ───────────────────────────────────────────────── */}}
     <section class="lp-hero">
-      <div class="container lp-hero-inner">
+      <div class="lp-hero-grid" aria-hidden="true"></div>
+      <div class="lp-hero-glow lp-hero-glow--one" aria-hidden="true"></div>
+      <div class="lp-hero-glow lp-hero-glow--two" aria-hidden="true"></div>
 
-        {{/* Desktop: text left, buttons right. Mobile/tablet: stacked. */}}
+      <div class="container lp-hero-inner">
         <div class="lp-hero-layout">
           <div class="lp-hero-text">
-            <p class="lp-eyebrow">{{if .PairCount}}{{.PairCount}} pairs · {{end}}Open source · Free to use</p>
-            <h1 class="lp-headline">Your brain confuses<br>similar verses.<br>Now you can track that.</h1>
-            <p class="lp-sub">hifzlink captures the confusion patterns you encounter during recitation. The next time your mind slips from one verse to another, you know exactly where the difference is.</p>
-          </div>
-          <div class="lp-side-actions">
-            <a class="lp-cta-primary" href="{{.SearchURL}}">Compare verses →</a>
-            <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">Browse by Surah</a>
-          </div>
-        </div>
+            <p class="lp-eyebrow"><span class="lp-eyebrow-dot"></span>Mutashabihat review</p>
+            <h1 class="lp-headline">Similar ayahs.<br><em>Clearer recall.</em></h1>
+            <p class="lp-sub">See the exact words your memory keeps crossing. Compare, practice, and build a stronger anchor for every difficult pair.</p>
 
-        {{/* ── Diff preview ── */}}
-        <div class="lp-diff-example lp-hero-diff">
-          <div class="lp-diff-card">
-            <p class="lp-diff-ref">60:8 · Al-Mumtahanah</p>
-            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">لَّا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">لَمْ يُقَاتِلُوكُمْ</mark> فِي الدِّينِ...</p>
-          </div>
-          <div class="lp-diff-card">
-            <p class="lp-diff-ref">60:9 · Al-Mumtahanah</p>
-            <p class="lp-diff-arabic" lang="ar"><mark class="word-unique">إِنَّمَا</mark> يَنْهَاكُمُ اللَّهُ عَنِ الَّذِينَ <mark class="word-unique">قَاتَلُوكُمْ</mark> فِي الدِّينِ...</p>
-          </div>
-        </div>
-        <p class="lp-diff-caption">Word-level highlights show exactly where two nearly identical verses diverge. <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">See full comparison →</a></p>
+            <div class="lp-hero-actions">
+              <a class="lp-cta-primary" href="{{.SearchURL}}">Find a pair <span aria-hidden="true">↗</span></a>
+              <a class="lp-text-link" href="{{.SurahIndexURL}}">Browse by Surah <span aria-hidden="true">→</span></a>
+            </div>
 
+            <div class="lp-proof" aria-label="HifzLink index coverage">
+              {{if .PairCount}}<span class="lp-proof-value">{{.PairCount}}</span><span>curated pairs</span>{{end}}
+              <span class="lp-proof-divider" aria-hidden="true"></span>
+              <span class="lp-proof-value">6,236</span><span>ayahs indexed</span>
+            </div>
+          </div>
+
+          {{if .HomeDemo}}
+          <div class="lp-demo-wrap">
+            <div class="lp-demo-orbit lp-demo-orbit--one" aria-hidden="true"></div>
+            <div class="lp-demo-orbit lp-demo-orbit--two" aria-hidden="true"></div>
+            <section class="lp-demo" data-home-demo data-diff-visible="true" aria-labelledby="home-demo-title">
+              <div class="lp-demo-topline">
+                <div>
+                  <p class="lp-demo-kicker">Interactive example</p>
+                  <h2 id="home-demo-title" class="lp-demo-title">{{.HomeDemo.Ref1}} <span aria-hidden="true">↔</span> {{.HomeDemo.Ref2}}</h2>
+                </div>
+                <span class="lp-demo-status" data-demo-status aria-live="polite">Differences visible</span>
+              </div>
+              <p class="lp-demo-context">{{.HomeDemo.Ayah1.SurahName}} <span aria-hidden="true">·</span> tap a marked word to focus it</p>
+
+              <div class="lp-demo-grid">
+                <article class="lp-demo-card" data-demo-card="left">
+                  <div class="lp-demo-card-head">
+                    <a href="/ayah/{{.HomeDemo.Ayah1.Surah}}/{{.HomeDemo.Ayah1.Ayah}}?lang={{.Lang}}">{{.HomeDemo.Ref1}}</a>
+                    <span>first verse</span>
+                  </div>
+                  <p class="lp-demo-arabic" lang="ar">{{.HomeDemo.DiffText1}}</p>
+                </article>
+                <article class="lp-demo-card" data-demo-card="right">
+                  <div class="lp-demo-card-head">
+                    <a href="/ayah/{{.HomeDemo.Ayah2.Surah}}/{{.HomeDemo.Ayah2.Ayah}}?lang={{.Lang}}">{{.HomeDemo.Ref2}}</a>
+                    <span>second verse</span>
+                  </div>
+                  <p class="lp-demo-arabic" lang="ar">{{.HomeDemo.DiffText2}}</p>
+                </article>
+              </div>
+
+              <div class="lp-demo-footer">
+                <span class="lp-demo-legend"><span class="lp-legend-swatch" aria-hidden="true"></span><span data-demo-legend>Marked words differ</span></span>
+                <a class="lp-demo-open" href="{{.HomeDemo.CompareURL}}">Open full compare <span aria-hidden="true">↗</span></a>
+              </div>
+
+              <div class="lp-demo-controls" role="toolbar" aria-label="Interactive comparison controls">
+                <button type="button" class="lp-demo-control lp-demo-control--primary" data-demo-action="toggle-diff" aria-pressed="true">Hide differences</button>
+                <button type="button" class="lp-demo-control" data-demo-action="practice" aria-pressed="false">Practice mode</button>
+              </div>
+
+              <div class="lp-demo-practice" data-demo-practice-controls hidden>
+                <p>Recall the hidden verse first.</p>
+                <div>
+                  <button type="button" class="lp-demo-control lp-demo-control--primary" data-demo-action="reveal">Reveal</button>
+                  <button type="button" class="lp-demo-control" data-demo-action="switch">Switch side</button>
+                  <button type="button" class="lp-demo-control" data-demo-action="exit">Exit practice</button>
+                </div>
+              </div>
+            </section>
+          </div>
+          {{end}}
+        </div>
       </div>
 
-      {{/* Scroll cue: absolute at bottom of hero, outside the centered inner */}}
       <div class="lp-scroll-cue" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 8l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <span>Explore the pattern</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6.5 9 11.5l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
     </section>
 
-    {{/* ── Why I built this ───────────────────────────────────── */}}
     <section class="lp-section lp-story">
-      <div class="container lp-section-inner">
-        <p class="lp-section-label">Why I built this</p>
-        <blockquote class="lp-quote">
-          "When I'm reciting and my brain slips from one verse to a similar one, I want a tool that captures that relationship. So next time I encounter it, I can immediately recall: <em>ah, this is the one that sounds like 60:9. The difference is here.</em>"
-        </blockquote>
-        <p class="lp-story-body">Mutashabihat are verses nearly identical in wording, and among the hardest parts of Quran memorization to master. Standard review tools don't model this kind of confusion. hifzlink does.</p>
-      </div>
-    </section>
-
-    {{/* ── Features ───────────────────────────────────────────── */}}
-    <section class="lp-section lp-features">
-      <div class="container lp-section-inner">
-        <p class="lp-section-label">Features</p>
-        <h2 class="lp-section-title">Everything you need for mutashabihat review</h2>
-        <div class="lp-feature-grid">
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M4 11h14M14 7l4 4-4 4M8 7L4 11l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3>Word-level diff</h3>
-            <p>Compare two similar verses side by side with word-level highlighting. See precisely where one verse diverges from the other.</p>
-          </div>
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M14.5 14.5L18 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3>Search by ayah or surah</h3>
-            <p>Look up any ayah reference, surah number, or surah name to instantly see all saved pairs involving it.</p>
-          </div>
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-                <rect x="12" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-                <rect x="3" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-                <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-              </svg>
-            </div>
-            <h3>Browse by Surah &amp; Juz</h3>
-            <p>Explore the full map of known similar verses organized by surah or juz. Scan where confusions are concentrated.</p>
-          </div>
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M5 4h12a1 1 0 011 1v13l-3-2-3 2-3-2-3 2V5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                <path d="M8 9h6M8 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3>Collections</h3>
-            <p>Group pairs into named collections for focused review sessions. Isolate the verses you're currently working on. <span class="lp-login-note">Login required.</span></p>
-          </div>
-          <div class="lp-feature-card">
-            <div class="lp-feature-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <polygon points="8,5 8,17 17,11" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                <line x1="3" y1="5" x2="3" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3>Verse audio</h3>
-            <p>Listen to any verse with Alafasy recitation, powered by the Quran Foundation. Available on every ayah detail page.</p>
-          </div>
+      <div class="container lp-story-layout">
+        <div class="lp-story-intro">
+          <p class="lp-section-label">The problem</p>
+          <h2 class="lp-section-title">The moment your memory slips.</h2>
+        </div>
+        <div class="lp-story-copy">
+          <blockquote class="lp-quote">“This sounds like another ayah. Where exactly is the difference?”</blockquote>
+          <p>Mutashabihat are verses that share so much wording that ordinary review can blur them together. HifzLink turns that moment of uncertainty into a precise visual anchor.</p>
         </div>
       </div>
     </section>
 
-    {{/* ── Stats strip ───────────────────────────────────────── */}}
+    <section class="lp-section lp-workflow">
+      <div class="container lp-section-inner lp-wide-inner">
+        <div class="lp-section-heading">
+          <p class="lp-section-label">A focused review loop</p>
+          <h2 class="lp-section-title">From a slip to a stronger recall.</h2>
+        </div>
+        <div class="lp-workflow-grid">
+          <a class="lp-workflow-card" href="{{.SearchURL}}">
+            <span class="lp-workflow-number">01</span>
+            <h3>Find the pair</h3>
+            <p>Search by ayah reference, surah number, or surah name.</p>
+            <span class="lp-card-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="lp-workflow-card lp-workflow-card--featured" href="{{if .HomeDemo}}{{.HomeDemo.CompareURL}}{{else}}{{.SearchURL}}{{end}}">
+            <span class="lp-workflow-number">02</span>
+            <h3>See the difference</h3>
+            <p>Read both full verses and spot the words that change.</p>
+            <span class="lp-card-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="lp-workflow-card" href="{{.JuzIndexURL}}">
+            <span class="lp-workflow-number">03</span>
+            <h3>Lock it in</h3>
+            <p>Practice the pair until the right anchor comes back.</p>
+            <span class="lp-card-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     {{if .PairCount}}
-    <section class="lp-section lp-stats">
-      <div class="container lp-section-inner">
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-num">{{.PairCount}}</span>
-            <span class="stat-label">curated pairs</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">114</span>
-            <span class="stat-label">surahs covered</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-num">6,236</span>
-            <span class="stat-label">ayahs indexed</span>
-          </div>
-        </div>
+    <section class="lp-stats" aria-label="HifzLink statistics">
+      <div class="container lp-stats-grid">
+        <div><strong>{{.PairCount}}</strong><span>curated pairs</span></div>
+        <div><strong>114</strong><span>surahs covered</span></div>
+        <div><strong>6,236</strong><span>ayahs indexed</span></div>
       </div>
     </section>
     {{end}}
 
-    {{/* ── How it works ───────────────────────────────────────── */}}
-    <section class="lp-section lp-how">
-      <div class="container lp-section-inner">
-        <p class="lp-section-label">How it works</p>
-        <h2 class="lp-section-title">Three steps from confusion to clarity</h2>
-        <ol class="lp-steps">
-          <li class="lp-step">
-            <span class="lp-step-num">1</span>
-            <div>
-              <h3>Encounter a confusion</h3>
-              <p>During recitation, your mind slips. You land on the wrong verse or can't tell two similar ones apart.</p>
-            </div>
-          </li>
-          <li class="lp-step">
-            <span class="lp-step-num">2</span>
-            <div>
-              <h3>Search for the pair</h3>
-              <p>Type the ayah reference into Search. If the pair is saved, you'll see it immediately, along with any other verses that share the same confusion pattern.</p>
-            </div>
-          </li>
-          <li class="lp-step">
-            <span class="lp-step-num">3</span>
-            <div>
-              <h3>Compare and lock it in</h3>
-              <p>Open the side-by-side compare view. The highlighted diff shows exactly which words differ, so your brain builds the right anchor.</p>
-            </div>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    {{/* ── Browse CTA ──────────────────────────────────────────── */}}
-    <section class="lp-section lp-browse-cta">
-      <div class="container lp-section-inner">
-        <div class="lp-browse-split">
-          <div class="lp-browse-text">
-            <h2 class="lp-section-title">Start reviewing</h2>
-            <p class="lp-sub">Browse the full collection of saved mutashabihat pairs, or search for a specific verse.</p>
-          </div>
-          <div class="lp-side-actions">
-            <a class="lp-cta-primary" href="{{.SearchURL}}">Compare verses →</a>
-            <a class="lp-cta-secondary" href="{{.SurahIndexURL}}">By Surah</a>
-            <a class="lp-cta-secondary" href="{{.JuzIndexURL}}">By Juz</a>
-          </div>
+    <section class="lp-section lp-tools">
+      <div class="container lp-section-inner lp-wide-inner">
+        <div class="lp-section-heading">
+          <p class="lp-section-label">Built for your study desk</p>
+          <h2 class="lp-section-title">Everything stays close to the verse.</h2>
+        </div>
+        <div class="lp-tool-grid">
+          <a class="lp-tool-card" href="{{.SearchURL}}"><span class="lp-tool-icon">⌕</span><h3>Search by ayah</h3><p>Start from the verse that keeps getting mixed up.</p></a>
+          <a class="lp-tool-card" href="{{.SurahIndexURL}}"><span class="lp-tool-icon">◫</span><h3>Browse by Surah</h3><p>See where similar verses cluster across the Quran.</p></a>
+          <a class="lp-tool-card" href="{{.JuzIndexURL}}"><span class="lp-tool-icon">◌</span><h3>Browse by Juz</h3><p>Review pairs in the section you are memorizing now.</p></a>
+          <a class="lp-tool-card" href="{{.LoginURL}}"><span class="lp-tool-icon">▱</span><h3>Save your pairs</h3><p>Keep a personal review set for focused murojaah.</p></a>
         </div>
       </div>
     </section>
 
+    <section class="lp-final-cta">
+      <div class="container lp-final-cta-inner">
+        <div>
+          <p class="lp-section-label">Ready when you are</p>
+          <h2>Find the difference.<br><em>Keep the anchor.</em></h2>
+        </div>
+        <div class="lp-final-actions">
+          <a class="lp-cta-primary" href="{{.SearchURL}}">Start reviewing <span aria-hidden="true">↗</span></a>
+          <a class="lp-text-link" href="{{.JuzIndexURL}}">Browse by Juz <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
   </main>
 
 {{template "footer" .}}
+<script>
+  (() => {
+    const demo = document.querySelector("[data-home-demo]");
+    if (!demo) return;
+
+    const marks = Array.from(demo.querySelectorAll("mark.word-unique"));
+    const status = demo.querySelector("[data-demo-status]");
+    const toggleDiff = demo.querySelector('[data-demo-action="toggle-diff"]');
+    const practiceButton = demo.querySelector('[data-demo-action="practice"]');
+    const practiceControls = demo.querySelector("[data-demo-practice-controls]");
+    const cards = Array.from(demo.querySelectorAll("[data-demo-card]"));
+
+    const updateStatus = (text) => {
+      if (status) status.textContent = text;
+    };
+
+    const clearFocus = () => marks.forEach((mark) => mark.classList.remove("is-focused", "is-dimmed"));
+
+    const setPractice = (active) => {
+      demo.classList.toggle("is-practice", active);
+      demo.classList.remove("is-revealed", "is-hiding-left");
+      demo.classList.toggle("is-hiding-right", active);
+      if (practiceControls) practiceControls.hidden = !active;
+      if (practiceButton) {
+        practiceButton.setAttribute("aria-pressed", String(active));
+        practiceButton.textContent = active ? "Exit practice" : "Practice mode";
+      }
+      if (active) updateStatus("Second verse hidden");
+      else updateStatus(demo.classList.contains("is-diff-hidden") ? "Differences hidden" : "Differences visible");
+      clearFocus();
+    };
+
+    demo.addEventListener("click", (event) => {
+      const action = event.target.closest("[data-demo-action]")?.dataset.demoAction;
+      if (action === "toggle-diff") {
+        const hidden = demo.classList.toggle("is-diff-hidden");
+        toggleDiff?.setAttribute("aria-pressed", String(!hidden));
+        if (toggleDiff) toggleDiff.textContent = hidden ? "Show differences" : "Hide differences";
+        updateStatus(hidden ? "Differences hidden" : "Differences visible");
+        return;
+      }
+      if (action === "practice") {
+        setPractice(!demo.classList.contains("is-practice"));
+        return;
+      }
+      if (action === "reveal") {
+        demo.classList.add("is-revealed");
+        updateStatus("Both verses revealed");
+        return;
+      }
+      if (action === "switch") {
+        demo.classList.toggle("is-hiding-right");
+        demo.classList.toggle("is-hiding-left");
+        updateStatus(demo.classList.contains("is-hiding-left") ? "First verse hidden" : "Second verse hidden");
+        return;
+      }
+      if (action === "exit") {
+        setPractice(false);
+        return;
+      }
+
+      const mark = event.target.closest("mark.word-unique");
+      if (mark) {
+        const focused = mark.classList.contains("is-focused");
+        clearFocus();
+        if (!focused) {
+          mark.classList.add("is-focused");
+          marks.filter((item) => item !== mark).forEach((item) => item.classList.add("is-dimmed"));
+          updateStatus("Focused on one difference");
+        } else {
+          updateStatus(demo.classList.contains("is-practice") ? "Second verse hidden" : "Differences visible");
+        }
+      }
+    });
+
+    marks.forEach((mark) => {
+      mark.tabIndex = 0;
+      mark.setAttribute("role", "button");
+      mark.setAttribute("aria-label", "Focus this difference");
+      mark.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          mark.click();
+        }
+      });
+    });
+
+    cards.forEach((card) => card.addEventListener("pointermove", (event) => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty("--pointer-x", ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + "%");
+      card.style.setProperty("--pointer-y", ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + "%");
+    }));
+  })();
+</script>
 </body>
 </html>
