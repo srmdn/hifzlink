@@ -12,6 +12,7 @@ import (
 	neturl "net/url"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -1803,6 +1804,7 @@ func logRequests(next http.Handler) http.Handler {
 
 func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	lang := pageLang(r)
+	data["AssetVersion"] = buildAssetVersion()
 	data["Lang"] = lang
 	data["HomeURL"] = withLang("/", lang)
 	data["LangARURL"] = switchLang(r, "ar")
@@ -1841,6 +1843,25 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	}
 
 	return data
+}
+
+func buildAssetVersion() string {
+	info, ok := debug.ReadBuildInfo()
+	if ok {
+		for _, setting := range info.Settings {
+			if setting.Key != "vcs.revision" {
+				continue
+			}
+			version := strings.TrimSpace(setting.Value)
+			if len(version) > 12 {
+				return version[:12]
+			}
+			if version != "" {
+				return version
+			}
+		}
+	}
+	return "dev"
 }
 
 func pageLang(r *http.Request) string {

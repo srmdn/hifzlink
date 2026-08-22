@@ -29,12 +29,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
-  <link rel="stylesheet" href="/static/base.css" />
-  <link rel="stylesheet" href="/static/topbar.css" />
-  <link rel="stylesheet" href="/static/components.css" />
-  <link rel="stylesheet" href="/static/admin.css" />
-  <link rel="stylesheet" href="/static/pages.css" />
-  {{if .HomeDemo}}<link rel="stylesheet" href="/static/home.css" />{{end}}
+  <link rel="stylesheet" href="/static/base.css?v={{.AssetVersion}}" />
+  <link rel="stylesheet" href="/static/topbar.css?v={{.AssetVersion}}" />
+  <link rel="stylesheet" href="/static/components.css?v={{.AssetVersion}}" />
+  <link rel="stylesheet" href="/static/admin.css?v={{.AssetVersion}}" />
+  <link rel="stylesheet" href="/static/pages.css?v={{.AssetVersion}}" />
+  {{if .HomeDemo}}<link rel="stylesheet" href="/static/home.css?v={{.AssetVersion}}" />{{end}}
   {{if .UmamiID}}<script defer src="https://analytics.srmdn.com/script.js" data-website-id="{{.UmamiID}}"></script>{{end}}
   {{if .JSONLD}}<script type="application/ld+json">{{.JSONLD}}</script>{{end}}
 </head>
