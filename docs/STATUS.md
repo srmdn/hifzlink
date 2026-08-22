@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: August 13, 2026
+Last updated: August 22, 2026
 
 ## Current state
 
@@ -31,6 +31,8 @@ implemented.
 - admin auth auto-loaded from `.env` at startup (no shell export needed for local dev)
 - em dashes removed from all visitor-facing templates; replaced with natural sentence structure
 - unit and handler tests passing (`go test ./...`)
+- GitHub Actions CI runs tests, dataset validation, translation validation, and
+  the server build for `staging` and `main` changes
 
 ## Implemented Features
 
@@ -55,12 +57,17 @@ implemented.
 
 ## Branch model
 
-- `staging` is the daily development and staging deployment branch.
-- `production` is the release branch for `hifz.click`.
-- `main` is a historical branch and is not a deployment source.
+- Feature branches target `staging` through pull requests.
+- `staging` is the integration branch and local verification target.
+- `main` is the target production branch for `hifz.click`.
+- `production` is the legacy release branch and is frozen during migration.
+- `qf-api` is historical and is not part of the active workflow.
 
-Develop and test locally on `staging`. Promote the verified staging commit to
-`production` without rewriting shared history.
+Develop and test locally on feature branches based on `staging`. Promote the
+verified `staging` commit to `main` through a pull request. The VPS remains on
+the legacy `production` branch until the migration checklist is complete.
+
+See [`docs/GIT-WORKFLOW.md`](./GIT-WORKFLOW.md) for the migration checklist.
 
 ## Data and scripts
 
@@ -87,8 +94,6 @@ entries. Only curated pairs belong in the application seed.
 
 ## Known gaps
 
-- Automated CI remains deferred. Run the local test and validation commands
-  before every push.
 - Additional search facets remain deferred until the curated relation set
   requires them.
 - The external dataset still contains pending pairs that need human review.

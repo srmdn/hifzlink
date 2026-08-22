@@ -132,6 +132,7 @@ curl -X POST http://localhost:8080/api/relations \
 ## Open Source Docs
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [Git workflow](./docs/GIT-WORKFLOW.md)
 - [CHANGELOG.md](./CHANGELOG.md)
 - [LICENSE](./LICENSE)
 - [NOTICE.md](./NOTICE.md)
