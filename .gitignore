@@ -20,3 +20,6 @@ AGENTS.local.md
 *.log
 tmp/
 coverage.out
+
+# Local agent checkpoint
+HANDOFF.md
