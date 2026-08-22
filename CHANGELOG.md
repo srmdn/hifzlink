@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is inspired by Keep a Changelog.
 
+## [Unreleased]
+
+### Added
+
+- GitHub Actions CI for tests, dataset validation, translation validation, and
+  the server build on `staging` and `main` changes
+
+### Changed
+
+- Defined the protected `feature -> staging -> main` workflow and marked the
+  legacy `production` branch for retirement after the VPS migration
+
 ## [0.2.3] - 2026-04-18 — QF integration, practice tools, surah index redesign
 
 ### Added

@@ -17,6 +17,8 @@ go run ./cmd/server
 gofmt -w ./cmd ./internal
 go test ./...
 go run ./scripts/validate
+go run ./scripts/validate_translations
+go build ./cmd/server
 ```
 
 If your PR updates Quran text data, regenerate from source:
@@ -25,6 +27,25 @@ If your PR updates Quran text data, regenerate from source:
 go run ./scripts/import
 go run ./scripts/validate
 ```
+
+## Branch and pull request workflow
+
+Never commit or push directly to `main`, `staging`, or the legacy
+`production` branch. Start from `staging`, create a focused feature branch,
+and push it to `origin`:
+
+```bash
+git fetch origin --prune
+git switch staging
+git pull --ff-only origin staging
+git switch -c codex/short-description
+git push -u origin codex/short-description
+```
+
+Open the first pull request into `staging`. After verification, open a second
+pull request from `staging` into `main`. Read
+[`docs/GIT-WORKFLOW.md`](./docs/GIT-WORKFLOW.md) for the release and migration
+procedure.
 
 ## Contribution Scope
 

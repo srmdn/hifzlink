@@ -122,9 +122,9 @@ func TestHandleAPIAyah_Basic(t *testing.T) {
 	if resp["text"] == nil || resp["text"] == "" {
 		t.Error("expected non-empty text")
 	}
-	// Default lang=ar — no translation fields
-	if _, ok := resp["translation_text"]; ok {
-		t.Error("expected no translation_text for lang=ar")
+	// Default lang=en — translation fields are present
+	if _, ok := resp["translation_text"]; !ok {
+		t.Error("expected translation_text for default lang=en")
 	}
 }
 
@@ -751,9 +751,9 @@ func TestSanitizeLang(t *testing.T) {
 		{"id", "id"},
 		{"EN", "en"},
 		{"  ar  ", "ar"},
-		{"fr", "ar"},
-		{"", "ar"},
-		{"xyz", "ar"},
+		{"fr", "en"},
+		{"", "en"},
+		{"xyz", "en"},
 	}
 	for _, tc := range tests {
 		if got := sanitizeLang(tc.input); got != tc.want {

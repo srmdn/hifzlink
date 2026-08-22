@@ -2,29 +2,34 @@
 
 This document describes the system architecture.
 
-## System Overview
+## System overview
 
-The application consists of three main parts:
+The application consists of five main parts:
 
-1. Quran dataset
+1. Local Quran, translation, and tafsir datasets
 2. Go backend server
-3. server-rendered frontend
+3. SQLite persistence
+4. Server-rendered frontend
+5. Optional Quran Foundation account services
 
 ```mermaid
 graph TD
     Browser["Browser"]
+    QF["Quran Foundation APIs"]
 
     subgraph Server["Go HTTP Server (cmd/server)"]
         Router["Router (net/http)"]
         RelService["Relations Service\n(internal/relations)"]
         Search["Quran Loader\n(internal/search)"]
         DB["SQLite Store\n(internal/db)"]
+        QFClient["OAuth and API Clients\n(internal/qfclient)"]
         Templates["HTML Templates\n(web/templates)"]
     end
 
     subgraph Data["Data Layer"]
         QuranJSON["data/quran.json\n(in-memory at startup)"]
-        SQLiteDB["relations.db\n(relations only)"]
+        ContentJSON["translations and tafsir\n(in-memory at startup)"]
+        SQLiteDB["relations.db\nrelations, sessions, collections"]
     end
 
     Browser -->|HTTP request| Router
@@ -33,11 +38,14 @@ graph TD
     RelService --> DB
     DB --> SQLiteDB
     Search --> QuranJSON
+    Search --> ContentJSON
+    Router --> QFClient
+    QFClient --> QF
     Router --> Templates
     Templates -->|HTML response| Browser
 ```
 
-## Quran Dataset
+## Quran dataset
 
 Primary file:
 
@@ -53,7 +61,7 @@ Each record:
 - `juz`
 - `text_ar`
 
-### Data Ingestion Flow
+### Data ingestion flow
 
 1. source dataset is placed in `data/raw/` (optional workspace)
 2. transform/normalize into project schema
@@ -61,7 +69,7 @@ Each record:
 4. run validation checks
 5. commit generated dataset and attribution updates
 
-### Validation Rules
+### Validation rules
 
 - total records: `6236`
 - unique key: `(surah, ayah)`
@@ -74,29 +82,31 @@ The backend is a Go HTTP server.
 
 Responsibilities:
 
-- load Quran dataset
-- handle API requests
-- store verse relations
-- serve HTML pages
+- Load Quran, translation, and tafsir datasets.
+- Handle public, account, collection, and administration routes.
+- Store relations and account-specific state in SQLite.
+- Integrate with Quran Foundation OAuth, bookmarks, audio, and content APIs.
+- Render and serve HTML pages and static assets.
 
 ## Database
 
 SQLite database.
 
-Stores only verse relations.
+The database stores mutable application state. Quran text, translations, and
+tafsir remain in versioned JSON files and load into memory at startup.
 
-Table: `relations`
+Primary tables:
 
-Fields:
+- `relations`: curated ayah pairs, categories, highlights, source, and review
+  state.
+- `sessions`: Quran Foundation account identity, expiring OAuth sessions, and
+  token state.
+- `collections`: user-created murojaah collections.
+- `collection_items`: saved ayahs and pairs, including mastery state.
 
-- `id`
-- `ayah1_surah`
-- `ayah1_ayah`
-- `ayah2_surah`
-- `ayah2_ayah`
-- `note`
+Schema changes use additive migrations in `internal/db`.
 
-## Folder Structure
+## Folder structure
 
 - `cmd/server/main.go`
 - `internal/db`
@@ -105,8 +115,11 @@ Fields:
 - `web/templates`
 - `web/static`
 - `data/quran.json`
+- `data/translations`
+- `data/tafsir`
+- `data/relations.seed.json`
 
-## Request Flow
+## Request flow
 
 Example: `GET /ayah/60/8`
 
@@ -127,7 +140,7 @@ sequenceDiagram
     T-->>B: HTML response
 ```
 
-## Compare Mode
+## Compare mode
 
 Compare view renders two verses side-by-side.
 
@@ -141,15 +154,19 @@ This keeps verse lookup fast and simple.
 
 ## Deployment
 
-The server runs with one command:
+Run the local server with one command:
 
 ```bash
 go run ./cmd/server
 ```
 
-No additional services required.
+The same Go binary serves staging and production. Each environment uses its own
+configuration and SQLite database. Develop on a feature branch, merge through
+`staging`, verify the result, and promote the verified commit to `main` through
+a pull request. The production VPS uses `main` after the branch migration is
+complete.
 
-## Design Philosophy
+## Design philosophy
 
 Keep everything simple.
 

@@ -166,6 +166,91 @@
   letter-spacing: 0.04em;
 }
 
+.admin-relations-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-relations-header h2 {
+  margin: 0;
+}
+
+.review-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.review-count-pending {
+  background: #fff3cd;
+  color: #7a5a00;
+  border: 1px solid #f0d070;
+}
+
+.review-count-done {
+  background: #edf7eb;
+  color: #2a5426;
+  border: 1px solid #c3d9c0;
+}
+
+.btn-review {
+  border: 1px solid #d0a020;
+  background: #fff8e1;
+  color: #7a5a00;
+  border-radius: 999px;
+  padding: 0.16rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.btn-review:hover {
+  background: #ffedb0;
+}
+
+.btn-review-done {
+  border-color: #c3d9c0;
+  background: #edf7eb;
+  color: #2a5426;
+}
+
+.btn-review-done:hover {
+  background: #d6efd3;
+}
+
+.btn-review:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.admin-filter-bar {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.admin-filter-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.22rem 0.72rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-filter-btn.active {
+  border-color: #2d4558;
+  background: #2d4558;
+  color: #fff;
+}
+
 .word-picker-section {
   grid-column: 1 / -1;
   margin-top: 0.4rem;

@@ -51,7 +51,7 @@ func run() error {
 
 	added, skipped := 0, 0
 	for i, rel := range seeds {
-		err := svc.AddWithCategory(rel.Ayah1, rel.Ayah2, rel.Note, rel.Category)
+		err := svc.AddWithCategory(rel.Ayah1, rel.Ayah2, rel.Note, rel.Category, "seed")
 		if err != nil {
 			if err.Error() == "relation already exists" {
 				skipped++

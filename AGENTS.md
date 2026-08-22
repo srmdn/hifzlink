@@ -51,6 +51,58 @@ Follow the project structure defined in `docs/ARCHITECTURE.md`.
 
 Do not change folder layout without good reason.
 
+## Local-First and Git Workflow
+
+This project now uses a local-first workflow.
+
+Public branch model:
+
+- feature branches contain focused changes and target `staging` by pull
+  request.
+- `staging` is the integration branch.
+- `main` is the production branch and receives verified `staging` changes by
+  pull request.
+- `production` is the legacy release branch and is frozen during migration.
+- `qf-api` is a historical branch and is not part of the active workflow.
+
+Never commit or push directly to `main`, `staging`, or `production`. Start a
+change from the latest `staging` branch, create a feature branch, push it to
+`origin`, and open a pull request into `staging`.
+
+Read `docs/GIT-WORKFLOW.md` for the complete branch, verification, pull
+request, and release procedure.
+
+Develop and test changes locally before deploying to any server.
+
+Use the VPS only as a production deployment and verification target. Until the
+branch migration is complete, the VPS still uses the legacy `production`
+branch. Do not edit code directly on the VPS except for emergency hotfixes. If
+an emergency VPS edit happens, sync the exact change back to Git immediately.
+
+Private runtime files must stay out of this public repo:
+
+- no `.env` files
+- no live `data/relations.db`
+- no local DB snapshots
+- no server-only paths or secrets
+
+Promotion flow after migration:
+
+1. Create a feature branch from `staging`.
+2. Open and merge a pull request from the feature branch into `staging`.
+3. Run the local preview at `http://127.0.0.1:18088` and verify the change.
+4. Open and merge a pull request from `staging` into `main`.
+5. Confirm the production binary matches the `main` source commit.
+6. Deploy the VPS production service.
+7. Verify `https://hifz.click`.
+
+The `quran-mutashabihat` repo is a separate source dataset project. Do not mix
+generated candidate files, raw private state, or local absolute paths into this
+HifzLink repo.
+
+If `AGENTS.local.md` exists, read it for machine-specific paths and operational
+helper commands. `AGENTS.local.md` must remain untracked.
+
 ## Code Quality
 
 Code must be:

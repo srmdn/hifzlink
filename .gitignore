@@ -12,6 +12,8 @@ bin/
 # Secrets
 .env*
 !.env.example
+AGENTS.local.md
+.local/
 
 # Misc
 .DS_Store
