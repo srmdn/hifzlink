@@ -62,13 +62,13 @@ Public branch model:
 - `staging` is the integration branch.
 - `main` is the production branch and receives verified `staging` changes by
   pull request.
-- `production` is the legacy release branch and is frozen after the VPS
-  migration.
+- `production` is the archived legacy release branch. Do not recreate it.
 - `qf-api` is a historical branch and is not part of the active workflow.
 
-Never commit or push directly to `main`, `staging`, or `production`. Start a
-change from the latest `staging` branch, create a feature branch, push it to
-`origin`, and open a pull request into `staging`.
+Never commit or push directly to `main` or `staging`. Do not recreate the
+archived `production` branch. Start a change from the latest `staging` branch,
+create a feature branch, push it to `origin`, and open a pull request into
+`staging`.
 
 Read `docs/GIT-WORKFLOW.md` for the complete branch, verification, pull
 request, and release procedure.
