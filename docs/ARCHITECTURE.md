@@ -161,8 +161,10 @@ go run ./cmd/server
 ```
 
 The same Go binary serves staging and production. Each environment uses its own
-configuration and SQLite database. Develop on `staging`, verify the staging
-deployment, then merge and promote the verified commit to `production`.
+configuration and SQLite database. Develop on a feature branch, merge through
+`staging`, verify the result, and promote the verified commit to `main` through
+a pull request. The production VPS uses `main` after the branch migration is
+complete.
 
 ## Design philosophy
 

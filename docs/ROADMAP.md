@@ -74,15 +74,20 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 
 ## Milestone 4: Open Source Maturity
 
-1. CI pipeline — **deferred**:
+1. CI pipeline: [done]
 - run `go test ./...`
 - run dataset/translation validation scripts
 
-2. release flow: [done]
+2. protected branch workflow: [in progress]
+- feature branches merge into `staging` through pull requests
+- verified `staging` merges into production (`main`) through a pull request
+- migrate the VPS checkout from legacy `production` to `main`
+
+3. release flow: [done]
 - tag-based releases
 - changelog discipline for user-visible changes
 
-3. contributor onboarding: [done]
+4. contributor onboarding: [done]
 - screenshots and architecture diagram in docs
 - issue templates for bug/feature/data reports
 
