@@ -81,7 +81,8 @@ Deliver a stable, contributor-friendly open source Quran murojaah tool focused o
 2. pull-request production workflow: [done]
 - [done] feature branches merge into `staging` through pull requests
 - [done] verified `staging` merges into production (`main`) through a pull request
-- [done] migrate the VPS checkout from legacy `production` to `main`
+- [done] archive the legacy `production` branch; `main` is the release-source
+  branch
 - [done] configure GitHub branch protection for `main` and `staging`
 - [done] preserve local changes and update the local `production/` worktree to `main`
 - [done] archive the legacy `production` source and delete its branch
