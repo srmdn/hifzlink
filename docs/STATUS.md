@@ -60,7 +60,7 @@ implemented.
 
 - Feature branches target `staging` through pull requests.
 - `staging` is the integration branch and local verification target.
-- `main` is the production branch and current source for `hifz.click`.
+- `main` is the production branch and release-source branch.
 - the legacy `production` branch is archived under
   `archive/production-2026-08-22` and is no longer an active branch
 - `qf-api` is historical and is not part of the active workflow.
