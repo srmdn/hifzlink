@@ -15,8 +15,8 @@ documentation change.
   `production` branch. Do not recreate that branch.
 - `qf-api` is historical and is not part of the active workflow.
 
-The production VPS checkout and local `production/` worktree both use `main`.
-The archived legacy source is not a deployment source.
+`main` is the release-source branch. Operational deployment configuration is
+intentionally managed outside this public repository.
 
 ## Start a change
 
@@ -58,30 +58,20 @@ git push -u origin codex/short-description
 Merge only after review and required checks pass. After the change is
 verified on `staging`, open a second pull request from `staging` to `main`.
 
-## Release from `main`
+## Release source from `main`
 
 After staging verification:
 
 1. Merge the verified `staging` pull request into `main`.
-2. Confirm the production binary matches the `main` source commit.
-3. Deploy the binary to the production VPS.
-4. Verify `https://hifz.click`.
-5. Tag the release and update `CHANGELOG.md`.
+2. Tag the verified source release and update `CHANGELOG.md`.
 
-Do not edit application source directly on the VPS. Emergency changes require
-explicit approval and must be synchronized back to Git immediately.
+## Historical branch migration record
 
-## Migration record
-
-The VPS migration is complete:
+This records the completed source-control transition from the legacy
+`production` branch to `main`:
 
 1. Merge the verified application state into `main` through a pull request.
 2. Set `main` as the GitHub default branch.
-3. Switch the production VPS checkout from `production` to `main` through the
-   normal deployment procedure.
-4. Verify the binary, service, and `https://hifz.click`.
-5. Configure GitHub branch protection for `main` and `staging`.
-6. Preserve local changes, then update the local `production/` worktree to
-   `main`.
-7. Archive the legacy source under
+3. Configure GitHub branch protection for `main` and `staging`.
+4. Archive the legacy source under
    `archive/production-2026-08-22`, then delete the legacy `production` branch.

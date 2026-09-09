@@ -75,10 +75,10 @@ request, and release procedure.
 
 Develop and test changes locally before deploying to any server.
 
-Use the VPS only as a production deployment and verification target. The VPS
-production checkout now uses `main`. Do not edit code directly on the VPS
-except for emergency hotfixes. If an emergency VPS edit happens, sync the
-exact change back to Git immediately.
+This public source repository owns development, testing, and release-source
+history only. Operational deployment and environment configuration are managed
+outside the repository. Do not add infrastructure, runtime, credential, or
+deployment-procedure details here.
 
 Private runtime files must stay out of this public repo:
 
@@ -93,9 +93,8 @@ Promotion flow:
 2. Open and merge a pull request from the feature branch into `staging`.
 3. Run the local preview at `http://127.0.0.1:18088` and verify the change.
 4. Open and merge a pull request from `staging` into `main`.
-5. Confirm the production binary matches the `main` source commit.
-6. Deploy the VPS production service.
-7. Verify `https://hifz.click`.
+5. Tag or otherwise identify the verified `main` source release and update
+   `CHANGELOG.md` when it has user-visible changes.
 
 The `quran-mutashabihat` repo is a separate source dataset project. Do not mix
 generated candidate files, raw private state, or local absolute paths into this
