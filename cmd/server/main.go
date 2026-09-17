@@ -12,7 +12,6 @@ import (
 	neturl "net/url"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -180,7 +179,10 @@ func main() {
 	}
 	defer dbStore.Close()
 
-	tmpl, err := template.ParseGlob(filepath.Join(baseDir, "web", "templates", "*.html"))
+	staticDir := filepath.Join(baseDir, "web", "static")
+	assets := loadAssetVersions(staticDir)
+
+	tmpl, err := template.New("").Funcs(assetFuncs(assets)).ParseGlob(filepath.Join(baseDir, "web", "templates", "*.html"))
 	if err != nil {
 		log.Fatalf("failed to parse templates: %v", err)
 	}
@@ -236,7 +238,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(baseDir, "web", "static")))))
+	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler(staticDir)))
 
 	mux.HandleFunc("/", s.handleHome)
 	mux.HandleFunc("/privacy", s.handlePrivacy)
@@ -1804,7 +1806,6 @@ func logRequests(next http.Handler) http.Handler {
 
 func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	lang := pageLang(r)
-	data["AssetVersion"] = buildAssetVersion()
 	data["Lang"] = lang
 	data["HomeURL"] = withLang("/", lang)
 	data["LangARURL"] = switchLang(r, "ar")
@@ -1843,25 +1844,6 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	}
 
 	return data
-}
-
-func buildAssetVersion() string {
-	info, ok := debug.ReadBuildInfo()
-	if ok {
-		for _, setting := range info.Settings {
-			if setting.Key != "vcs.revision" {
-				continue
-			}
-			version := strings.TrimSpace(setting.Value)
-			if len(version) > 12 {
-				return version[:12]
-			}
-			if version != "" {
-				return version
-			}
-		}
-	}
-	return "dev"
 }
 
 func pageLang(r *http.Request) string {
