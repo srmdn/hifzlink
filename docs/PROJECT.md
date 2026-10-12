@@ -8,6 +8,8 @@ Many Quran verses contain similar wording. During memorization (murojaah), memor
 
 This project provides a simple tool to:
 
+- practice sample verse continuations without an account
+- browse memorization sections by surah or juz
 - search a verse
 - view related similar verses
 - compare verses side-by-side

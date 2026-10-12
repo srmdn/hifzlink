@@ -1,85 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page catalog-page search-page">
 {{template "topbar" .}}
-
-  <main class="container">
-    <h1>Search pairs</h1>
-    <p class="meta">Find mutashabihat pairs by ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).</p>
-
-    <form action="/search" method="get" class="search-pairs-form">
-      <input type="hidden" name="lang" value="{{.Lang}}" />
-      <div class="search-pairs-row">
-        <input
-          type="text"
-          name="q"
-          value="{{.Query}}"
-          placeholder="e.g. 60:8 or 60 or Al-Mumtahanah"
-          autocomplete="off"
-          autocorrect="off"
-          spellcheck="false"
-          autofocus
-          class="search-pairs-input"
-        />
-        <button type="submit" class="btn">Search</button>
-      </div>
-    </form>
-
-    {{if .ErrMsg}}
-    <p class="search-pairs-error">{{.ErrMsg}}</p>
-    {{end}}
-
-    {{if .Query}}
-      {{if .Results}}
-      <section class="card">
-        <h2 class="search-pairs-label">{{len .Results}} {{if eq (len .Results) 1}}pair{{else}}pairs{{end}} for {{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</h2>
-        {{if .FilterPills}}
-        <div class="filter-pills">
-          {{range .FilterPills}}
-          <a href="{{.URL}}" class="filter-pill{{if .Active}} active{{end}}">{{.Label}}</a>
-          {{end}}
-        </div>
-        {{end}}
-        <p class="pairs-hint">Click a verse to open it, or Compare to see both side by side.</p>
-        <ul class="pairs-list">
-          {{range .Results}}
+<main class="learning-content">
+  <p class="catalog-kicker">{{.UI.similar}}</p>
+  <h1>{{.UI.searchTitle}}</h1>
+  <p class="catalog-intro">{{.UI.searchDescription}}</p>
+  <form action="/search" method="get" class="search-pairs-form">
+    <input type="hidden" name="lang" value="{{.Lang}}" />
+    <label for="pair-search" class="search-pairs-label">{{.UI.searchInput}}</label>
+    <div class="search-pairs-row">
+      <input id="pair-search" type="search" name="q" value="{{.Query}}" placeholder="{{.UI.searchPlaceholder}}" autocomplete="off" autocorrect="off" spellcheck="false" class="search-pairs-input" />
+      <button type="submit" class="catalog-button">{{.UI.searchSubmit}} <span aria-hidden="true">→</span></button>
+    </div>
+  </form>
+  {{if .ErrMsg}}<p class="search-pairs-error" role="alert">{{.ErrMsg}}</p>{{end}}
+  {{if .Query}}
+    {{if .Results}}
+      <section class="search-results" aria-labelledby="search-results-title">
+        <div class="search-results-heading"><h2 id="search-results-title">{{len .Results}} {{.UI.searchResults}} <span>{{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</span></h2></div>
+        {{if .FilterPills}}<nav class="filter-pills" aria-label="{{.UI.all}} results by pattern">{{range .FilterPills}}<a href="{{.URL}}" class="filter-pill{{if .Active}} active{{end}}"{{if .Active}} aria-current="page"{{end}}>{{.Label}}</a>{{end}}</nav>{{end}}
+        <p class="pairs-hint">{{.UI.searchHint}}</p>
+        <ul class="pairs-list">{{range .Results}}
           <li class="pair-item">
-            <div class="line-head">
-              <span class="pair-refs">
-                <a class="ayah-chip" href="{{.Ayah1URL}}">{{.Ayah1}}</a>
-                <span class="meta">↔</span>
-                <a class="ayah-chip" href="{{.Ayah2URL}}">{{.Ayah2}}</a>
-              </span>
-              <a class="btn-sm" href="{{.CompareURL}}">Compare</a>
-            </div>
-            <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .CategoryLabel}} · <span class="category-tag">{{.CategoryLabel}}</span>{{end}}</p>
-            {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
+            <div class="line-head"><span class="pair-refs"><a class="ayah-chip" href="{{.Ayah1URL}}">{{.Ayah1}}</a><span class="meta">↔</span><a class="ayah-chip" href="{{.Ayah2URL}}">{{.Ayah2}}</a></span><a class="catalog-compare" href="{{.CompareURL}}">{{$.UI.compare}} <span aria-hidden="true">→</span></a></div>
+            <p class="pair-detail">{{.Ayah1Name}} · {{.Ayah2Name}}{{if .CategoryLabel}} <span>· {{.CategoryLabel}}</span>{{end}}</p>
+            {{if .Note}}<p class="pair-note">{{.Note}}</p>{{end}}
           </li>
-          {{end}}
-        </ul>
+        {{end}}</ul>
       </section>
-      {{else if not .ErrMsg}}
-      <div class="search-empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <p class="meta">No pairs found for <strong>{{.Query}}</strong>{{if .CategoryFilter}} with pattern <strong>{{index .CategoryLabelMap .CategoryFilter}}</strong>{{end}}.</p>
-        <p class="meta">Try a different format: <code>60:8</code> or <code>Al-Mumtahanah</code></p>
-        <div class="search-empty-links">
-          <a class="btn-sm" href="{{$.SurahIndexURL}}">Browse by Surah</a>
-          <a class="btn-sm" href="{{$.JuzIndexURL}}">Browse by Juz</a>
-        </div>
-        <p class="meta" style="margin-top:0.75rem">Popular pairs:</p>
-        <div class="search-empty-links">
-          <a class="ayah-chip" href="/compare?ayah1=60:8&ayah2=60:9&lang={{$.Lang}}">60:8 vs 60:9</a>
-          <a class="ayah-chip" href="/compare?ayah1=2:3&ayah2=2:284&lang={{$.Lang}}">2:3 vs 2:284</a>
-          <a class="ayah-chip" href="/compare?ayah1=1:1&ayah2=27:30&lang={{$.Lang}}">1:1 vs 27:30</a>
-          <a class="ayah-chip" href="/compare?ayah1=2:255&ayah2=3:18&lang={{$.Lang}}">2:255 vs 3:18</a>
-        </div>
-      </div>
-      {{end}}
+    {{else if not .ErrMsg}}
+      <section class="catalog-empty"><h2>{{.UI.searchEmpty}}</h2><p>{{.UI.searchEmptyHint}}</p><div><a href="{{.SurahIndexURL}}">{{.UI.browse}}</a><a href="{{.JuzIndexURL}}">{{.UI.byJuz}}</a></div></section>
     {{end}}
-  </main>
-
-{{template "footer" .}}
+  {{else}}
+    <div class="catalog-examples"><span>{{.UI.searchExamples}}</span><a href="/search?q=60%3A8&lang={{.Lang}}">60:8</a><a href="/search?q=78&lang={{.Lang}}">An-Naba · 78</a><a href="/search?q=Al-Kahf&lang={{.Lang}}">Al-Kahf</a></div>
+  {{end}}
+</main>
+{{template "learning-footer" .}}
 </body>
 </html>

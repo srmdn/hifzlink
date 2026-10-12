@@ -1,126 +1,103 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page catalog-page ayah-page">
 {{template "topbar" .}}
+<main class="ayah-content">
+  <p class="ayah-back"><a href="{{.SurahURL}}">← {{.AyahUI.back}}</a></p>
 
-  <main class="container">
-    <p class="back"><a href="/surah/{{.Ayah.Surah}}?lang={{.Lang}}">← Surah {{.Ayah.Surah}}: {{.SurahName}}</a></p>
-    <div class="page-heading">
-      <h1>Ayah {{.AyahRef}}, {{.SurahName}}</h1>
-      <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
+  <header class="ayah-heading">
+    <div>
+      <p class="catalog-kicker">{{.AyahUI.kicker}}</p>
+      <h1>{{.Ayah.SurahName}}</h1>
+      <p class="ayah-reference"><span>{{.AyahUI.surah}} {{.Ayah.Surah}}:{{.Ayah.Ayah}}</span><span aria-hidden="true">·</span><a href="{{.JuzURL}}">{{.AyahUI.juz}} {{.Ayah.Juz}}</a></p>
     </div>
+    <button type="button" class="ayah-share" id="share-btn" data-share-url="{{.ShareURL}}" data-share-text="{{.AyahUI.shareText}}">{{.AyahUI.share}}</button>
+  </header>
+  <p class="ayah-share-status" role="status" aria-live="polite"></p>
 
-    <article class="card verse-card">
-      <p class="meta">Surah {{.Ayah.Surah}} · Ayah {{.Ayah.Ayah}} · Juz {{.Ayah.Juz}}</p>
-      <p class="arabic" lang="ar">{{.Ayah.TextAR}}</p>
-      {{if .AyahTranslation}}
-      <p class="translation">{{.AyahTranslation}}</p>
-      {{end}}
-      {{if .QFAudioURL}}
-      <div class="qf-audio">
-        <audio controls preload="none" style="width:100%;margin-top:0.75rem">
-          <source src="{{.QFAudioURL}}" type="audio/mpeg" />
-        </audio>
-        <p class="meta" style="margin-top:0.25rem">Recitation via <a href="https://quran.foundation" target="_blank" rel="noopener noreferrer">Quran Foundation</a></p>
-      </div>
-      {{end}}
+  <article class="ayah-reading">
+    <div class="ayah-reading-top"><span>{{.AyahRef}}</span><span>{{.AyahUI.surah}} {{.Ayah.SurahName}}</span></div>
+    <p class="ayah-arabic" lang="ar" dir="rtl">{{.Ayah.TextAR}}</p>
+    {{if .AyahTranslation}}<div class="ayah-translation"><p class="ayah-section-label">{{.AyahUI.translation}}</p><p lang="{{.Lang}}">{{.AyahTranslation}}</p></div>{{end}}
+    {{if .QFAudioURL}}<details class="ayah-audio"><summary>{{.AyahUI.audio}}</summary><audio controls preload="none"><source src="{{.QFAudioURL}}" type="audio/mpeg" /></audio><p>{{.AyahUI.audioSource}} · <a href="https://quran.foundation" target="_blank" rel="noopener noreferrer">Quran Foundation</a></p></details>{{end}}
+  </article>
 
-      {{if .CurrentUser}}
-        {{if .Collections}}
-        <form action="/collections/items" method="post" class="collection-save-form">
-          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-          <input type="hidden" name="lang" value="{{.Lang}}" />
-          <input type="hidden" name="item_type" value="ayah" />
-          <input type="hidden" name="ayah1" value="{{.AyahRef}}" />
-          <input type="hidden" name="return_to" value="/ayah/{{.Ayah.Surah}}/{{.Ayah.Ayah}}" />
-          <label for="collection-id-ayah">Save to collection</label>
-          <select id="collection-id-ayah" name="collection_id" required>
-            <option value="">Select collection</option>
-            {{range .Collections}}
-            <option value="{{.ID}}">{{.Name}}</option>
-            {{end}}
-          </select>
-          <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
-          <button type="submit" class="btn">Save Ayah</button>
-        </form>
-        {{else}}
-        <p class="meta">No collections yet. <a href="/collections?lang={{.Lang}}">Create a collection</a> first.</p>
-        {{end}}
-      {{else}}
-      <p class="meta"><a href="{{.LoginURL}}">Login with Quran.Foundation</a> to save this ayah to your collection.</p>
-      {{end}}
-      {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
-    </article>
-
-    {{if .AyahTafsir}}
-    <section class="card tafsir-card">
-      <div class="tafsir-header">
-        <div>
-          <h2>Tafsir</h2>
-          <span class="tafsir-source">{{.TafsirSource}}</span>
-        </div>
-        <button type="button" class="btn-sm" id="tafsir-toggle" aria-expanded="true" aria-controls="tafsir-body">Hide</button>
-      </div>
-      <div class="tafsir-body" id="tafsir-body">
-        {{.AyahTafsir}}
-      </div>
+  {{if .CurrentUser}}
+    <section class="ayah-save">
+      <h2>{{.AyahUI.saveHeading}}</h2>
+      {{if .Collections}}
+      <form action="/collections/items" method="post" class="ayah-save-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="hidden" name="item_type" value="ayah" />
+        <input type="hidden" name="ayah1" value="{{.AyahRef}}" />
+        <input type="hidden" name="return_to" value="/ayah/{{.Ayah.Surah}}/{{.Ayah.Ayah}}?lang={{.Lang}}" />
+        <label class="visually-hidden" for="collection-id-ayah">{{.AyahUI.saveLabel}}</label>
+        <select id="collection-id-ayah" name="collection_id" required><option value="">{{.AyahUI.selectCollection}}</option>{{range .Collections}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select>
+        <input type="text" name="note" placeholder="{{.AyahUI.notePlaceholder}}" autocomplete="off" />
+        <button type="submit">{{.AyahUI.saveAyah}}</button>
+      </form>
+      {{else}}<p>{{.AyahUI.noCollections}} <a href="{{.CollectionsURL}}">{{.AyahUI.createCollection}}</a>.</p>{{end}}
+      {{if .SaveStatus}}<p class="ayah-save-status" role="status">{{.SaveStatus}}</p>{{end}}
     </section>
-    {{end}}
+  {{else if .QFEnabled}}
+    <p class="ayah-save-prompt"><a href="{{.LoginURL}}?lang={{.Lang}}">{{.AyahUI.saveLogin}}</a></p>
+  {{end}}
 
-    <section class="card">
-      <h2>Related Verses</h2>
-      {{if .Related}}
-      <ul class="related-list">
-        {{range .Related}}
-        <li class="related-item">
-          <div class="line-head">
-            <a href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.Surah}}:{{.Ayah}} ({{.SurahName}})</a>
-            <a class="btn-sm" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">Compare</a>
-          </div>
-          <p class="arabic arabic-small" lang="ar">{{.Text}}</p>
-          {{if .Translation}}
-          <p class="translation">{{.Translation}}</p>
-          {{end}}
-        </li>
-        {{end}}
-      </ul>
-      {{else}}
-      <p class="meta">No relations yet.</p>
+  {{if .AyahTafsir}}
+  <details class="ayah-tafsir">
+    <summary><span>{{.AyahUI.tafsir}}</span><span class="ayah-tafsir-source">{{.TafsirSource}}</span></summary>
+    <div class="ayah-tafsir-body">{{.AyahTafsir}}</div>
+  </details>
+  {{end}}
+
+  <section class="ayah-related">
+    <div class="ayah-related-heading"><div><p class="catalog-kicker">{{.UI.similar}}</p><h2>{{.AyahUI.relatedHeading}}</h2><p>{{.AyahUI.relatedLead}}</p></div></div>
+    {{if .Related}}
+    <ol class="ayah-related-list">
+      {{range .Related}}
+      <li class="ayah-related-item">
+        <div class="ayah-related-top"><a class="ayah-related-ref" href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.SurahName}} · {{.Surah}}:{{.Ayah}}</a><a class="ayah-compare-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">{{$.AyahUI.compare}} →</a></div>
+        <p class="ayah-related-arabic" lang="ar" dir="rtl">{{.Text}}</p>
+        {{if .Translation}}<p class="ayah-related-translation" lang="{{$.Lang}}">{{.Translation}}</p>{{end}}
+      </li>
       {{end}}
-    </section>
-  </main>
-
-{{template "footer" .}}
+    </ol>
+    {{else}}<p class="ayah-related-empty">{{.AyahUI.noRelated}}</p>{{end}}
+  </section>
+</main>
+{{template "learning-footer" .}}
 <script>
-  (() => {
-    const toggle = document.getElementById("tafsir-toggle");
-    const body = document.getElementById("tafsir-body");
-    if (toggle && body) {
-      toggle.addEventListener("click", () => {
-        const expanded = toggle.getAttribute("aria-expanded") === "true";
-        body.hidden = expanded;
-        toggle.setAttribute("aria-expanded", String(!expanded));
-        toggle.textContent = expanded ? "Show" : "Hide";
-      });
-    }
-  })();
-  (() => {
-    const btn = document.getElementById("share-btn");
-    if (!btn) return;
-    btn.addEventListener("click", async () => {
-      const url = window.location.href;
-      const title = document.title;
-      if (navigator.share) {
-        try { await navigator.share({ title, url }); } catch (_) {}
-      } else {
-        await navigator.clipboard.writeText(url);
-        btn.textContent = "Copied!";
-        btn.classList.add("btn--copied");
-        setTimeout(() => { btn.textContent = "Share"; btn.classList.remove("btn--copied"); }, 2000);
+(() => {
+  const share = document.getElementById("share-btn");
+  const status = document.querySelector(".ayah-share-status");
+  if (!share || !status) return;
+  const shareURL = new URL(share.dataset.shareUrl, window.location.origin).href;
+  let statusTimer;
+  const announce = message => {
+    status.textContent = message;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => { status.textContent = ""; }, 4000);
+  };
+  share.addEventListener("click", async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, text: share.dataset.shareText, url: shareURL });
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
       }
-    });
-  })();
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(shareURL);
+      announce("{{.AyahUI.shareCopied}}");
+    } catch (_) {
+      announce("{{.AyahUI.shareFailed}}");
+    }
+  });
+})();
 </script>
 </body>
 </html>

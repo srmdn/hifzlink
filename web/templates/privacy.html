@@ -1,46 +1,49 @@
 <!doctype html>
 <html lang="en">
 {{template "head" .}}
-<body>
+<body class="learning-page legal-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <div class="card" style="max-width:720px;margin:2rem auto;padding:2rem 2.5rem;">
+  <main class="legal-content">
+    <article class="legal-document">
       <h1>Privacy Policy</h1>
-      <p style="color:var(--muted);font-size:.9rem;">Last updated: April 7, 2026</p>
+      <p class="legal-updated">Last updated: October 12, 2026</p>
 
       <h2>What we collect</h2>
-      <p>hifzlink collects minimal data to operate the service:</p>
+      <p>HifzLink processes the following information to provide the service:</p>
       <ul>
-        <li><strong>Usage analytics</strong> — We use self-hosted Umami, a privacy-friendly analytics tool. It records page views and referrers but does not store personal information, cookies, or cross-site tracking data.</li>
-        <li><strong>Account data (optional)</strong> — If you sign in via the Quran Foundation, we receive a user identifier and display name from their OAuth2 service. This is stored locally to associate your saved collections with your account.</li>
+        <li><strong>Usage analytics</strong> — If analytics is enabled for this deployment, a self-hosted Umami instance records page views and referrers for aggregate usage reports. The analytics server's configuration determines what technical request metadata it retains.</li>
+        <li><strong>Account and session data (optional)</strong> — When you sign in through Quran Foundation, HifzLink receives your account identifier, name, email address, and OAuth access and refresh tokens. The app stores these in its server-side database to maintain your session, associate your collections with your account, and access Quran Foundation bookmark features.</li>
+        <li><strong>Saved items</strong> — Collection names, descriptions, ayah and pair references, notes, and review status are stored in HifzLink's server-side database.</li>
+        <li><strong>Operational logs</strong> — The server logs the HTTP method and request path for requests. Log storage and retention depend on the deployment.</li>
       </ul>
 
       <h2>What we do not collect</h2>
       <ul>
-        <li>We do not sell or share your data with third parties.</li>
+        <li>We do not sell your personal data.</li>
         <li>We do not use advertising trackers.</li>
-        <li>We do not store passwords. Authentication is handled entirely by the Quran Foundation OAuth2 service.</li>
+        <li>HifzLink does not receive or store your Quran Foundation password. Authentication is handled by Quran Foundation.</li>
       </ul>
 
       <h2>Third-party services</h2>
       <ul>
-        <li><strong>Quran Foundation API</strong> — Used to fetch Quran verse data and (for signed-in users) to store personal collections. Their privacy policy applies to data processed through their service.</li>
-        <li><strong>Google Fonts</strong> — Fonts are loaded from Google's CDN. Google may log font requests per their standard privacy policy.</li>
-        <li><strong>Tanzil</strong> — Quran text is sourced from Tanzil. No data is sent to Tanzil at runtime.</li>
+        <li><strong>Quran Foundation</strong> — Sign-in uses its OAuth service. When bookmark integration is enabled, HifzLink reads your Quran Foundation bookmarks for the dashboard and adds the primary ayah from a newly saved item as a bookmark in your Quran Foundation account. HifzLink collections themselves are stored by HifzLink. Quran Foundation's policies apply to information it processes.</li>
+        <li><strong>Google Fonts</strong> — Fonts load from Google's CDN, so your browser sends a request to Google when a page loads. Google may log request metadata under its own policies.</li>
+        <li><strong>Umami analytics</strong> — If enabled, analytics are sent to the self-hosted Umami service configured for the deployment.</li>
+        <li><strong>Tanzil</strong> — The Quran text is bundled from Tanzil. HifzLink does not send data to Tanzil at runtime.</li>
       </ul>
 
       <h2>Cookies</h2>
-      <p>If you sign in, a session cookie is stored in your browser to keep you logged in. It expires when you log out or the session times out. No tracking cookies are set for anonymous visitors.</p>
+      <p>Signing in sets a secure, HTTP-only session cookie that lasts up to 30 days and may be renewed when an access token is refreshed. Logging out removes the session. Temporary cookies are also used during the Quran Foundation sign-in flow. HifzLink does not set advertising cookies.</p>
 
       <h2>Data retention</h2>
-      <p>Your saved collections are stored as long as your account is active. You can delete your collections at any time from your dashboard. To request full account deletion, contact us.</p>
+      <p>Expired session records are deleted when the application starts; logging out deletes the current session immediately. Saved collection data remains in HifzLink's database until deletion is requested. You can remove individual saved items in the app, but the current interface does not delete an entire collection or all account data. Contact us to request that deletion.</p>
 
       <h2>Contact</h2>
-      <p>Questions about this policy: <a href="mailto:mail@saidwp.com">mail@saidwp.com</a></p>
-    </div>
+      <p>Questions or data deletion requests: <a href="mailto:mail@srmdn.com">mail@srmdn.com</a></p>
+    </article>
   </main>
 
-{{template "footer" .}}
+{{template "learning-footer" .}}
 </body>
 </html>

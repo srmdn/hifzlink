@@ -1,0 +1,133 @@
+/* Browse and search surfaces share the homepage's quiet, verse-led palette. */
+.catalog-page { min-height: calc(100vh - 155px); }
+.not-found-content { min-height: 52vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.not-found-content .catalog-button { margin-top: 26px; text-decoration: none; }
+.learning-content { width: min(100% - 96px, 920px); margin: 0 auto; padding: 76px 0 92px; }
+.catalog-kicker { margin: 0 0 18px; color: var(--color-text-muted); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+.catalog-page h1 { max-width: 720px; margin: 0; font-family: var(--learning-serif); font-size: clamp(42px, 5vw, 62px); font-weight: 400; line-height: 1.1; letter-spacing: -.045em; }
+.catalog-intro { max-width: 590px; margin: 18px 0 0; color: var(--color-text-muted); font-size: 14px; line-height: 1.8; }
+.catalog-button { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 46px; padding: 0 18px; border: 1px solid var(--color-accent); border-radius: 4px; background: var(--color-accent); color: var(--color-accent-ink); font: inherit; font-size: 13px; cursor: pointer; }
+.catalog-button:hover { background: var(--color-accent-strong); }
+.catalog-button span { font-size: 17px; }
+.search-pairs-form { max-width: 680px; margin-top: 38px; }
+.search-pairs-label,.surah-filter-label { display: block; margin-bottom: 9px; color: var(--color-text-secondary); font-size: 12px; }
+.search-pairs-row { display: flex; gap: 10px; }
+.search-pairs-input,.surah-filter-input { width: 100%; min-width: 0; min-height: 48px; padding: 0 14px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 14px; }
+.search-pairs-input::placeholder,.surah-filter-input::placeholder { color: var(--color-text-muted); opacity: .78; }
+.search-pairs-input:focus,.surah-filter-input:focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.catalog-examples { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; margin-top: 20px; color: var(--color-text-muted); font-size: 12px; }
+.catalog-examples a,.surah-shortcuts button { color: var(--color-text-secondary); text-decoration-color: var(--learning-rule); text-underline-offset: 4px; }
+.catalog-examples a:hover,.surah-shortcuts button:hover { color: var(--color-accent); }
+.search-pairs-error { max-width: 680px; margin: 16px 0 0; color: var(--color-warning-text); font-size: 13px; line-height: 1.7; }
+.search-results { margin-top: 68px; }
+.search-results-heading { padding-bottom: 18px; border-bottom: 1px solid var(--learning-rule); }
+.search-results-heading h2 { margin: 0; font-size: 15px; font-weight: 400; }
+.search-results-heading h2 span { color: var(--color-text-muted); }
+.filter-pills { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 16px 0 0; }
+.filter-pill { color: var(--color-text-muted); font-size: 12px; text-decoration: none; }
+.filter-pill:hover,.filter-pill.active { color: var(--color-accent); text-decoration: underline; text-underline-offset: 4px; }
+.pairs-hint { margin: 16px 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.7; }
+.pairs-list { margin: 0; padding: 0; list-style: none; }
+.pair-item { padding: 20px 0; border-top: 1px solid var(--learning-rule); }
+.pair-item:first-child { border-top: 0; }
+.line-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.pair-refs { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.ayah-chip { color: var(--color-text); font-size: 13px; font-variant-numeric: tabular-nums; text-decoration-color: var(--learning-rule); text-underline-offset: 4px; }
+.ayah-chip:hover { color: var(--color-accent); }
+.line-head .meta { color: var(--color-text-muted); font-size: 12px; }
+.catalog-compare { flex: 0 0 auto; color: var(--color-accent); font-size: 12px; text-decoration: none; }
+.catalog-compare:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pair-detail,.pair-note { margin: 8px 0 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.7; }
+.pair-note { color: var(--color-text-secondary); }
+.catalog-empty { margin-top: 48px; padding: 24px 0; border-top: 1px solid var(--learning-rule); }
+.catalog-empty h2 { margin: 0; font-family: var(--learning-serif); font-size: 25px; font-weight: 400; }
+.catalog-empty p { max-width: 540px; color: var(--color-text-muted); font-size: 13px; line-height: 1.8; }
+.catalog-empty div { display: flex; gap: 20px; margin-top: 18px; }
+.catalog-empty a { color: var(--color-accent); font-size: 13px; text-underline-offset: 4px; }
+.surah-filter-bar { margin: 38px 0 30px; }
+.surah-filter-input { max-width: 440px; }
+.surah-index-stats { margin-top: 12px; color: var(--color-text-muted); font-size: 11px; }
+.surah-index-stats strong { color: var(--color-text); font-weight: 500; }
+.surah-shortcuts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 17px; color: var(--color-text-muted); font-size: 11px; }
+.surah-shortcuts button { padding: 0; border: 0; background: none; font: inherit; font-size: 12px; cursor: pointer; }
+.surah-index-list { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); column-gap: 28px; }
+.surah-index-row { display: grid; grid-template-columns: 32px minmax(0,1fr) auto; align-items: center; gap: 10px; min-height: 54px; border-top: 1px solid var(--learning-rule); color: var(--color-text); text-decoration: none; }
+.surah-index-row:hover .surah-index-name { color: var(--color-accent); text-decoration: underline; text-underline-offset: 4px; }
+.surah-index-num { color: var(--color-text-muted); font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums; }
+.surah-index-name { overflow: hidden; color: var(--color-text-secondary); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.surah-index-badge { color: var(--color-accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+.surah-index-empty { color: var(--color-text-muted); font-size: 11px; }
+.surah-filter-empty { padding: 20px 0; border-top: 1px solid var(--learning-rule); color: var(--color-text-muted); font-size: 13px; }
+.juz-index-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); column-gap: 26px; margin-top: 42px; }
+.juz-index-card { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-height: 66px; padding: 17px 0 12px; border-top: 1px solid var(--learning-rule); color: var(--color-text); text-decoration: none; }
+.juz-index-card:hover .juz-index-num { color: var(--color-accent); }
+.juz-index-num { font-family: var(--learning-serif); font-size: 22px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.juz-index-badge,.juz-index-empty { color: var(--color-text-muted); font-size: 10px; white-space: nowrap; }
+.juz-index-card.has-pairs .juz-index-badge { color: var(--color-accent); }
+.catalog-detail-page .catalog-detail-content { width: min(100% - 96px, 920px); margin: 0 auto; padding: 56px 0 88px; }
+.catalog-back { margin: 0 0 34px; color: var(--color-text-muted); font-size: 12px; }
+.catalog-back a { color: inherit; text-decoration-color: var(--learning-rule); text-underline-offset: 4px; }
+.catalog-detail-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--learning-rule); }
+.catalog-detail-heading h1 { margin: 0; font-family: var(--learning-serif); font-size: clamp(38px,5vw,58px); font-weight: 400; line-height: 1.1; letter-spacing: -.04em; }
+.catalog-detail-subtitle { margin: 12px 0 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.7; }
+.catalog-detail-arabic { margin: 18px 0 0; font-family: var(--font-arabic); font-size: 28px; color: var(--color-text-secondary); }
+.catalog-detail-count { flex: 0 0 auto; color: var(--color-text-muted); font-size: 12px; }
+.catalog-detail-nav { display: flex; justify-content: space-between; gap: 20px; margin: 18px 0 44px; }
+.catalog-detail-nav a { color: var(--color-text-secondary); font-size: 12px; text-decoration-color: var(--learning-rule); text-underline-offset: 4px; }
+.catalog-detail-nav a:hover { color: var(--color-accent); }
+.catalog-detail-content .sp-layout { display: block; }
+.catalog-detail-content .sp-sidebar { position: static; width: auto; border: 0; background: none; }
+.catalog-detail-content .sp-sidebar-inner { padding: 0; }
+.catalog-detail-content .sp-num,.catalog-detail-content .sp-meta-list,.catalog-detail-content .sp-nav { display: none; }
+.catalog-detail-content .sp-name { margin: 0; font-family: var(--learning-serif); font-size: clamp(38px,5vw,58px); font-weight: 400; }
+.catalog-detail-content .sp-arabic { margin: 18px 0 0; font-size: 28px; }
+.catalog-detail-content .sp-main { width: 100%; padding: 32px 0 0; }
+.catalog-detail-content .sp-pairs-head { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--learning-rule); }
+.catalog-detail-content .sp-pairs-head h2 { margin: 0; font-size: 15px; font-weight: 400; }
+.catalog-detail-content .sp-pairs-count { color: var(--color-text-muted); font-size: 11px; }
+.catalog-detail-content .sp-pairs { border-top: 0; }
+.catalog-detail-content .sp-pair { padding: 20px 0; border-color: var(--learning-rule); background: none; }
+.catalog-detail-content .sp-chip { border: 0; background: none; padding: 0; color: var(--color-text); }
+.catalog-detail-content .sp-pair-top svg,.catalog-detail-content .sp-empty svg { display: none; }
+.catalog-detail-content .sp-pair-names,.catalog-detail-content .sp-pair-note { color: var(--color-text-muted); }
+.catalog-detail-content .sp-empty { padding: 28px 0; border-top: 1px solid var(--learning-rule); background: none; }
+.catalog-detail-content .sp-empty p { color: var(--color-text-muted); }
+.catalog-detail-content .card { padding: 0; border: 0; background: none; box-shadow: none; }
+.catalog-detail-content .empty-state { min-height: 0; padding: 28px 0; border-top: 1px solid var(--learning-rule); }
+.catalog-detail-content .empty-state svg { display: none; }
+@media(max-width: 980px) { .surah-index-list { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width: 700px) {
+ .learning-content { width: calc(100% - 44px); padding: 48px 0 68px; }
+ .search-results { margin-top: 48px; }
+ .search-pairs-row { align-items: stretch; }
+ .search-pairs-row .catalog-button { padding-inline: 13px; }
+ .surah-index-list { grid-template-columns: 1fr; }
+ .juz-index-grid { grid-template-columns: repeat(3,minmax(0,1fr)); column-gap: 20px; margin-top: 32px; }
+ .catalog-detail-page .catalog-detail-content { width: calc(100% - 44px); padding: 36px 0 64px; }
+ .catalog-detail-heading { align-items: start; }
+ .catalog-detail-count { padding-top: 8px; }
+ .catalog-detail-nav { margin-bottom: 32px; }
+ .catalog-detail-content .sp-main { padding-top: 26px; }
+ .line-head { align-items: flex-start; }
+}
+@media(max-width: 390px) {
+ .learning-content,.catalog-detail-page .catalog-detail-content { width: calc(100% - 32px); }
+ .search-pairs-row { flex-direction: column; }
+ .search-pairs-row .catalog-button { align-self: flex-start; }
+ .juz-index-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .catalog-detail-heading { flex-direction: column; gap: 12px; }
+}
+/* Override legacy index/detail components on the redesigned learning pages. */
+.learning-page .primary-nav a[aria-current="page"] { background: transparent; color: var(--color-accent); }
+.juz-index-card { flex-direction: row; border: 0; border-top: 1px solid var(--learning-rule); border-radius: 0; background: transparent; box-shadow: none; }
+.juz-index-card:hover { border-color: var(--learning-rule); box-shadow: none; }
+.juz-index-card.has-pairs .juz-index-num { color: var(--color-text); }
+.catalog-detail-content .sp-pair { border: 0; border-bottom: 1px solid var(--learning-rule); border-radius: 0; box-shadow: none; }
+.catalog-detail-content .sp-pair:hover { background: transparent; }
+.catalog-detail-content .ayah-chip { display: inline; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--color-text); font-size: 13px; }
+.catalog-detail-content .ayah-chip:hover { color: var(--color-accent); }
+.catalog-page .ayah-chip { display: inline; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--color-text); font-size: 13px; }
+.catalog-page .ayah-chip:hover { color: var(--color-accent); }
+.filter-pill { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.filter-pill:hover,.filter-pill.active { background: transparent; }
+.surah-index-row[hidden] { display: none; }
