@@ -2,8 +2,6 @@
 
 Simple Go web app to help memorizers review similar Quran verses (mutashabihat).
 
-![HifzLink homepage](docs/screenshots/homepage.webp)
-
 ## Stack
 
 - Go (`net/http`)
@@ -55,7 +53,9 @@ Admin access uses separate HTTP Basic Auth (env vars above). Admin routes are pr
 - **Tafsir**: collapsible Ibn Kathir (EN) and Kemenag RI (ID) tafsir on ayah pages
 - **Surah/Juz metadata**: place of revelation, ayah count, and juz start verse shown on listing pages
 - **Search**: by ayah ref, surah number, surah name, or category; filter pills; empty-state suggestions
-- **Stats**: homepage shows live pair count, 114 surahs, 6,236 ayahs
+- **Homepage**: try a verse continuation without an account, then explore editorial practice and featured pairs
+- **Surah/Juz browsing**: filter all surahs or choose a juz, then browse curated similar verse pairs
+- **Continuation practice**: `/practice` offers An-Naba and At-Takaathur sample passages, optional EN/ID translations, and self-rating
 
 ## Quran Dataset Workflow
 

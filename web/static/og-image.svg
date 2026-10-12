@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#141c18"/>
+  <rect x="22" y="22" width="1156" height="586" rx="10" fill="none" stroke="#35473b" stroke-width="2"/>
+  <path d="M72 136H1128" stroke="#35473b" stroke-width="2"/>
+  <path d="M72 510H1128" stroke="#35473b" stroke-width="2"/>
+  <circle cx="83" cy="88" r="5" fill="#b5dba9"/>
+  <text x="104" y="101" fill="#e8f0e8" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="600" letter-spacing="-1.4">hifzlink</text>
+  <text x="1128" y="96" text-anchor="end" fill="#afc4b4" font-family="Arial, Helvetica, sans-serif" font-size="15" letter-spacing="2.5">FREE AND OPEN SOURCE</text>
+  <text x="76" y="202" fill="#afc4b4" font-family="Arial, Helvetica, sans-serif" font-size="15" letter-spacing="3.2">QURAN MEMORIZATION · MUTASHABIHAT</text>
+  <text x="72" y="310" fill="#e8f0e8" font-family="Georgia, 'Times New Roman', serif" font-size="80" letter-spacing="-3">Similar verses.</text>
+  <text x="72" y="402" fill="#b5dba9" font-family="Georgia, 'Times New Roman', serif" font-size="80" letter-spacing="-3">Clearer recall.</text>
+  <text x="76" y="466" fill="#afc4b4" font-family="Arial, Helvetica, sans-serif" font-size="22">See what stays the same. Remember what changes.</text>
+  <text x="76" y="562" fill="#e8f0e8" font-family="Arial, Helvetica, sans-serif" font-size="18">Understand the difference. Strengthen your recall.</text>
+  <text x="1128" y="562" text-anchor="end" fill="#afc4b4" font-family="Arial, Helvetica, sans-serif" font-size="16">hifz.click</text>
+</svg>

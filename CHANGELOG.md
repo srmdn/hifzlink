@@ -8,10 +8,31 @@ The format is inspired by Keep a Changelog.
 
 ### Added
 
+- Account-free sample verse continuation practice with optional English/Indonesian
+  translations and self-rating.
+
 - GitHub Actions CI for tests, dataset validation, translation validation, and
   the server build on `staging` and `main` changes
 
 ### Changed
+
+- Replaced the search-first homepage with an interactive continuation example,
+  editorial weekly practice, and featured similar pairs.
+- Restyled Search, Surah, and Juz browsing pages to share the homepage layout,
+  colors, and navigation.
+- Redesigned verse comparison with a recall mode, pair sharing, pair-specific
+  canonical links, and refreshed social preview metadata.
+- Restyled ayah details to match the learning pages, with localized verse
+  sharing, reading metadata, translation, tafsir, audio, and related verses.
+- Aligned the Privacy and Terms pages with the shared learning navigation,
+  footer, and responsive dark green styling.
+- Corrected Privacy and Terms to describe current analytics, session, collection,
+  and Quran Foundation bookmark behavior; added data-deletion contact details.
+- Restored the homepage's first-person “Why I built this” section in English and
+  Indonesian.
+- Improved keyboard and screen-reader behavior in the mobile menu and recall
+  mode, and added a branded, localized 404 page.
+- Unified shared UI colors around a dark green palette.
 
 - Defined the pull-request `feature -> staging -> main` workflow and archived
   the legacy `production` source after the VPS migration

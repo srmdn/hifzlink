@@ -14,27 +14,28 @@
   <meta property="og:description" content="{{.Description}}" />
   <meta property="og:url" content="{{.CanonicalURL}}" />
   <meta property="og:image" content="{{.OGImageURL}}" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="{{.Title}} - hifzlink" />
+  <meta property="og:image:alt" content="{{.OGImageAlt}}" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{{.Title}}" />
   <meta name="twitter:description" content="{{.Description}}" />
   <meta name="twitter:image" content="{{.OGImageURL}}" />
-  <meta name="twitter:image:alt" content="{{.Title}} - hifzlink" />
+  <meta name="twitter:image:alt" content="{{.OGImageAlt}}" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=IBM+Plex+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
-  <link rel="stylesheet" href="/static/base.css?v={{.AssetVersion}}" />
-  <link rel="stylesheet" href="/static/topbar.css?v={{.AssetVersion}}" />
-  <link rel="stylesheet" href="/static/components.css?v={{.AssetVersion}}" />
-  <link rel="stylesheet" href="/static/admin.css?v={{.AssetVersion}}" />
-  <link rel="stylesheet" href="/static/pages.css?v={{.AssetVersion}}" />
-  {{if .HomeDemo}}<link rel="stylesheet" href="/static/home.css?v={{.AssetVersion}}" />{{end}}
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="{{asset "favicon.svg"}}" />
+  <link rel="stylesheet" href="{{asset "base.css"}}" />
+  <link rel="stylesheet" href="{{asset "topbar.css"}}" />
+  <link rel="stylesheet" href="{{asset "components.css"}}" />
+  <link rel="stylesheet" href="{{asset "admin.css"}}" />
+  <link rel="stylesheet" href="{{asset "pages.css"}}" />
+  {{if .LearningUI}}<link rel="stylesheet" href="{{asset "home.css"}}" /><link rel="stylesheet" href="{{asset "practice.css"}}" />{{if eq .LearningSection "surah"}}<link rel="stylesheet" href="{{asset "surah-detail.css"}}" />{{end}}<link rel="stylesheet" href="{{asset "catalog.css"}}" />{{if eq .LearningSection "compare"}}<link rel="stylesheet" href="{{asset "compare.css"}}" />{{end}}{{if eq .LearningSection "ayah"}}<link rel="stylesheet" href="{{asset "ayah.css"}}" />{{end}}{{if eq .LearningSection "legal"}}<link rel="stylesheet" href="{{asset "legal.css"}}" />{{end}}{{end}}
   {{if .UmamiID}}<script defer src="https://analytics.srmdn.com/script.js" data-website-id="{{.UmamiID}}"></script>{{end}}
   {{if .JSONLD}}<script type="application/ld+json">{{.JSONLD}}</script>{{end}}
 </head>
@@ -44,21 +45,33 @@
 <header class="topbar" data-mobile-nav-root>
   <div class="container topbar-inner">
     <div class="topbar-left">
-      <a class="brand" href="{{.HomeURL}}"><span class="brand-main">HifzLink</span></a>
+      <a class="brand" href="{{.HomeURL}}"><span class="brand-main">hifzlink</span></a>
       <nav class="primary-nav" aria-label="Primary">
+        {{if .LearningUI}}
+        <a href="{{.HomeURL}}" {{if eq .LearningSection "home"}}aria-current="page"{{end}}>{{.UI.navHome}}</a>
+        <a href="{{.PracticeURL}}" {{if eq .LearningSection "practice"}}aria-current="page"{{end}}>{{.UI.practice}}</a>
+        <a href="{{.SurahIndexURL}}" {{if eq .LearningSection "surah"}}aria-current="page"{{end}}>{{.UI.browse}}</a>
+        <a href="{{.JuzIndexURL}}" {{if eq .LearningSection "juz"}}aria-current="page"{{end}}>{{.UI.byJuz}}</a>
+        <a href="{{.SearchURL}}" {{if or (eq .LearningSection "search") (eq .LearningSection "compare") (eq .LearningSection "ayah")}}aria-current="page"{{end}}>{{.UI.similar}}</a>
+        {{else}}
         <a href="{{.HomeURL}}">Home</a>
         <a href="{{.SurahIndexURL}}">Surah</a>
         <a href="{{.JuzIndexURL}}">Juz</a>
         <a href="{{.SearchURL}}">Search</a>
+        {{end}}
       </nav>
     </div>
 
     <div class="topbar-right">
+      {{if .LearningUI}}
+      <details class="learning-language"><summary aria-label="{{.UI.language}}">{{if eq .Lang "id"}}ID{{else}}EN{{end}} <span aria-hidden="true">⌄</span></summary><nav aria-label="{{.UI.language}}"><a href="{{.LangENURL}}" lang="en">English</a><a href="{{.LangIDURL}}" lang="id">Indonesia</a></nav></details>
+      {{else}}
       <nav class="lang-switch" aria-label="Language mode">
         <a class="{{if eq .Lang "ar"}}active{{end}}" href="{{.LangARURL}}">AR</a>
         <a class="{{if eq .Lang "en"}}active{{end}}" href="{{.LangENURL}}">EN</a>
         <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">ID</a>
       </nav>
+      {{end}}
       {{if .QFEnabled}}
         {{if .CurrentUser}}
         <div class="user-menu" data-user-menu>
@@ -98,7 +111,7 @@
         <button type="submit" class="auth-btn">Logout</button>
       </form>
       {{end}}
-      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-toggle>
+      <button class="menu-toggle" type="button" aria-label="{{if .LearningUI}}{{.UI.menuOpen}}{{else}}Open navigation{{end}}" data-label-open="{{if .LearningUI}}{{.UI.menuOpen}}{{else}}Open navigation{{end}}" data-label-close="{{if .LearningUI}}{{.UI.menuClose}}{{else}}Close navigation{{end}}" aria-expanded="false" data-menu-toggle>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
           <rect y="3" width="18" height="2" rx="1" fill="currentColor"/>
           <rect y="8" width="18" height="2" rx="1" fill="currentColor"/>
@@ -113,18 +126,27 @@
 <aside class="mobile-drawer" hidden data-menu-drawer aria-label="Mobile navigation">
   <div class="mobile-drawer-head">
     <span>Menu</span>
-    <button class="drawer-close" type="button" aria-label="Close navigation" data-menu-close>
+      <button class="drawer-close" type="button" aria-label="{{if .LearningUI}}{{.UI.menuClose}}{{else}}Close navigation{{end}}" data-menu-close>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </button>
   </div>
   <nav class="mobile-nav" aria-label="Mobile primary">
+    {{if .LearningUI}}
+    <a href="{{.HomeURL}}">{{.UI.navHome}}</a>
+    <a href="{{.PracticeURL}}">{{.UI.practice}}</a>
+    <a href="{{.SurahIndexURL}}">{{.UI.browse}}</a>
+    <a href="{{.JuzIndexURL}}">{{.UI.byJuz}}</a>
+    <a href="{{.SearchURL}}">{{.UI.similar}}</a>
+    {{else}}
     <a href="{{.HomeURL}}">Home</a>
     <a href="{{.SurahIndexURL}}">Surah</a>
     <a href="{{.JuzIndexURL}}">Juz</a>
     <a href="{{.SearchURL}}">Search</a>
+    {{end}}
   </nav>
+  {{if not .LearningUI}}
   <div class="mobile-lang">
     <p>Language</p>
     <nav aria-label="Mobile language mode">
@@ -133,6 +155,7 @@
       <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">Arabic + Indonesian</a>
     </nav>
   </div>
+  {{end}}
   {{if .QFEnabled}}
   <div class="mobile-lang mobile-account">
     <p>Account</p>
@@ -173,6 +196,7 @@
       const backdrop = document.querySelector("[data-menu-backdrop]");
       if (!toggle || !drawer || !backdrop) return;
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? toggle.dataset.labelClose : toggle.dataset.labelOpen);
       drawer.hidden = !open;
       backdrop.hidden = !open;
       document.body.classList.toggle("menu-open", open);

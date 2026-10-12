@@ -1,0 +1,22 @@
+{{define "continuation-challenge"}}
+<section class="home-challenge" aria-labelledby="challenge-heading">
+  <div class="home-challenge-head"><h2 id="challenge-heading" class="home-eyebrow">{{.UI.try}}</h2><span class="home-badge">Juz {{.Continuation.Prompt.Juz}}</span></div>
+  <div class="home-reference"><span>{{.Continuation.Prompt.SurahName}}</span><a href="/ayah/{{.Continuation.Prompt.Surah}}/{{.Continuation.Prompt.Ayah}}?lang={{.Lang}}">{{.Continuation.PromptRef}}</a></div>
+  <p class="home-arabic" dir="rtl" lang="ar">{{.Continuation.Prompt.TextAR}}</p>
+  <div class="home-prompt"><div><h3>{{.UI.continue}}</h3><p>{{.UI.recall}}</p></div></div>
+  <details class="practice-answer" data-practice-answer>
+    <summary class="home-button reveal" data-open-label="{{.UI.hide}} {{.Continuation.AnswerRef}}" data-closed-label="{{.UI.reveal}} {{.Continuation.AnswerRef}}">{{.UI.reveal}} {{.Continuation.AnswerRef}}</summary>
+    <div class="practice-answer-content">
+      <div class="home-reference"><a href="/ayah/{{.Continuation.Answer.Surah}}/{{.Continuation.Answer.Ayah}}?lang={{.Lang}}">{{.Continuation.Answer.SurahName}} · {{.Continuation.AnswerRef}}</a><span>{{.UI.fullAnswer}}</span></div>
+      <p class="home-arabic" dir="rtl" lang="ar">{{.Continuation.Answer.TextAR}}</p>
+      <details class="practice-translation"><summary>{{.UI.translation}} · English</summary><p lang="en">{{.Continuation.TranslationEN}}</p></details>
+      <details class="practice-translation"><summary>{{.UI.translation}} · Indonesia</summary><p lang="id">{{.Continuation.TranslationID}}</p></details>
+      <div class="practice-next"><p>{{.UI.similarHint}}</p><a class="home-link" href="{{.Continuation.CompareURL}}">{{.UI.compare}} <span aria-hidden="true">→</span></a></div>
+    </div>
+  </details>
+  <p class="home-sample">{{.UI.sample}} · {{.Continuation.Prompt.SurahName}} {{.Continuation.PromptRef}}–{{.Continuation.Answer.Ayah}}</p>
+</section>
+{{end}}
+{{define "learning-footer"}}
+<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.free}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
+{{end}}

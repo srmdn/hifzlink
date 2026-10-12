@@ -12,7 +12,6 @@ import (
 	neturl "net/url"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -180,7 +179,10 @@ func main() {
 	}
 	defer dbStore.Close()
 
-	tmpl, err := template.ParseGlob(filepath.Join(baseDir, "web", "templates", "*.html"))
+	staticDir := filepath.Join(baseDir, "web", "static")
+	assets := newAssetVersions(staticDir)
+
+	tmpl, err := template.New("").Funcs(assetFuncs(assets)).ParseGlob(filepath.Join(baseDir, "web", "templates", "*.html"))
 	if err != nil {
 		log.Fatalf("failed to parse templates: %v", err)
 	}
@@ -236,9 +238,10 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(baseDir, "web", "static")))))
+	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler(staticDir)))
 
 	mux.HandleFunc("/", s.handleHome)
+	mux.HandleFunc("/practice", s.handlePractice)
 	mux.HandleFunc("/privacy", s.handlePrivacy)
 	mux.HandleFunc("/terms", s.handleTerms)
 	mux.HandleFunc("/auth/login", s.handleAuthLogin)
@@ -290,59 +293,15 @@ func main() {
 	}
 }
 
-type homeDemoView struct {
-	Ref1       string
-	Ref2       string
-	Ayah1      search.Ayah
-	Ayah2      search.Ayah
-	DiffText1  template.HTML
-	DiffText2  template.HTML
-	CompareURL string
-}
-
-func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
-	count, err := s.db.CountRelations()
-	if err != nil {
-		count = 0
-	}
-
-	lang := pageLang(r)
-	var demo *homeDemoView
-	if ayah1, ok := s.quran.Get(60, 8); ok {
-		if ayah2, ok := s.quran.Get(60, 9); ok {
-			diff1, diff2 := diffHighlight(ayah1.TextAR, ayah2.TextAR)
-			ref1 := relations.FormatAyahRef(ayah1.Surah, ayah1.Ayah)
-			ref2 := relations.FormatAyahRef(ayah2.Surah, ayah2.Ayah)
-			demo = &homeDemoView{
-				Ref1:       ref1,
-				Ref2:       ref2,
-				Ayah1:      ayah1,
-				Ayah2:      ayah2,
-				DiffText1:  diff1,
-				DiffText2:  diff2,
-				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
-			}
-		}
-	}
-
-	s.render(w, "home.html", s.withCommonViewData(r, map[string]any{
-		"Title":       "hifzlink: Quran mutashabihat review",
-		"Description": "hifzlink helps you identify and review mutashabihat: similar Quran verses that are easy to confuse during memorization. Try it yourself at hifz.click.",
-		"PairCount":   count,
-		"HomeDemo":    demo,
-		"JSONLD":      websiteJSONLD("https://" + r.Host),
-	}))
-}
-
 func (s *server) handlePrivacy(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "privacy.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "privacy.html", s.learningData(r, map[string]any{
 		"Title":       "Privacy Policy — hifzlink",
 		"Description": "Privacy policy for hifzlink, the open-source Quran mutashabihat review tool.",
 	}))
 }
 
 func (s *server) handleTerms(w http.ResponseWriter, r *http.Request) {
-	s.render(w, "terms.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "terms.html", s.learningData(r, map[string]any{
 		"Title":       "Terms of Service — hifzlink",
 		"Description": "Terms of service for hifzlink, the open-source Quran mutashabihat review tool.",
 	}))
@@ -372,6 +331,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	lang := pageLang(r)
 	categoryFilter := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("category")))
 
 	type pairResult struct {
@@ -409,24 +369,38 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		var err error
 
 		if surahNum, ayahNum, parseErr := relations.ParseAyahRef(q); parseErr == nil {
-			queryLabel = fmt.Sprintf("pairs involving %s", relations.FormatAyahRef(surahNum, ayahNum))
+			if lang == "id" {
+				queryLabel = fmt.Sprintf("pasangan yang memuat ayat %s", relations.FormatAyahRef(surahNum, ayahNum))
+			} else {
+				queryLabel = fmt.Sprintf("pairs involving %s", relations.FormatAyahRef(surahNum, ayahNum))
+			}
 			dbRels, err = s.db.ByAyah(surahNum, ayahNum)
 		} else if n, atoiErr := strconv.Atoi(q); atoiErr == nil && n >= 1 && n <= 114 {
-			queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
+			if lang == "id" {
+				queryLabel = fmt.Sprintf("pasangan di Surah %d: %s", n, s.quran.SurahName(n))
+			} else {
+				queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
+			}
 			dbRels, err = s.db.BySurah(n)
 		} else if n := search.SurahByName(q); n > 0 {
-			queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
+			if lang == "id" {
+				queryLabel = fmt.Sprintf("pasangan di Surah %d: %s", n, s.quran.SurahName(n))
+			} else {
+				queryLabel = fmt.Sprintf("pairs in Surah %d: %s", n, s.quran.SurahName(n))
+			}
 			dbRels, err = s.db.BySurah(n)
 		} else {
-			errMsg = fmt.Sprintf("Could not interpret %q — try an ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).", q)
+			if lang == "id" {
+				errMsg = fmt.Sprintf("Pencarian %q belum dikenali. Coba referensi ayat (60:8), nomor surah (60), atau nama surah (Al-Mumtahanah).", q)
+			} else {
+				errMsg = fmt.Sprintf("Could not interpret %q — try an ayah ref (60:8), surah number (60), or surah name (Al-Mumtahanah).", q)
+			}
 		}
 
 		if err != nil {
 			internalError(w, r, err)
 			return
 		}
-
-		lang := pageLang(r)
 
 		// Build all results without category filter first.
 		var allResults []pairResult
@@ -482,7 +456,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.render(w, "search.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "search.html", s.learningData(r, map[string]any{
 		"Title":            "Search pairs",
 		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
 		"Query":            q,
@@ -542,9 +516,20 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.render(w, "ayah.html", s.withCommonViewData(r, map[string]any{
-		"Title":           fmt.Sprintf("Ayah %d:%d (%s)", surah, ayah, a.SurahName),
-		"Description":     fmt.Sprintf("Review %s %d:%d and its mutashabihat - similar verses that are easy to confuse. Try it yourself at hifz.click.", a.SurahName, surah, ayah),
+	langCopy := ayahCopy(lang)
+	ref := relations.FormatAyahRef(surah, ayah)
+	sharePath := fmt.Sprintf("/ayah/%d/%d", surah, ayah)
+	canonicalPath := withLang(sharePath, lang)
+	pageTitle := fmt.Sprintf("Ayah %s · %s | hifzlink", ref, a.SurahName)
+	description := fmt.Sprintf("Read Ayah %s from Surah %s, with its translation, tafsir, and related verses.", ref, a.SurahName)
+	if lang == "id" {
+		pageTitle = fmt.Sprintf("Ayat %s · %s | hifzlink", ref, a.SurahName)
+		description = fmt.Sprintf("Baca Ayat %s dari Surah %s, beserta terjemahan, tafsir, dan ayat yang mirip.", ref, a.SurahName)
+	}
+	viewData := s.learningData(r, map[string]any{
+		"Title":           pageTitle,
+		"Description":     description,
+		"AyahUI":          langCopy,
 		"AyahRef":         relations.FormatAyahRef(surah, ayah),
 		"Ayah":            a,
 		"AyahTranslation": ayahTranslation,
@@ -553,14 +538,20 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 		"Related":         related,
 		"SurahName":       a.SurahName,
 		"Collections":     collections,
-		"SaveStatus":      collectionStatusMessage(r.URL.Query().Get("saved")),
+		"SaveStatus":      ayahSaveStatus(r.URL.Query().Get("saved"), lang),
 		"QFAudioURL":      qfAudioURL,
 		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
-			{Name: "Home", Path: "/"},
+			{Name: "Home", Path: withLang("/", lang)},
 			{Name: a.SurahName, Path: fmt.Sprintf("/surah/%d", surah)},
-			{Name: relations.FormatAyahRef(surah, ayah), Path: fmt.Sprintf("/ayah/%d/%d", surah, ayah)},
+			{Name: ref, Path: canonicalPath},
 		}),
-	}))
+	})
+	viewData["SurahURL"] = withLang(fmt.Sprintf("/surah/%d", surah), lang)
+	viewData["JuzURL"] = withLang(fmt.Sprintf("/juz/%d", a.Juz), lang)
+	viewData["ShareURL"] = canonicalPath
+	viewData["CanonicalURL"] = "https://" + r.Host + canonicalPath
+	viewData["OGImageAlt"] = "hifzlink dark green Quran reading preview"
+	s.render(w, "ayah.html", viewData)
 }
 
 func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
@@ -652,8 +643,8 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	ref1str := relations.FormatAyahRef(s1, y1)
 	ref2str := relations.FormatAyahRef(s2, y2)
 	compareData := map[string]any{
-		"Title":       fmt.Sprintf("Compare %s vs %s | hifzlink", ref1str, ref2str),
-		"Description": fmt.Sprintf("Side-by-side comparison of %s and %s with word-level highlights. See exactly where these similar Quran verses diverge.", ref1str, ref2str),
+		"Title":       fmt.Sprintf("Compare %s and %s | hifzlink", ref1str, ref2str),
+		"Description": fmt.Sprintf("Compare %s %s and %s %s to see what is shared and what changes.", ayah1.SurahName, ref1str, ayah2.SurahName, ref2str),
 		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
 			{Name: "Home", Path: "/"},
 			{Name: fmt.Sprintf("%s vs %s", ref1str, ref2str), Path: fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1str, ref2str)},
@@ -672,12 +663,21 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		"SavedItemID":       savedItemID,
 		"SavedItemMastered": savedItemMastered,
 	}
+	if lang == "id" {
+		compareData["Title"] = fmt.Sprintf("Bandingkan ayat %s dan %s | hifzlink", ref1str, ref2str)
+		compareData["Description"] = fmt.Sprintf("Bandingkan %s %s dan %s %s. Temukan lafaz yang sama dan bagian yang berubah.", ayah1.SurahName, ref1str, ayah2.SurahName, ref2str)
+	}
 	if relFound {
 		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
 		compareData["RelationUpdatedAt"] = formatUpdatedAt(rel.UpdatedAt)
 		compareData["RelationNote"] = rel.Note
 	}
-	s.render(w, "compare.html", s.withCommonViewData(r, compareData))
+	viewData := s.learningData(r, compareData)
+	sharePath := fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", neturl.QueryEscape(ref1str), neturl.QueryEscape(ref2str))
+	viewData["ShareURL"] = withLang(sharePath, lang)
+	viewData["CanonicalURL"] = "https://" + r.Host + withLang(sharePath, lang)
+	viewData["OGImageAlt"] = "hifzlink dark green card for Quran verse comparison"
+	s.render(w, "compare.html", viewData)
 }
 
 type qfBookmarkView struct {
@@ -1185,7 +1185,7 @@ func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.render(w, "surah-index.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "surah-index.html", s.learningData(r, map[string]any{
 		"Title":       "Browse by Surah",
 		"Description": "Browse all 114 surahs and their mutashabihat relations. Try it yourself at hifz.click.",
 		"Surahs":      items,
@@ -1231,7 +1231,7 @@ func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
 		items[i-1] = juzIndexItem{Number: i, RelationCount: counts[i]}
 	}
 
-	s.render(w, "juz-index.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "juz-index.html", s.learningData(r, map[string]any{
 		"Title":       "Browse by Juz",
 		"Description": "Browse mutashabihat relations across all 30 juz of the Quran. Try it yourself at hifz.click.",
 		"Juzs":        items,
@@ -1280,7 +1280,7 @@ func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
 		data["NextSurah"] = surah + 1
 		data["NextSurahName"] = s.quran.SurahName(surah + 1)
 	}
-	s.render(w, "surah-detail.html", s.withCommonViewData(r, data))
+	s.render(w, "surah-detail.html", s.learningData(r, data))
 }
 
 func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
@@ -1303,7 +1303,7 @@ func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
 	juzStartSurah, juzStartAyah := s.quran.JuzFirstAyah(juz)
 	juzStartName := s.quran.SurahName(juzStartSurah)
 
-	s.render(w, "juz.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "juz.html", s.learningData(r, map[string]any{
 		"Title":         fmt.Sprintf("Juz %d Relations", juz),
 		"Description":   fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
 		"Juz":           juz,
@@ -1804,7 +1804,6 @@ func logRequests(next http.Handler) http.Handler {
 
 func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[string]any {
 	lang := pageLang(r)
-	data["AssetVersion"] = buildAssetVersion()
 	data["Lang"] = lang
 	data["HomeURL"] = withLang("/", lang)
 	data["LangARURL"] = switchLang(r, "ar")
@@ -1818,7 +1817,8 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 
 	base := "https://" + r.Host
 	data["CanonicalURL"] = base + r.URL.Path
-	data["OGImageURL"] = base + "/static/og-image.png"
+	data["OGImageURL"] = base + "/static/og-image.png?v=2"
+	data["OGImageAlt"] = "hifzlink — Quran mutashabihat review"
 	if _, ok := data["Description"]; !ok {
 		data["Description"] = "Master Quran mutashabihat: review similar verses and strengthen your memorization."
 	}
@@ -1843,25 +1843,6 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	}
 
 	return data
-}
-
-func buildAssetVersion() string {
-	info, ok := debug.ReadBuildInfo()
-	if ok {
-		for _, setting := range info.Settings {
-			if setting.Key != "vcs.revision" {
-				continue
-			}
-			version := strings.TrimSpace(setting.Value)
-			if len(version) > 12 {
-				return version[:12]
-			}
-			if version != "" {
-				return version
-			}
-		}
-	}
-	return "dev"
 }
 
 func pageLang(r *http.Request) string {
@@ -1997,8 +1978,27 @@ func (s *server) withTranslations(lang string, related []relations.AyahView) []r
 
 func (s *server) renderNotFound(w http.ResponseWriter, r *http.Request, heading, message string) {
 	w.WriteHeader(http.StatusNotFound)
-	s.render(w, "not-found.html", s.withCommonViewData(r, map[string]any{
-		"Title":   "Not Found",
+	if pageLang(r) == "id" {
+		switch {
+		case strings.Contains(heading, "Ayah"):
+			heading = "Ayat tidak ditemukan"
+			if strings.Contains(message, "format") {
+				message = "Referensi ayat tidak valid. Gunakan format surah:ayat, misalnya 60:8."
+			} else {
+				message = "Ayat ini tidak ada dalam data Quran. Periksa kembali nomor surah dan ayatnya."
+			}
+		case strings.Contains(heading, "Collection"):
+			heading, message = "Koleksi tidak ditemukan", "Koleksi ini tidak tersedia."
+		case strings.Contains(heading, "Relation"):
+			heading, message = "Pasangan tidak ditemukan", "Pasangan ayat ini tidak tersedia."
+		}
+	}
+	title := "Page not found"
+	if pageLang(r) == "id" {
+		title = "Halaman tidak ditemukan"
+	}
+	s.render(w, "not-found.html", s.learningData(r, map[string]any{
+		"Title":   title,
 		"Heading": heading,
 		"Message": message,
 	}))

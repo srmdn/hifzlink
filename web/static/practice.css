@@ -1,0 +1,31 @@
+/* Continuation exercise, also shared by the homepage sample. */
+.practice-answer>summary { width: 100%; list-style: none; background: var(--color-hover); }
+.practice-answer>summary::-webkit-details-marker { display: none; }
+.practice-answer-content { border-top: 1px solid var(--color-border); margin-top: 22px; }
+.practice-answer-content .home-reference { font-size: 12px; color: var(--color-text-muted); flex-wrap: wrap; }
+.practice-translation { margin: 14px 0; font-size: 12px; color: var(--color-text-muted); }
+.practice-translation summary { padding: 8px 0; cursor: pointer; }
+.practice-translation p { font-size: 14px; color: var(--color-text); }
+.practice-next { margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--color-border); }
+.practice-next p { margin: 0; font-size: 12px; color: var(--color-text-muted); }
+.practice-main { width: 100%; max-width: 960px; padding: 32px 40px 48px; margin: 0 auto; }
+.practice-back { margin-bottom: 22px; }
+.practice-main h1 { font-size: 30px; font-weight: 500; letter-spacing: -.035em; margin: 16px 0; }
+.practice-main>.home-challenge { max-width: 600px; margin-top: 26px; }
+.practice-rating { max-width: 600px; margin-top: 24px; }
+.practice-rating[hidden] { display: none; }
+.practice-rating h2 { font-size: 18px; font-weight: 500; }
+.practice-rating .home-actions { margin-top: 14px; gap: 10px; }
+.practice-rating [aria-pressed="true"] { color: var(--color-accent-ink); background: var(--color-accent); border-color: var(--color-accent); }
+.practice-setup { margin-top: 30px; max-width: 680px; }
+.practice-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; margin-bottom: 30px; }
+.practice-fields label,.practice-fields>div>span { display: flex; flex-direction: column; gap: 9px; font-size: 12px; color: var(--color-text-muted); }
+.practice-fields select { padding: 12px; font: inherit; font-size: 14px; color: var(--color-text); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 9px; width: 100%; }
+.practice-fields p { font-size: 14px; margin: 18px 0 0; }
+@media(max-width:640px) {
+ .practice-main { padding: 26px 22px 35px; }
+ .practice-fields { grid-template-columns: 1fr; gap: 16px; }
+ .practice-fields select { font-size: 16px; }
+ .practice-main h1 { font-size: 29px; }
+}
+@media(max-width:350px) { .practice-main { padding-left: 16px; padding-right: 16px; } }

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
+{{template "head" .}}
+<body class="learning-page practice-page">
+{{template "topbar" .}}
+<main class="practice-main">
+  <a class="home-link practice-back" href="{{.HomeURL}}"><span aria-hidden="true">←</span> {{.UI.back}}</a>
+  <p class="home-eyebrow">{{.UI.practice}}</p>
+  {{if .Continuation}}
+    <h1>{{.UI.practiceHeading}} {{.Continuation.Prompt.SurahName}}.</h1>
+    <p class="home-lead">{{.UI.recall}}</p>
+    {{template "continuation-challenge" .}}
+    <section class="practice-rating" data-practice-rating hidden aria-labelledby="rating-heading">
+      <h2 id="rating-heading">{{.UI.rating}}</h2>
+      <div class="home-actions"><button class="home-button" type="button" data-rating="remembered" aria-pressed="false">{{.UI.remembered}}</button><button class="home-button" type="button" data-rating="hesitated" aria-pressed="false">{{.UI.hesitated}}</button><button class="home-button" type="button" data-rating="mixed" aria-pressed="false">{{.UI.mixed}}</button></div>
+      <p class="home-muted" role="status" data-rating-status data-prefix="{{.UI.ratingStatus}}"></p>
+      <div class="home-actions"><button type="button" class="home-link" data-practice-reset>{{.UI.again}} <span aria-hidden="true">↻</span></button><a class="home-link" href="{{.PracticeURL}}">{{.UI.change}}</a></div>
+    </section>
+  {{else}}
+    <h1>{{.UI.setup}}</h1><p class="home-lead">{{.UI.setupLead}}</p>
+    <form class="practice-setup" method="GET" action="/practice">
+      <input type="hidden" name="lang" value="{{.Lang}}">
+      <div class="practice-fields"><label>{{.UI.passage}}<select name="surah"><option value="78">An-Naba · 78:4–5</option><option value="102">At-Takaathur · 102:3–4</option></select></label><div><span>{{.UI.mode}}</span><p>{{.UI.textMode}}</p></div></div>
+      <button type="submit" class="home-button primary">{{.UI.start}} <span aria-hidden="true">→</span></button>
+    </form>
+  {{end}}
+</main>
+{{template "learning-footer" .}}
+<script defer src="{{asset "practice.js"}}"></script>
+</body>
+</html>
