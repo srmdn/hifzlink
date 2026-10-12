@@ -1,59 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<link rel="stylesheet" href="{{asset "surah-index.css"}}">
-<body>
+<body class="learning-page catalog-page surah-index-shell">
 {{template "topbar" .}}
-
-  <main class="surah-index-page">
-    <h1>Browse by Surah</h1>
-    <p class="meta">114 surahs. Surahs with mutashabihat pairs are highlighted.</p>
-
-    <div class="surah-filter-bar">
-      <label for="surah-filter" class="surah-filter-label">Filter</label>
-      <input id="surah-filter" class="surah-filter-input" type="search" placeholder="Name or number..." autocomplete="off">
-      <p class="surah-index-stats"><strong id="surah-stat-shown">114</strong> shown &middot; <span id="surah-stat-pairs"></span></p>
-    </div>
-
-    <div class="surah-index-list" id="surah-index-list">
-      {{range .Surahs}}
-      <a class="surah-index-row{{if gt .RelationCount 0}} has-pairs{{end}}" href="/surah/{{.Number}}?lang={{$.Lang}}">
-        <span class="surah-index-num">{{.Number}}</span>
-        <span class="surah-index-name">{{.Name}}</span>
-        {{if gt .RelationCount 0}}
-        <span class="surah-index-badge">{{.RelationCount}}</span>
-        {{else}}
-        <span class="surah-index-empty">0 pairs</span>
-        {{end}}
-      </a>
-      {{end}}
-    </div>
-  </main>
-
-  <script>
-  (() => {
-    const input = document.getElementById('surah-filter');
-    const list = document.getElementById('surah-index-list');
-    const statShown = document.getElementById('surah-stat-shown');
-    const statPairs = document.getElementById('surah-stat-pairs');
-    const rows = Array.from(list.querySelectorAll('.surah-index-row'));
-    const withPairs = rows.filter(r => r.classList.contains('has-pairs')).length;
-    statPairs.textContent = withPairs + ' with pairs';
-    input.addEventListener('input', () => {
-      const q = input.value.trim().toLowerCase();
-      let shown = 0;
-      rows.forEach(row => {
-        const name = row.querySelector('.surah-index-name').textContent.toLowerCase();
-        const num = row.querySelector('.surah-index-num').textContent.trim();
-        const match = !q || name.includes(q) || num.startsWith(q);
-        row.style.display = match ? '' : 'none';
-        if (match) shown++;
-      });
-      statShown.textContent = shown;
+<main class="learning-content surah-index-page">
+  <p class="catalog-kicker">{{.UI.browse}}</p>
+  <h1>{{.UI.surahTitle}}</h1>
+  <p class="catalog-intro">{{.UI.surahDescription}}</p>
+  <div class="surah-filter-bar">
+    <label for="surah-filter" class="surah-filter-label">{{.UI.surahFilter}}</label>
+    <input id="surah-filter" class="surah-filter-input" type="search" placeholder="{{.UI.surahPlaceholder}}" autocomplete="off" data-count-suffix="{{.UI.surahs}}">
+    <div class="surah-index-stats" role="status" aria-live="polite"><strong id="surah-stat-shown">114</strong> {{.UI.shown}} <span>·</span> <span id="surah-stat-pairs" data-pair-suffix="{{.UI.withPairs}}"></span></div>
+    <div class="surah-shortcuts"><span>{{.UI.trySurah}}</span><button type="button" data-surah-query="2">Al-Baqarah</button><button type="button" data-surah-query="18">Al-Kahf</button><button type="button" data-surah-query="78">An-Naba</button></div>
+  </div>
+  <nav class="surah-index-list" id="surah-index-list" aria-label="{{.UI.browse}}">
+    {{range .Surahs}}
+    <a class="surah-index-row{{if gt .RelationCount 0}} has-pairs{{end}}" href="/surah/{{.Number}}?lang={{$.Lang}}">
+      <span class="surah-index-num">{{printf "%03d" .Number}}</span><span class="surah-index-name">{{.Name}}</span>
+      {{if gt .RelationCount 0}}<span class="surah-index-badge">{{.RelationCount}}</span>{{else}}<span class="surah-index-empty">—</span>{{end}}
+    </a>
+    {{end}}
+  </nav>
+  <p class="surah-filter-empty" hidden>{{.UI.noSurahMatch}}</p>
+</main>
+{{template "learning-footer" .}}
+<script>
+(() => {
+  const input = document.getElementById('surah-filter');
+  const rows = [...document.querySelectorAll('.surah-index-row')];
+  const shown = document.getElementById('surah-stat-shown');
+  const pairs = document.getElementById('surah-stat-pairs');
+  const empty = document.querySelector('.surah-filter-empty');
+  const pairCount = rows.filter(row => row.classList.contains('has-pairs')).length;
+  pairs.textContent = `${pairCount} ${pairs.dataset.pairSuffix}`;
+  const filter = value => {
+    const query = value.trim().toLocaleLowerCase(); let count = 0;
+    rows.forEach(row => {
+      const match = !query || row.querySelector('.surah-index-name').textContent.toLocaleLowerCase().includes(query) || String(Number(row.querySelector('.surah-index-num').textContent)).startsWith(query);
+      row.hidden = !match; if (match) count++;
     });
-  })();
-  </script>
-
-{{template "footer" .}}
+    shown.textContent = count; empty.hidden = count !== 0;
+  };
+  input.addEventListener('input', () => filter(input.value));
+  document.querySelectorAll('[data-surah-query]').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.surahQuery; filter(input.value); input.focus(); }));
+})();
+</script>
 </body>
 </html>

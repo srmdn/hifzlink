@@ -1,175 +1,173 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page catalog-page compare-page">
 {{template "topbar" .}}
-
-  <main class="container">
-    <h1>Compare {{.Ref1}} and {{.Ref2}}</h1>
-    {{if .RelationUpdatedAt}}<p class="meta">Last updated: {{.RelationUpdatedAt}}</p>{{end}}
-
-    <div class="compare-toolbar">
-      <button type="button" class="btn-outline" id="toggle-highlights">Hide highlights</button>
-      <button type="button" class="btn-outline btn-share" id="share-btn">Share</button>
-      <button type="button" class="btn-outline" id="practice-btn">Practice Mode</button>
-      {{if and .IsAdmin .AdminEditURL}}<a class="btn-outline" href="{{.AdminEditURL}}">Edit</a>{{end}}
+<main class="compare-content">
+  <p class="compare-back"><a href="{{.SearchURL}}">← {{.UI.compareBack}}</a>{{if .RelationUpdatedAt}}<span>{{.UI.lastUpdated}} · {{.RelationUpdatedAt}}</span>{{end}}</p>
+  <header class="compare-heading">
+    <div class="compare-heading-copy">
+      <p class="catalog-kicker">{{.UI.similar}}</p>
+      <h1>{{.UI.compareHeading}}</h1>
+      <p class="compare-references"><span>{{.Ref1}}</span><span aria-hidden="true">↔</span><span>{{.Ref2}}</span></p>
+      <p class="catalog-intro">{{.UI.compareLead}}</p>
     </div>
-
-    <div class="practice-controls" id="practice-controls" role="toolbar" aria-label="Practice controls">
-      <button type="button" class="btn" id="practice-reveal">Reveal</button>
-      <button type="button" class="btn-outline" id="practice-switch">Switch Side</button>
-      {{if .RelatedPairs}}<a class="btn-outline" href="{{(index .RelatedPairs 0).CompareURL}}">Next Pair</a>{{end}}
-      <button type="button" class="btn-outline" id="practice-exit">Exit Practice</button>
+    <div class="compare-actions">
+      <button type="button" class="compare-action compare-action-primary" id="practice-btn" aria-pressed="false">{{.UI.startPractice}} <span aria-hidden="true">→</span></button>
+      <button type="button" class="compare-action compare-action-secondary" id="share-btn" data-share-url="{{.ShareURL}}" data-share-text="{{.UI.shareText}}">{{.UI.sharePair}}</button>
+      {{if and .IsAdmin .AdminEditURL}}<a class="compare-action compare-action-secondary" href="{{.AdminEditURL}}">Edit pair</a>{{end}}
     </div>
+  </header>
+  <p class="compare-share-status" role="status" aria-live="polite"></p>
 
-    <p class="highlight-legend"><mark class="word-unique">highlighted</mark> words differ between verses</p>
+  <div class="practice-controls" id="practice-controls" role="toolbar" aria-label="{{.UI.practiceControls}}" hidden>
+    <button type="button" class="compare-control-primary" id="practice-reveal">{{.UI.reveal}}</button>
+    <button type="button" class="compare-control-secondary" id="practice-switch">{{.UI.switchSide}}</button>
+    {{if .RelatedPairs}}<a class="compare-control-secondary" href="{{(index .RelatedPairs 0).CompareURL}}">{{.UI.nextPair}} →</a>{{end}}
+    <button type="button" class="compare-control-secondary" id="practice-exit">{{.UI.exitPractice}}</button>
+  </div>
 
-    <section class="compare-grid">
-      <article class="card verse-card">
-        <p class="meta">{{.Ref1}} · {{.Ayah1.SurahName}} · Juz {{.Ayah1.Juz}}</p>
-        <p class="arabic" lang="ar">{{.DiffText1}}</p>
-        {{if .Ayah1Translation}}
-        <p class="translation">{{.Ayah1Translation}}</p>
-        {{end}}
-      </article>
-      <article class="card verse-card">
-        <p class="meta">{{.Ref2}} · {{.Ayah2.SurahName}} · Juz {{.Ayah2.Juz}}</p>
-        <p class="arabic" lang="ar">{{.DiffText2}}</p>
-        {{if .Ayah2Translation}}
-        <p class="translation">{{.Ayah2Translation}}</p>
-        {{end}}
-      </article>
-    </section>
+  <div class="compare-difference-bar">
+    <p class="highlight-legend"><span class="difference-swatch" aria-hidden="true"></span>{{.UI.highlightLegend}}</p>
+    <button type="button" class="compare-highlight-toggle" id="toggle-highlights" aria-pressed="true">{{.UI.hideHighlights}}</button>
+  </div>
 
-    {{if .RelationNote}}
-    <p class="compare-note">{{.RelationNote}}</p>
-    {{end}}
+  <section class="compare-grid" aria-label="{{.UI.similar}}">
+    <article class="card verse-card">
+      <p class="compare-verse-label"><span>01</span>{{.UI.verseOne}}</p>
+      <p class="compare-verse-meta">{{.Ref1}} · {{.Ayah1.SurahName}} · {{.UI.juz}} {{.Ayah1.Juz}}</p>
+      <p class="arabic compare-arabic" lang="ar" dir="rtl">{{.DiffText1}}</p>
+      {{if .Ayah1Translation}}<p class="translation compare-translation">{{.Ayah1Translation}}</p>{{end}}
+    </article>
+    <article class="card verse-card">
+      <p class="compare-verse-label"><span>02</span>{{.UI.verseTwo}}</p>
+      <p class="compare-verse-meta">{{.Ref2}} · {{.Ayah2.SurahName}} · {{.UI.juz}} {{.Ayah2.Juz}}</p>
+      <p class="arabic compare-arabic" lang="ar" dir="rtl">{{.DiffText2}}</p>
+      {{if .Ayah2Translation}}<p class="translation compare-translation">{{.Ayah2Translation}}</p>{{end}}
+    </article>
+  </section>
 
-    {{if .QFEnabled}}
-    <section class="card compare-save-card">
-      {{if .CurrentUser}}
-        {{if .Collections}}
-        <form action="/collections/items" method="post" class="collection-save-form">
-          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-          <input type="hidden" name="lang" value="{{.Lang}}" />
-          <input type="hidden" name="item_type" value="relation" />
-          <input type="hidden" name="ayah1" value="{{.Ref1}}" />
-          <input type="hidden" name="ayah2" value="{{.Ref2}}" />
-          <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
-          <label for="collection-id-compare">Save pair to collection</label>
-          <select id="collection-id-compare" name="collection_id" required>
-            <option value="">Select collection</option>
-            {{range .Collections}}
-            <option value="{{.ID}}">{{.Name}}</option>
-            {{end}}
-          </select>
-          <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
-          <button type="submit" class="btn">Save Pair</button>
-        </form>
-        {{else}}
-        <p class="meta">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>
-        {{end}}
-        {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
-        {{if .SavedItemID}}
-        <form action="/collections/items/mastered/{{.SavedItemID}}" method="post" class="mastered-form">
-          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-          <input type="hidden" name="return_to" value="/compare?ayah1={{.Ref1}}&ayah2={{.Ref2}}" />
-          <button type="submit" class="btn-mastered{{if .SavedItemMastered}} btn-mastered--done{{end}}">
-            {{if .SavedItemMastered}}Mastered ✓{{else}}Mark as Mastered{{end}}
-          </button>
-        </form>
-        {{end}}
-      {{else}}
-      <p class="compare-login-nudge">
-        <a href="{{.LoginURL}}">Login with Quran.Foundation</a> to save this pair to your collection.
-      </p>
-      {{end}}
-    </section>
-    {{end}}
+  {{if .RelationNote}}<section class="compare-note"><h2>{{.UI.relationNote}}</h2><p>{{.RelationNote}}</p></section>{{end}}
 
-    {{if .RelatedPairs}}
-    <section class="related-pairs">
-      <h2 class="related-pairs-title">Related pairs</h2>
-      <ul class="related-pairs-list">
-        {{range .RelatedPairs}}
-        <li>
-          <a href="{{.CompareURL}}" class="related-pair-link">
-            <span class="related-pair-refs">{{.Ref1}} ↔ {{.Ref2}}</span>
-            {{if .Category}}<span class="related-pair-cat">{{.Category}}</span>{{end}}
-          </a>
-        </li>
-        {{end}}
-      </ul>
-    </section>
-    {{end}}
-  </main>
+  {{if .QFEnabled}}
+  <section class="compare-save-section">
+    {{if .CurrentUser}}
+      {{if .Collections}}
+      <form action="/collections/items" method="post" class="collection-save-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="hidden" name="item_type" value="relation" />
+        <input type="hidden" name="ayah1" value="{{.Ref1}}" />
+        <input type="hidden" name="ayah2" value="{{.Ref2}}" />
+        <input type="hidden" name="return_to" value="{{.ShareURL}}" />
+        <label for="collection-id-compare">Save pair to collection</label>
+        <select id="collection-id-compare" name="collection_id" required><option value="">Select collection</option>{{range .Collections}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select>
+        <input type="text" name="note" placeholder="Optional note" autocomplete="off" />
+        <button type="submit" class="btn">Save pair</button>
+      </form>
+      {{else}}<p class="compare-login-nudge">No collections yet. <a href="{{.DashboardURL}}">Create a collection</a> first.</p>{{end}}
+      {{if .SaveStatus}}<p class="admin-success" role="status">{{.SaveStatus}}</p>{{end}}
+      {{if .SavedItemID}}<form action="/collections/items/mastered/{{.SavedItemID}}" method="post" class="mastered-form"><input type="hidden" name="csrf_token" value="{{.CSRFToken}}" /><input type="hidden" name="return_to" value="{{.ShareURL}}" /><button type="submit" class="btn-mastered{{if .SavedItemMastered}} btn-mastered--done{{end}}">{{if .SavedItemMastered}}Mastered ✓{{else}}Mark as mastered{{end}}</button></form>{{end}}
+    {{else}}<p class="compare-login-nudge"><a href="{{.LoginURL}}">Login with Quran.Foundation</a> to save this pair to your collection.</p>{{end}}
+  </section>
+  {{end}}
 
-{{template "footer" .}}
+  {{if .RelatedPairs}}
+  <section class="related-pairs">
+    <h2 class="related-pairs-title">{{.UI.relatedPairs}}</h2>
+    <ul class="related-pairs-list">{{range .RelatedPairs}}<li><a href="{{.CompareURL}}" class="related-pair-link"><span class="related-pair-refs">{{.Ref1}} ↔ {{.Ref2}}</span>{{if .Category}}<span class="related-pair-cat">{{.Category}}</span>{{end}}<span aria-hidden="true">→</span></a></li>{{end}}</ul>
+  </section>
+  {{end}}
+</main>
+{{template "learning-footer" .}}
 <script>
-  (() => {
-    const btn = document.getElementById("toggle-highlights");
-    const grid = document.querySelector(".compare-grid");
-    const legend = document.querySelector(".highlight-legend");
-    if (!btn || !grid) return;
-    btn.addEventListener("click", () => {
-      const hidden = grid.classList.toggle("no-highlights");
-      btn.textContent = hidden ? "Show highlights" : "Hide highlights";
-      if (legend) legend.style.display = hidden ? "none" : "";
-    });
-  })();
-
-  (() => {
-    const btn = document.getElementById("share-btn");
-    if (!btn) return;
-    btn.addEventListener("click", async () => {
-      const url = window.location.href;
-      const title = document.title;
+(() => {
+  const share = document.getElementById("share-btn");
+  const status = document.querySelector(".compare-share-status");
+  if (share && status) {
+    const shareURL = new URL(share.dataset.shareUrl, window.location.origin).href;
+    let statusTimer;
+    const announce = message => {
+      status.textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => { status.textContent = ""; }, 4000);
+    };
+    const copyLink = async () => {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(shareURL);
+      announce("{{.UI.shareCopied}}");
+    };
+    share.addEventListener("click", async () => {
       if (navigator.share) {
-        try { await navigator.share({ title, url }); } catch (_) {}
-      } else {
-        await navigator.clipboard.writeText(url);
-        btn.textContent = "Copied!";
-        btn.classList.add("btn--copied");
-        setTimeout(() => { btn.textContent = "Share"; btn.classList.remove("btn--copied"); }, 2000);
+        try {
+          await navigator.share({ title: document.title, text: share.dataset.shareText, url: shareURL });
+          return;
+        } catch (error) {
+          if (error?.name === "AbortError") return;
+        }
       }
+      try { await copyLink(); } catch (_) { announce("{{.UI.shareFailed}}"); }
     });
-  })();
+  }
 
-  (() => {
-    const grid = document.querySelector(".compare-grid");
-    const practiceBtn = document.getElementById("practice-btn");
-    const controls = document.getElementById("practice-controls");
-    const revealBtn = document.getElementById("practice-reveal");
-    const switchBtn = document.getElementById("practice-switch");
-    const exitBtn = document.getElementById("practice-exit");
-    if (!grid || !practiceBtn) return;
-
-    practiceBtn.addEventListener("click", () => {
-      grid.classList.add("practice-mode");
-      grid.classList.remove("practice-right", "revealed");
-      controls.classList.add("active");
-      practiceBtn.style.display = "none";
-      revealBtn.disabled = false;
+  const grid = document.querySelector(".compare-grid");
+  const toggleHighlights = document.getElementById("toggle-highlights");
+  if (grid && toggleHighlights) {
+    toggleHighlights.addEventListener("click", () => {
+      const shown = toggleHighlights.getAttribute("aria-pressed") === "true";
+      grid.classList.toggle("no-highlights", shown);
+      toggleHighlights.setAttribute("aria-pressed", String(!shown));
+      toggleHighlights.textContent = shown ? "{{.UI.showHighlights}}" : "{{.UI.hideHighlights}}";
     });
+  }
 
-    revealBtn.addEventListener("click", () => {
-      grid.classList.add("revealed");
-      revealBtn.disabled = true;
-    });
-
-    switchBtn.addEventListener("click", () => {
-      grid.classList.toggle("practice-right");
-      grid.classList.remove("revealed");
-      revealBtn.disabled = false;
-    });
-
-    exitBtn.addEventListener("click", () => {
-      grid.classList.remove("practice-mode", "practice-right", "revealed");
-      controls.classList.remove("active");
-      practiceBtn.style.display = "";
-      revealBtn.disabled = false;
-    });
-  })();
+  const practiceButton = document.getElementById("practice-btn");
+  const controls = document.getElementById("practice-controls");
+  const revealButton = document.getElementById("practice-reveal");
+  const switchButton = document.getElementById("practice-switch");
+  const exitButton = document.getElementById("practice-exit");
+  if (!grid || !practiceButton || !controls || !revealButton || !switchButton || !exitButton) return;
+  const verses = grid.querySelectorAll(".verse-card");
+  const setVerseHidden = (index, hidden) => {
+    const verse = verses[index];
+    if (!verse) return;
+    verse.setAttribute("aria-hidden", String(hidden));
+    verse.toggleAttribute("inert", hidden);
+  };
+  practiceButton.addEventListener("click", () => {
+    grid.classList.add("practice-mode");
+    grid.classList.remove("practice-right", "revealed");
+    setVerseHidden(0, true);
+    setVerseHidden(1, false);
+    controls.hidden = false;
+    controls.classList.add("active");
+    practiceButton.hidden = true;
+    revealButton.disabled = false;
+  });
+  revealButton.addEventListener("click", () => {
+    grid.classList.add("revealed");
+    setVerseHidden(0, false);
+    setVerseHidden(1, false);
+    revealButton.disabled = true;
+  });
+  switchButton.addEventListener("click", () => {
+    const hideFirst = grid.classList.contains("practice-right");
+    grid.classList.toggle("practice-right", !hideFirst);
+    grid.classList.remove("revealed");
+    setVerseHidden(0, hideFirst);
+    setVerseHidden(1, !hideFirst);
+    revealButton.disabled = false;
+  });
+  exitButton.addEventListener("click", () => {
+    grid.classList.remove("practice-mode", "practice-right", "revealed");
+    setVerseHidden(0, false);
+    setVerseHidden(1, false);
+    controls.classList.remove("active");
+    controls.hidden = true;
+    practiceButton.hidden = false;
+    revealButton.disabled = false;
+  });
+})();
 </script>
 </body>
 </html>

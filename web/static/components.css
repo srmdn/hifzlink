@@ -1,45 +1,45 @@
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 1rem 1.1rem;
-  margin: 1rem 0;
-  box-shadow: var(--card-shadow);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-4) 0;
 }
 
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+  font-weight: 500;
 }
 
 .lead {
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   max-width: 66ch;
 }
 
 .back {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
 }
 
 .back a {
-  color: #546779;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
   padding: 0.32rem 0.66rem;
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
 }
 
 .hero-meta {
-  margin-top: 0.8rem;
+  margin-top: var(--space-3);
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--space-2);
 }
 
 input,
@@ -54,9 +54,10 @@ button {
 
 input,
 select {
-  border: 1px solid var(--border);
-  background: var(--surface-soft);
-  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
   padding: 0.72rem 0.9rem;
 }
 
@@ -71,67 +72,69 @@ select {
   justify-content: center;
   font-weight: 600;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   border: 0;
   white-space: nowrap;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 /* Primary — form submits, main actions */
 .btn {
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
   padding: 0.68em 1.2em;
-  font-size: 0.92rem;
+  font-size: var(--text-base);
 }
 
 .btn:hover {
-  background: var(--accent-strong);
+  background: var(--color-accent-strong);
 }
 
 /* Small — inline actions (Compare, Open, Resume) */
 .btn-sm {
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
   padding: 0.35em 0.72em;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .btn-sm:hover {
-  background: var(--accent-strong);
+  background: var(--color-accent-strong);
 }
 
 /* Outline — secondary/cancel actions */
 .btn-outline {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 0.58em 1.1em;
-  font-size: 0.92rem;
+  font-size: var(--text-base);
 }
 
 .btn-outline:hover {
-  background: #efe6d7;
-  color: var(--ink);
+  background: var(--color-hover);
+  color: var(--color-text);
 }
 
 .btn--copied,
 .btn--copied:hover {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #15803d;
+  background: var(--color-success-bg);
+  border-color: var(--color-success-line);
+  color: var(--color-success-text);
 }
 
 /* Danger — destructive actions */
 .btn-danger {
-  background: #be123c;
-  color: #fff;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border: 1px solid var(--color-danger-line);
   padding: 0.6em 1.15em;
-  font-size: 0.92rem;
+  font-size: var(--text-base);
 }
 
 .btn-danger:hover {
-  background: #9f1239;
+  background: var(--color-danger-line);
+  color: var(--color-text-inverse);
 }
 
 @media (max-width: 768px) {
@@ -139,7 +142,7 @@ select {
   .btn-outline,
   .btn-danger {
     padding: 0.55em 1em;
-    font-size: 0.9rem;
+    font-size: var(--text-base);
   }
 }
 
@@ -159,24 +162,24 @@ select {
 .error-msg {
   grid-column: 1 / -1;
   margin: 0.06rem 0 0;
-  color: #b91c1c;
-  font-size: 0.9rem;
+  color: var(--color-danger-text);
+  font-size: var(--text-base);
 }
 
 .collection-form,
 .collection-save-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 0.7rem;
+  gap: var(--space-2) 0.7rem;
   align-items: end;
 }
 
 .collection-form label,
 .collection-save-form label {
   grid-column: 1 / -1;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 600;
-  color: #526679;
+  color: var(--color-text-secondary);
 }
 
 .collection-form input[id="collection-description"],
@@ -194,8 +197,10 @@ select {
 }
 
 .meta {
-  color: var(--text-muted);
-  font-size: 0.92rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
 }
 
 .simple-list,
@@ -209,7 +214,7 @@ select {
 .simple-list li,
 .related-item,
 .pairs-list li {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
   padding: 0.82rem 0;
 }
 
@@ -228,17 +233,17 @@ select {
 }
 
 .verse-card {
-  border-left: 4px solid #b8d8d3;
+  border-left: 3px solid var(--color-accent);
 }
 
 .arabic {
   margin: 0.72rem 0;
-  font-family: "Amiri Quran", "Noto Naskh Arabic", serif;
+  font-family: var(--font-arabic);
   font-size: clamp(1.78rem, 3vw, 2.18rem);
   line-height: 2.06;
   direction: rtl;
   text-align: right;
-  color: var(--ink);
+  color: var(--color-text);
 }
 
 .arabic-small {
@@ -247,20 +252,23 @@ select {
 
 .translation {
   margin: 0.5rem 0 0;
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed var(--color-border);
   padding-top: 0.58rem;
-  color: #4f6278;
-  font-size: 0.99rem;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
 }
 
 mark.word-unique {
-  background: var(--saffron);
+  background: var(--color-diff-bg);
   color: inherit;
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 0 2px;
+  box-shadow: inset 0 -1px 0 var(--color-diff-line);
 }
 
 .pair-refs {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -271,26 +279,27 @@ mark.word-unique {
 .ayah-chip {
   display: inline-block;
   padding: 0.18rem 0.55rem;
-  background: #e8f4f2;
-  border: 1px solid #b8d8d3;
-  border-radius: 999px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #1a6b5e;
+  background: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-accent);
   text-decoration: none;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .ayah-chip:hover {
-  background: #c8eae4;
-  border-color: #7bbdb5;
-  color: #0f4f44;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
 .pairs-hint {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin: 0 0 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3);
 }
 
 .note {
@@ -299,14 +308,14 @@ mark.word-unique {
 
 .not-found-card {
   max-width: 540px;
-  margin-top: 2.5rem;
+  margin-top: var(--space-6);
 }
 
 .tafsir-card .tafsir-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .tafsir-card .tafsir-header h2 {
@@ -314,19 +323,19 @@ mark.word-unique {
 }
 
 .tafsir-source {
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   display: block;
   margin-top: 0.18rem;
 }
 
 .tafsir-body {
-  margin-top: 1rem;
-  border-top: 1px dashed var(--border);
-  padding-top: 1rem;
-  font-size: 0.97rem;
+  margin-top: var(--space-4);
+  border-top: 1px dashed var(--color-border);
+  padding-top: var(--space-4);
+  font-size: var(--text-base);
   line-height: 1.75;
-  color: #2e3f4e;
+  color: var(--color-text-secondary);
 }
 
 .tafsir-body p {
@@ -338,21 +347,21 @@ mark.word-unique {
 }
 
 .tafsir-body h2 {
-  font-size: 1rem;
+  font-size: var(--text-md);
   font-weight: 600;
   margin: 1.1rem 0 0.4rem;
-  color: #0b2734;
+  color: var(--color-text);
 }
 
 .not-found-card .button-link {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
 }
 
 .qf-bookmarks-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .qf-bookmark-item {
@@ -360,16 +369,17 @@ mark.word-unique {
   flex-direction: column;
   gap: 0.3rem;
   padding: 0.55rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #fafafa;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
   min-width: 0;
 }
 
 .qf-bookmark-ref {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
 }
 
 .qf-bookmark-links {
@@ -378,10 +388,10 @@ mark.word-unique {
 }
 
 .qf-bookmark-link {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   text-decoration: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 0.15rem 0.5rem;
   border: 1px solid;
   white-space: nowrap;
@@ -389,57 +399,59 @@ mark.word-unique {
 }
 
 .qf-bookmark-link--internal {
-  color: #1a6b5e;
-  border-color: #b8d8d3;
-  background: #e8f4f2;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
 }
 
 .qf-bookmark-link--internal:hover {
-  background: #c8eae4;
-  border-color: #7bbdb5;
-  color: #0f4f44;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
 .qf-bookmark-link--external {
-  color: #5a6e7a;
-  border-color: #d0dde4;
-  background: #fff;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+  background: var(--color-surface);
 }
 
 .qf-bookmark-link--external:hover {
-  background: #eef3f6;
-  border-color: #aac0cc;
-  color: #2f4554;
+  background: var(--color-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
 }
 
 .qf-synced-badge {
   display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.05rem 0.28rem;
-  background: #e8f4f2;
-  border: 1px solid #b8d8d3;
-  border-radius: 3px;
-  color: #1a6b5e;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: 0.05rem 0.32rem;
+  background: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
   letter-spacing: 0.03em;
   vertical-align: middle;
 }
 
 .mastered-badge {
   display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.05rem 0.28rem;
-  background: #fef9c3;
-  border: 1px solid #fde047;
-  border-radius: 3px;
-  color: #854d0e;
-  letter-spacing: 0.02em;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: 0.05rem 0.32rem;
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-line);
+  border-radius: var(--radius-sm);
+  color: var(--color-warning-text);
+  letter-spacing: 0.03em;
   vertical-align: middle;
 }
 
 .mastered-form {
-  margin-top: 0.75rem;
+  margin-top: var(--space-3);
 }
 
 .btn-mastered {
@@ -447,27 +459,27 @@ mark.word-unique {
   align-items: center;
   gap: 0.3rem;
   padding: 0.45em 1em;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   font-weight: 600;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: #fff;
-  color: #324a5e;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .btn-mastered:hover {
-  background: #fef9c3;
-  border-color: #fde047;
-  color: #713f12;
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-line);
+  color: var(--color-warning-text);
 }
 
 .btn-mastered--done,
 .btn-mastered--done:hover {
-  background: #fef9c3;
-  border-color: #fde047;
-  color: #854d0e;
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-line);
+  color: var(--color-warning-text);
 }
 
 @media (max-width: 640px) {

@@ -1,19 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page catalog-page not-found-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
-    <div class="card not-found-card">
-      <p class="eyebrow">Not found</p>
+  <main class="learning-content not-found-content">
+      <p class="catalog-kicker">{{.UI.notFoundKicker}}</p>
       <h1>{{.Heading}}</h1>
-      <p class="lead">{{.Message}}</p>
-      <a class="btn-sm" href="{{.SearchURL}}">Search another ayah</a>
-    </div>
+      <p class="catalog-intro">{{.Message}}</p>
+      <a class="catalog-button" href="{{.SearchURL}}">{{.UI.searchAnother}} <span aria-hidden="true">→</span></a>
   </main>
 
-{{template "footer" .}}
+{{template "learning-footer" .}}
 </body>
 </html>

@@ -1,42 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page catalog-page catalog-detail-page juz-detail-page">
 {{template "topbar" .}}
-
-  <main class="container">
-    <p class="back"><a href="{{.JuzIndexURL}}">← All Juz</a></p>
-    <h1>Juz {{.Juz}}</h1>
-    {{if .JuzStartSurah}}<p class="meta">Begins at Surah {{.JuzStartSurah}}: {{.JuzStartName}}, Ayah {{.JuzStartAyah}}</p>{{end}}
-
-    <section class="card">
-      {{if .Pairs}}
-      <p class="pairs-hint">Click a verse to open it, or Compare to see both side by side.</p>
-      <ul class="pairs-list">
-        {{range .Pairs}}
-        <li class="pair-item">
-          <div class="line-head">
-            <span class="pair-refs">
-              <a class="ayah-chip" href="{{.Ayah1URL}}?lang={{$.Lang}}">{{.Ayah1}}</a>
-              <span class="meta">↔</span>
-              <a class="ayah-chip" href="{{.Ayah2URL}}?lang={{$.Lang}}">{{.Ayah2}}</a>
-            </span>
-            <a class="btn-sm" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">Compare</a>
-          </div>
-          <p class="meta">{{.Ayah1Name}} · {{.Ayah2Name}}</p>
-          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
-        </li>
-        {{end}}
-      </ul>
-      {{else}}
-      <div class="empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <p class="meta">No mutashabihat pairs in this juz yet.</p>
-      </div>
-      {{end}}
-    </section>
-  </main>
-
-{{template "footer" .}}
+<main class="catalog-detail-content">
+  <p class="catalog-back"><a href="{{.JuzIndexURL}}">← {{.UI.backToJuz}}</a></p>
+  <header class="catalog-detail-heading">
+    <div><h1>{{.UI.juz}} {{printf "%02d" .Juz}}</h1>{{if .JuzStartSurah}}<p class="catalog-detail-subtitle">{{.UI.beginsAt}} {{.JuzStartName}} {{.JuzStartSurah}}:{{.JuzStartAyah}}</p>{{end}}</div>
+    <span class="catalog-detail-count">{{len .Pairs}} {{.UI.pair}}</span>
+  </header>
+  {{if .Pairs}}
+  <p class="pairs-hint">{{.UI.pairHint}}</p>
+  <ul class="pairs-list">
+    {{range .Pairs}}
+    <li class="pair-item"><div class="line-head"><span class="pair-refs"><a class="ayah-chip" href="{{.Ayah1URL}}?lang={{$.Lang}}">{{.Ayah1}}</a><span class="meta">↔</span><a class="ayah-chip" href="{{.Ayah2URL}}?lang={{$.Lang}}">{{.Ayah2}}</a></span><a class="catalog-compare" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">{{$.UI.compare}} →</a></div><p class="pair-detail">{{.Ayah1Name}} · {{.Ayah2Name}}</p>{{if .Note}}<p class="pair-note">{{.Note}}</p>{{end}}</li>
+    {{end}}
+  </ul>
+  {{else}}
+  <section class="catalog-empty"><h2>{{.UI.noJuzPairs}}</h2><p>{{.UI.noJuzPairsHint}}</p><div><a href="{{.SurahIndexURL}}">{{.UI.browse}}</a><a href="{{.SearchURL}}">{{.UI.similar}}</a></div></section>
+  {{end}}
+</main>
+{{template "learning-footer" .}}
 </body>
 </html>

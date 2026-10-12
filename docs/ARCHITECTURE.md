@@ -109,11 +109,13 @@ Schema changes use additive migrations in `internal/db`.
 ## Folder structure
 
 - `cmd/server/main.go`
+- `cmd/server/home.go`: homepage and sample continuation practice handlers
 - `internal/db`
 - `internal/relations`
 - `internal/search`
 - `web/templates`
-- `web/static`
+- `web/static`: shared tokens/components, page styles, and small behavior scripts
+  (`home.css`, `practice.css`, `catalog.css`, and `practice.js` for the learning flow)
 - `data/quran.json`
 - `data/translations`
 - `data/tafsir`
