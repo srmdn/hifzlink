@@ -21,6 +21,7 @@ import (
 	"github.com/srmdn/hifzlink/internal/qfclient"
 	"github.com/srmdn/hifzlink/internal/relations"
 	"github.com/srmdn/hifzlink/internal/search"
+	webassets "github.com/srmdn/hifzlink/web"
 )
 
 type server struct {
@@ -179,10 +180,16 @@ func main() {
 	}
 	defer dbStore.Close()
 
-	staticDir := filepath.Join(baseDir, "web", "static")
-	assets := newAssetVersions(staticDir)
+	staticFiles, err := embeddedStaticFiles()
+	if err != nil {
+		log.Fatalf("failed to locate embedded static files: %v", err)
+	}
+	assets, err := newAssetVersions(staticFiles)
+	if err != nil {
+		log.Fatalf("failed to fingerprint embedded static files: %v", err)
+	}
 
-	tmpl, err := template.New("").Funcs(assetFuncs(assets)).ParseGlob(filepath.Join(baseDir, "web", "templates", "*.html"))
+	tmpl, err := template.New("").Funcs(assetFuncs(assets)).ParseFS(webassets.Files, "templates/*.html")
 	if err != nil {
 		log.Fatalf("failed to parse templates: %v", err)
 	}
@@ -238,7 +245,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler(staticDir)))
+	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler(staticFiles)))
 
 	mux.HandleFunc("/", s.handleHome)
 	mux.HandleFunc("/practice", s.handlePractice)

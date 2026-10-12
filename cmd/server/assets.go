@@ -4,12 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"html/template"
-	"log"
+	"io/fs"
 	"net/http"
-	"os"
-	"path/filepath"
-	"sync"
-	"time"
+	"path"
+
+	webassets "github.com/srmdn/hifzlink/web"
 )
 
 const (
@@ -21,93 +20,59 @@ const (
 	assetDefaultCache = "public, max-age=300"
 )
 
-type assetFingerprint struct {
-	version string
-	modTime time.Time
-	size    int64
+// Release templates and browser assets travel with the executable. Persistent
+// state and private configuration remain outside this embedded source bundle.
+type assetVersions map[string]string
+
+func embeddedStaticFiles() (fs.FS, error) {
+	return fs.Sub(webassets.Files, "static")
 }
 
-// assetVersions resolves a static file name to a short content hash. The hash
-// is recomputed only when the file's modification time or size changed, so a
-// running server picks up edited assets without a restart while fingerprinted
-// URLs stay valid for immutable caching.
-type assetVersions struct {
-	dir string
-
-	mu      sync.RWMutex
-	entries map[string]assetFingerprint
-}
-
-func newAssetVersions(dir string) *assetVersions {
-	if _, err := os.ReadDir(dir); err != nil {
-		log.Fatalf("failed to read static dir: %v", err)
+func newAssetVersions(files fs.FS) (*assetVersions, error) {
+	entries, err := fs.ReadDir(files, ".")
+	if err != nil {
+		return nil, err
 	}
-	return &assetVersions{
-		dir:     dir,
-		entries: make(map[string]assetFingerprint),
+	versions := assetVersions{}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		data, err := fs.ReadFile(files, entry.Name())
+		if err != nil {
+			return nil, err
+		}
+		sum := sha256.Sum256(data)
+		versions[entry.Name()] = hex.EncodeToString(sum[:])[:8]
 	}
+	return &versions, nil
 }
 
 // URL returns the versioned URL for a static asset, or the plain URL when the
 // asset is unknown.
 func (v *assetVersions) URL(name string) string {
-	version := v.version(name)
+	version := (*v)[path.Base(name)]
 	if version == "" {
 		return "/static/" + name
 	}
 	return "/static/" + name + "?" + assetVersionParam + "=" + version
 }
-
-func (v *assetVersions) version(name string) string {
-	path := filepath.Join(v.dir, filepath.Base(name))
-
-	info, err := os.Stat(path)
-	if err != nil || info.IsDir() {
-		return ""
-	}
-
-	v.mu.RLock()
-	cached, ok := v.entries[filepath.Base(name)]
-	v.mu.RUnlock()
-	if ok && cached.size == info.Size() && cached.modTime.Equal(info.ModTime()) {
-		return cached.version
-	}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		log.Printf("warn: read static asset %s: %v", name, err)
-		return ""
-	}
-	sum := sha256.Sum256(data)
-	version := hex.EncodeToString(sum[:])[:8]
-
-	v.mu.Lock()
-	v.entries[filepath.Base(name)] = assetFingerprint{
-		version: version,
-		modTime: info.ModTime(),
-		size:    info.Size(),
-	}
-	v.mu.Unlock()
-
-	return version
-}
-
 func assetFuncs(versions *assetVersions) template.FuncMap {
 	return template.FuncMap{
 		"asset": versions.URL,
 	}
 }
 
-// staticHandler serves dir and lets fingerprinted requests be cached
+// staticHandler serves embedded files and lets fingerprinted requests be cached
 // permanently while leaving unversioned requests revalidatable.
-func staticHandler(dir string) http.Handler {
-	files := http.FileServer(http.Dir(dir))
+func staticHandler(files fs.FS) http.Handler {
+	server := http.FileServer(http.FS(files))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get(assetVersionParam) != "" {
 			w.Header().Set("Cache-Control", assetImmutableCache)
 		} else {
 			w.Header().Set("Cache-Control", assetDefaultCache)
 		}
-		files.ServeHTTP(w, r)
+		server.ServeHTTP(w, r)
 	})
 }
