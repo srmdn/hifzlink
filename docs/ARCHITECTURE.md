@@ -113,13 +113,17 @@ Schema changes use additive migrations in `internal/db`.
 - `internal/db`
 - `internal/relations`
 - `internal/search`
-- `web/templates`
+- `web/assets.go`: embeds templates and browser assets into the release binary
+- `web/templates`: server-rendered page templates
 - `web/static`: shared tokens/components, page styles, and small behavior scripts
   (`home.css`, `practice.css`, `catalog.css`, and `practice.js` for the learning flow)
 - `data/quran.json`
 - `data/translations`
 - `data/tafsir`
 - `data/relations.seed.json`
+
+Templates and browser assets are embedded in the executable so a versioned
+binary serves a matching UI. Quran reference data and SQLite remain file-backed.
 
 ## Request flow
 

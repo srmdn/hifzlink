@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template"
+	"io/fs"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/srmdn/hifzlink/internal/search"
+	webassets "github.com/srmdn/hifzlink/web"
 )
 
 func newLearningTestServer(t *testing.T) *server {
@@ -24,7 +26,19 @@ func newLearningTestServer(t *testing.T) *server {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s.tmpl, err = template.New("").Funcs(assetFuncs(newAssetVersions(filepath.Join(root, "web", "static")))).ParseGlob(filepath.Join(root, "web", "templates", "*.html"))
+	staticFiles, err := embeddedStaticFiles()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assets, err := newAssetVersions(staticFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	templateFiles, err := fs.Sub(webassets.Files, "templates")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.tmpl, err = template.New("").Funcs(assetFuncs(assets)).ParseFS(templateFiles, "*.html")
 	if err != nil {
 		t.Fatal(err)
 	}
