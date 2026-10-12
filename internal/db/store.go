@@ -49,16 +49,40 @@ type RecentCollectionItem struct {
 	CollectionName string
 }
 
-// Session represents an authenticated user session created via QF OAuth2.
+type User struct {
+	ID        string
+	Email     string
+	Name      string
+	CreatedAt string
+	LastLogin string
+}
+
+type AdminUser struct {
+	Email          string
+	Name           string
+	CreatedAt      string
+	LastLogin      string
+	Collections    int
+	SavedItems     int
+	ActiveSessions int
+}
+
+type AdminUserSummary struct {
+	Users          int
+	ActiveSessions int
+	Collections    int
+	SavedItems     int
+}
+
+// Session represents a HifzLink session created after external identity verification.
 type Session struct {
-	ID           string
-	UserID       string
-	Email        string
-	Name         string
-	AccessToken  string
-	RefreshToken string
-	ExpiresAt    int64
-	CreatedAt    string
+	ID        string
+	UserID    string
+	Provider  string
+	Email     string
+	Name      string
+	ExpiresAt int64
+	CreatedAt string
 }
 
 type Store struct {
@@ -109,6 +133,7 @@ func Open(path string) (*Store, error) {
 	CREATE TABLE IF NOT EXISTS sessions (
 		id TEXT PRIMARY KEY,
 		user_id TEXT NOT NULL,
+		provider TEXT NOT NULL DEFAULT '',
 		email TEXT NOT NULL DEFAULT '',
 		name TEXT NOT NULL DEFAULT '',
 		access_token TEXT NOT NULL,
@@ -117,6 +142,14 @@ func Open(path string) (*Store, error) {
 		created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
 	CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
+
+	CREATE TABLE IF NOT EXISTS users (
+		id TEXT PRIMARY KEY,
+		email TEXT NOT NULL DEFAULT '',
+		name TEXT NOT NULL DEFAULT '',
+		created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		last_login_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+	);
 	`); err != nil {
 		_ = db.Close()
 		return nil, fmt.Errorf("migrate relations table: %w", err)
@@ -163,6 +196,16 @@ func Open(path string) (*Store, error) {
 	if err := ensureColumn(db, "collections", "created_at", "ALTER TABLE collections ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); err != nil {
 		_ = db.Close()
 		return nil, err
+	}
+	if err := ensureColumn(db, "sessions", "provider", "ALTER TABLE sessions ADD COLUMN provider TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+	// Legacy Quran Foundation user OAuth tokens are no longer used for sign-in.
+	// Retain old session rows, but clear those credentials during migration.
+	if _, err := db.Exec(`UPDATE sessions SET access_token = '', refresh_token = '' WHERE provider <> 'google'`); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("clear legacy OAuth tokens: %w", err)
 	}
 	if err := ensureColumn(db, "collection_items", "created_at", "ALTER TABLE collection_items ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); err != nil {
 		_ = db.Close()
@@ -715,32 +758,96 @@ func ensureColumn(db *sql.DB, table, column, alterSQL string) error {
 
 func (s *Store) CreateSession(sess Session) error {
 	_, err := s.db.Exec(`
-	INSERT OR REPLACE INTO sessions (id, user_id, email, name, access_token, refresh_token, expires_at, created_at)
-	VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, sess.ID, sess.UserID, sess.Email, sess.Name, sess.AccessToken, sess.RefreshToken, sess.ExpiresAt)
+	INSERT OR REPLACE INTO sessions (id, user_id, provider, email, name, access_token, refresh_token, expires_at, created_at)
+	VALUES (?, ?, ?, ?, ?, '', '', ?, CURRENT_TIMESTAMP)
+	`, sess.ID, sess.UserID, sess.Provider, sess.Email, sess.Name, sess.ExpiresAt)
 	if err != nil {
 		return fmt.Errorf("create session: %w", err)
 	}
 	return nil
 }
 
-// UpdateSessionTokens replaces the access/refresh tokens for a session after a token refresh.
-func (s *Store) UpdateSessionTokens(id, accessToken, refreshToken string, expiresAt int64) error {
-	_, err := s.db.Exec(`
-	UPDATE sessions SET access_token = ?, refresh_token = ?, expires_at = ? WHERE id = ?
-	`, accessToken, refreshToken, expiresAt, id)
+// CreateGoogleLogin stores a Google identity and its HifzLink session without
+// retaining Google's OAuth tokens after the user profile has been fetched.
+func (s *Store) CreateGoogleLogin(user User, sess Session) error {
+	tx, err := s.db.Begin()
 	if err != nil {
-		return fmt.Errorf("update session tokens: %w", err)
+		return fmt.Errorf("begin Google login transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec(`
+		INSERT INTO users (id, email, name, created_at, last_login_at)
+		VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		ON CONFLICT(id) DO UPDATE SET
+			email = excluded.email,
+			name = excluded.name,
+			last_login_at = CURRENT_TIMESTAMP
+	`, user.ID, user.Email, user.Name); err != nil {
+		return fmt.Errorf("store Google user: %w", err)
+	}
+
+	if _, err := tx.Exec(`
+		INSERT INTO sessions (id, user_id, provider, email, name, access_token, refresh_token, expires_at, created_at)
+		VALUES (?, ?, 'google', ?, ?, '', '', ?, CURRENT_TIMESTAMP)
+	`, sess.ID, user.ID, user.Email, user.Name, sess.ExpiresAt); err != nil {
+		return fmt.Errorf("store Google session: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit Google login: %w", err)
 	}
 	return nil
+}
+
+// AdminUsers returns account metadata and aggregate usage, never saved notes or tokens.
+func (s *Store) AdminUsers(limit int) ([]AdminUser, AdminUserSummary, error) {
+	if limit <= 0 || limit > 500 {
+		limit = 200
+	}
+	var summary AdminUserSummary
+	if err := s.db.QueryRow(`
+		SELECT
+			(SELECT COUNT(*) FROM users),
+			(SELECT COUNT(*) FROM sessions WHERE provider = 'google' AND expires_at >= strftime('%s', 'now')),
+			(SELECT COUNT(*) FROM collections WHERE user_id IN (SELECT id FROM users)),
+			(SELECT COUNT(*) FROM collection_items i JOIN collections c ON c.id = i.collection_id WHERE c.user_id IN (SELECT id FROM users))
+	`).Scan(&summary.Users, &summary.ActiveSessions, &summary.Collections, &summary.SavedItems); err != nil {
+		return nil, AdminUserSummary{}, fmt.Errorf("count admin user summary: %w", err)
+	}
+	rows, err := s.db.Query(`
+		SELECT u.email, u.name, u.created_at, u.last_login_at,
+			(SELECT COUNT(*) FROM collections c WHERE c.user_id = u.id),
+			(SELECT COUNT(*) FROM collection_items i JOIN collections c ON c.id = i.collection_id WHERE c.user_id = u.id),
+			(SELECT COUNT(*) FROM sessions ss WHERE ss.user_id = u.id AND ss.provider = 'google' AND ss.expires_at >= strftime('%s', 'now'))
+		FROM users u
+		ORDER BY u.last_login_at DESC, u.email COLLATE NOCASE
+		LIMIT ?
+	`, limit)
+	if err != nil {
+		return nil, AdminUserSummary{}, fmt.Errorf("query admin users: %w", err)
+	}
+	defer rows.Close()
+
+	users := make([]AdminUser, 0)
+	for rows.Next() {
+		var user AdminUser
+		if err := rows.Scan(&user.Email, &user.Name, &user.CreatedAt, &user.LastLogin, &user.Collections, &user.SavedItems, &user.ActiveSessions); err != nil {
+			return nil, AdminUserSummary{}, fmt.Errorf("scan admin user: %w", err)
+		}
+		users = append(users, user)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, AdminUserSummary{}, fmt.Errorf("iterate admin users: %w", err)
+	}
+	return users, summary, nil
 }
 
 func (s *Store) SessionByID(id string) (Session, error) {
 	var sess Session
 	err := s.db.QueryRow(`
-	SELECT id, user_id, email, name, access_token, refresh_token, expires_at, COALESCE(created_at, '')
+	SELECT id, user_id, provider, email, name, expires_at, COALESCE(created_at, '')
 	FROM sessions WHERE id = ?
-	`, id).Scan(&sess.ID, &sess.UserID, &sess.Email, &sess.Name, &sess.AccessToken, &sess.RefreshToken, &sess.ExpiresAt, &sess.CreatedAt)
+	`, id).Scan(&sess.ID, &sess.UserID, &sess.Provider, &sess.Email, &sess.Name, &sess.ExpiresAt, &sess.CreatedAt)
 	if err != nil {
 		return Session{}, fmt.Errorf("session by id: %w", err)
 	}

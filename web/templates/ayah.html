@@ -41,7 +41,7 @@
       {{else}}<p>{{.AyahUI.noCollections}} <a href="{{.CollectionsURL}}">{{.AyahUI.createCollection}}</a>.</p>{{end}}
       {{if .SaveStatus}}<p class="ayah-save-status" role="status">{{.SaveStatus}}</p>{{end}}
     </section>
-  {{else if .QFEnabled}}
+  {{else if .AuthEnabled}}
     <p class="ayah-save-prompt"><a href="{{.LoginURL}}?lang={{.Lang}}">{{.AyahUI.saveLogin}}</a></p>
   {{end}}
 

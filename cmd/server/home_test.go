@@ -169,7 +169,7 @@ func TestLegalPagesUseSharedLearningNavigationAndFooter(t *testing.T) {
 	for _, tc := range []struct {
 		path, heading, privacyLabel, browseLabel, content string
 	}{
-		{"/privacy?lang=en", "Privacy Policy", "Privacy", "Browse Quran", "OAuth access and refresh tokens"},
+		{"/privacy?lang=en", "Privacy Policy", "Privacy", "Browse Quran", "Google OAuth tokens"},
 		{"/terms?lang=id", "Terms of Service", "Privasi", "Baca per surah", "MIT License governs reuse"},
 	} {
 		t.Run(tc.path, func(t *testing.T) {

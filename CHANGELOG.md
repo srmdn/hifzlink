@@ -8,6 +8,8 @@ The format is inspired by Keep a Changelog.
 
 ### Added
 
+- Google Sign-In for user accounts and an admin overview of account activity
+  and aggregate collection usage.
 - Account-free sample verse continuation practice with optional English/Indonesian
   translations and self-rating.
 
@@ -26,8 +28,11 @@ The format is inspired by Keep a Changelog.
   sharing, reading metadata, translation, tafsir, audio, and related verses.
 - Aligned the Privacy and Terms pages with the shared learning navigation,
   footer, and responsive dark green styling.
-- Corrected Privacy and Terms to describe current analytics, session, collection,
-  and Quran Foundation bookmark behavior; added data-deletion contact details.
+- Updated Privacy and Terms for Google sign-in, admin account visibility,
+  collection retention, and data-deletion contact details.
+- Removed Quran Foundation user OAuth and bookmark synchronization; Quran
+  Foundation remains an optional audio/content provider.
+- Clear legacy Quran Foundation OAuth tokens during the session migration.
 - Restored the homepage's first-person “Why I built this” section in English and
   Indonesian.
 - Improved keyboard and screen-reader behavior in the mobile menu and recall

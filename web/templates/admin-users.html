@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
+{{template "head" .}}
+<body class="learning-page admin-dashboard admin-users-page">
+{{template "topbar" .}}
+
+  <main class="home-main admin-dashboard-main">
+    <header class="admin-page-header">
+      <div>
+        <p class="home-eyebrow">HifzLink · Private workspace</p>
+        <h1>User overview</h1>
+        <p class="admin-page-lead">A quiet view of account activity. Saved notes and verse content stay private.</p>
+      </div>
+      <nav class="admin-page-nav" aria-label="Admin pages">
+        <a href="/admin/users" aria-current="page">Users</a>
+        <a href="/admin/relations">Relations</a>
+      </nav>
+    </header>
+
+    <section class="admin-user-stats" aria-label="User totals">
+      <article class="admin-user-stat"><span>Accounts</span><strong>{{.AdminSummary.Users}}</strong></article>
+      <article class="admin-user-stat"><span>Active sessions</span><strong>{{.AdminSummary.ActiveSessions}}</strong></article>
+      <article class="admin-user-stat"><span>Collections</span><strong>{{.AdminSummary.Collections}}</strong></article>
+      <article class="admin-user-stat"><span>Saved items</span><strong>{{.AdminSummary.SavedItems}}</strong></article>
+    </section>
+
+    <section class="admin-users-section" aria-labelledby="admin-accounts-title">
+      <div class="admin-section-heading">
+        <div>
+          <p class="home-eyebrow">Accounts</p>
+          <h2 id="admin-accounts-title">Recent sign-ins</h2>
+        </div>
+        {{if .UsersLimited}}<span class="admin-list-limit">Latest 200 accounts</span>{{end}}
+      </div>
+      {{if .AdminUsers}}
+      <div class="admin-users-table-wrap">
+        <table class="admin-users-table">
+          <thead><tr><th scope="col">Account</th><th scope="col">Last sign-in</th><th scope="col">Collections</th><th scope="col">Saved items</th><th scope="col">Session</th></tr></thead>
+          <tbody>
+            {{range .AdminUsers}}
+            <tr>
+              <th scope="row"><span class="admin-user-name">{{if .Name}}{{.Name}}{{else}}Unnamed user{{end}}</span><span class="admin-user-email">{{.Email}}</span></th>
+              <td data-label="Last sign-in">{{.LastLogin}}</td>
+              <td data-label="Collections">{{.Collections}}</td>
+              <td data-label="Saved items">{{.SavedItems}}</td>
+              <td data-label="Session"><span class="admin-session-state {{if gt .ActiveSessions 0}}is-active{{end}}">{{if gt .ActiveSessions 0}}Active{{else}}Signed out{{end}}</span></td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="admin-users-empty">
+        <h3>No accounts yet</h3>
+        <p>Google sign-ins will appear here after the first user signs in.</p>
+      </div>
+      {{end}}
+    </section>
+
+    <p class="admin-users-privacy">This page shows account details and usage counts only. It does not expose saved notes, OAuth tokens, or private verse activity.</p>
+  </main>
+
+{{template "learning-footer" .}}
+</body>
+</html>

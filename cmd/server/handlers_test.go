@@ -1,8 +1,12 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -10,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/srmdn/hifzlink/internal/db"
 	"github.com/srmdn/hifzlink/internal/relations"
@@ -55,17 +60,22 @@ func newTestServer(t *testing.T) *server {
 	t.Cleanup(func() { dbStore.Close() })
 
 	s := &server{
-		quran:        quranStore,
-		trans:        transStore,
-		db:           dbStore,
-		rels:         relations.NewService(dbStore, quranStore),
-		adminUser:    "admin",
-		adminPass:    "secret",
-		adminToken:   "test-admin-token",
-		adminLimiter: newAdminRateLimiter(),
-		csrfSecret:   []byte("test-csrf-secret"),
+		quran:      quranStore,
+		trans:      transStore,
+		db:         dbStore,
+		rels:       relations.NewService(dbStore, quranStore),
+		adminUser:  "admin",
+		adminPass:  "secret",
+		adminToken: "test-admin-token",
+		adminSessions: map[string]time.Time{
+			"test-admin-token": time.Now().Add(time.Hour),
+		},
+		adminLimiter:       newAdminRateLimiter(5, 15*time.Minute),
+		adminGlobalLimiter: newAdminRateLimiter(30, 15*time.Minute),
+		csrfSecret:         []byte("test-csrf-secret"),
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
+			{{define "admin-users.html"}}{{range .AdminUsers}}{{.Email}}{{end}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
 			{{define "collection-detail.html"}}{{.StatusNotice}}{{end}}
 			{{define "dashboard.html"}}ok{{end}}
@@ -79,24 +89,185 @@ func addAdminCookie(r *http.Request, token string) {
 	r.AddCookie(&http.Cookie{Name: cookieAdminSession, Value: token})
 }
 
-// addTestSession creates a QF session in the DB and adds the session cookie to r.
+// addTestSession creates a Google-backed session in the DB and adds the session cookie to r.
 // Returns the userID of the created session.
 func addTestSession(t *testing.T, s *server, r *http.Request) string {
 	t.Helper()
 	const testUserID = "test-user-001"
 	sess := db.Session{
-		ID:          "test-session-id",
-		UserID:      testUserID,
-		Email:       "test@example.com",
-		Name:        "Test User",
-		AccessToken: "test-access-token",
-		ExpiresAt:   9999999999, // far future
+		ID:        "test-session-id",
+		UserID:    testUserID,
+		Provider:  "google",
+		Email:     "test@example.com",
+		Name:      "Test User",
+		ExpiresAt: 9999999999, // far future
 	}
 	if err := s.db.CreateSession(sess); err != nil {
 		t.Fatalf("create test session: %v", err)
 	}
 	r.AddCookie(&http.Cookie{Name: cookieSession, Value: sess.ID})
 	return testUserID
+}
+
+func TestHandleAuthLoginStartsGooglePKCEFlow(t *testing.T) {
+	s := newTestServer(t)
+	s.googleClientID = "test-client-id"
+	s.googleClientSecret = "test-client-secret"
+	s.googleRedirectURI = "http://localhost:8080/auth/callback"
+	request := httptest.NewRequest(http.MethodGet, "/auth/login", nil)
+	response := httptest.NewRecorder()
+	s.handleAuthLogin(response, request)
+
+	if response.Code != http.StatusFound {
+		t.Fatalf("expected redirect, got %d: %s", response.Code, response.Body.String())
+	}
+	location, err := url.Parse(response.Header().Get("Location"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if location.Host != "accounts.google.com" || location.Query().Get("client_id") != s.googleClientID {
+		t.Fatalf("unexpected authorization redirect: %s", location)
+	}
+	if location.Query().Get("redirect_uri") != s.googleRedirectURI || location.Query().Get("scope") != "openid email profile" {
+		t.Fatalf("unexpected OAuth parameters: %s", location.RawQuery)
+	}
+	if location.Query().Get("code_challenge_method") != "S256" || location.Query().Get("code_challenge") == "" {
+		t.Fatalf("PKCE challenge missing: %s", location.RawQuery)
+	}
+	var stateCookie, verifierCookie, nonceCookie *http.Cookie
+	for _, cookie := range response.Result().Cookies() {
+		switch cookie.Name {
+		case cookieOAuthState:
+			stateCookie = cookie
+		case cookieOAuthVerifier:
+			verifierCookie = cookie
+		case cookieOAuthNonce:
+			nonceCookie = cookie
+		}
+	}
+	if stateCookie == nil || verifierCookie == nil || nonceCookie == nil || stateCookie.Value != location.Query().Get("state") || nonceCookie.Value != location.Query().Get("nonce") {
+		t.Fatal("expected matching OAuth state, PKCE verifier, and OIDC nonce cookies")
+	}
+}
+
+func TestHandleAuthCallbackRejectsMismatchedState(t *testing.T) {
+	s := newTestServer(t)
+	request := httptest.NewRequest(http.MethodGet, "/auth/callback?code=authorization-code&state=attacker-state", nil)
+	request.AddCookie(&http.Cookie{Name: cookieOAuthState, Value: "browser-state"})
+	response := httptest.NewRecorder()
+	s.handleAuthCallback(response, request)
+	if response.Code != http.StatusBadRequest {
+		t.Fatalf("expected mismatched state to be rejected, got %d", response.Code)
+	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (fn roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) {
+	return fn(request)
+}
+
+func TestHandleAuthCallbackCreatesGoogleSessionWithoutStoringTokens(t *testing.T) {
+	s := newTestServer(t)
+	s.googleClientID = "test-client-id"
+	s.googleClientSecret = "test-client-secret"
+	s.googleRedirectURI = "http://localhost:8080/auth/callback"
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const nonce = "valid-nonce"
+	token := signGoogleTestToken(t, privateKey, makeGoogleTestClaims(nonce))
+	previousClient := googleHTTPClient
+	t.Cleanup(func() { googleHTTPClient = previousClient })
+	googleOIDCVerifierMu.Lock()
+	previousVerifier := googleOIDCVerifiers[s.googleClientID]
+	googleOIDCVerifiers[s.googleClientID] = googleTestVerifier(privateKey)
+	googleOIDCVerifierMu.Unlock()
+	t.Cleanup(func() {
+		googleOIDCVerifierMu.Lock()
+		defer googleOIDCVerifierMu.Unlock()
+		if previousVerifier == nil {
+			delete(googleOIDCVerifiers, s.googleClientID)
+		} else {
+			googleOIDCVerifiers[s.googleClientID] = previousVerifier
+		}
+	})
+	googleHTTPClient = &http.Client{Transport: roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		response := &http.Response{Header: make(http.Header), StatusCode: http.StatusOK, Request: request}
+		switch request.URL.String() {
+		case googleTokenURL:
+			if err := request.ParseForm(); err != nil {
+				t.Fatalf("parse token request: %v", err)
+			}
+			if request.Form.Get("client_id") != s.googleClientID || request.Form.Get("client_secret") != s.googleClientSecret || request.Form.Get("redirect_uri") != s.googleRedirectURI || request.Form.Get("code_verifier") == "" {
+				t.Errorf("unexpected token exchange form: %v", request.Form)
+			}
+			response.Body = io.NopCloser(strings.NewReader(`{"id_token":"` + token + `"}`))
+		default:
+			return nil, fmt.Errorf("unexpected Google endpoint: %s", request.URL)
+		}
+		return response, nil
+	})}
+
+	request := httptest.NewRequest(http.MethodGet, "/auth/callback?code=authorization-code&state=valid-state", nil)
+	request.AddCookie(&http.Cookie{Name: cookieOAuthState, Value: "valid-state"})
+	request.AddCookie(&http.Cookie{Name: cookieOAuthVerifier, Value: "valid-verifier"})
+	request.AddCookie(&http.Cookie{Name: cookieOAuthNonce, Value: nonce})
+	response := httptest.NewRecorder()
+	s.handleAuthCallback(response, request)
+	if response.Code != http.StatusSeeOther || !strings.HasPrefix(response.Header().Get("Location"), "/dashboard") {
+		t.Fatalf("unexpected callback response: %d %q %s", response.Code, response.Header().Get("Location"), response.Body.String())
+	}
+
+	var sessionCookie *http.Cookie
+	for _, cookie := range response.Result().Cookies() {
+		if cookie.Name == cookieSession {
+			sessionCookie = cookie
+		}
+	}
+	if sessionCookie == nil {
+		t.Fatal("successful sign-in did not set a session cookie")
+	}
+	request = httptest.NewRequest(http.MethodGet, "/dashboard", nil)
+	request.AddCookie(sessionCookie)
+	session, ok := s.currentSession(request)
+	if !ok || session.Email != "reader@example.com" || session.Provider != "google" {
+		t.Fatalf("Google session was not created: %+v, valid=%t", session, ok)
+	}
+}
+
+func TestCurrentSessionRejectsLegacyProvider(t *testing.T) {
+	s := newTestServer(t)
+	request := httptest.NewRequest(http.MethodGet, "/dashboard", nil)
+	if err := s.db.CreateSession(db.Session{ID: "legacy", UserID: "old-user", ExpiresAt: 9999999999}); err != nil {
+		t.Fatal(err)
+	}
+	request.AddCookie(&http.Cookie{Name: cookieSession, Value: "legacy"})
+	if _, ok := s.currentSession(request); ok {
+		t.Fatal("legacy Quran Foundation session must not authenticate a user")
+	}
+}
+
+func TestHandleAdminUsersRequiresAdminSession(t *testing.T) {
+	s := newTestServer(t)
+	request := httptest.NewRequest(http.MethodGet, "/admin/users", nil)
+	response := httptest.NewRecorder()
+	s.handleAdminUsers(response, request)
+	if response.Code != http.StatusSeeOther || response.Header().Get("Location") != "/admin/login" {
+		t.Fatalf("expected admin login redirect, got %d to %q", response.Code, response.Header().Get("Location"))
+	}
+
+	if err := s.db.CreateGoogleLogin(db.User{ID: "google-sub", Email: "reader@example.com", Name: "Reader"}, db.Session{ID: "google-session", ExpiresAt: 9999999999}); err != nil {
+		t.Fatal(err)
+	}
+	request = httptest.NewRequest(http.MethodGet, "/admin/users", nil)
+	addAdminCookie(request, s.adminToken)
+	response = httptest.NewRecorder()
+	s.handleAdminUsers(response, request)
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "reader@example.com") {
+		t.Fatalf("expected admin user overview, got %d: %s", response.Code, response.Body.String())
+	}
 }
 
 // --- /api/ayah/{surah}/{ayah} ---

@@ -10,19 +10,20 @@ The application consists of five main parts:
 2. Go backend server
 3. SQLite persistence
 4. Server-rendered frontend
-5. Optional Quran Foundation account services
+5. Optional Google identity verification and Quran Foundation audio content
 
 ```mermaid
 graph TD
     Browser["Browser"]
-    QF["Quran Foundation APIs"]
+    Google["Google OAuth user profile"]
+    QF["Quran Foundation Content API"]
 
     subgraph Server["Go HTTP Server (cmd/server)"]
         Router["Router (net/http)"]
         RelService["Relations Service\n(internal/relations)"]
         Search["Quran Loader\n(internal/search)"]
         DB["SQLite Store\n(internal/db)"]
-        QFClient["OAuth and API Clients\n(internal/qfclient)"]
+        QFClient["Content API Client\n(internal/qfclient)"]
         Templates["HTML Templates\n(web/templates)"]
     end
 
@@ -41,6 +42,7 @@ graph TD
     Search --> ContentJSON
     Router --> QFClient
     QFClient --> QF
+    Router --> Google
     Router --> Templates
     Templates -->|HTML response| Browser
 ```
@@ -85,7 +87,8 @@ Responsibilities:
 - Load Quran, translation, and tafsir datasets.
 - Handle public, account, collection, and administration routes.
 - Store relations and account-specific state in SQLite.
-- Integrate with Quran Foundation OAuth, bookmarks, audio, and content APIs.
+- Verify user identity through Google OAuth and load verse audio through the
+  optional Quran Foundation Content API.
 - Render and serve HTML pages and static assets.
 
 ## Database
@@ -99,10 +102,15 @@ Primary tables:
 
 - `relations`: curated ayah pairs, categories, highlights, source, and review
   state.
-- `sessions`: Quran Foundation account identity, expiring OAuth sessions, and
-  token state.
+- `users`: Google subject identifier, verified email, profile name, and sign-in
+  timestamps.
+- `sessions`: expiring HifzLink sessions. Google OAuth tokens are not retained.
 - `collections`: user-created murojaah collections.
 - `collection_items`: saved ayahs and pairs, including mastery state.
+
+The admin user overview reads account identity, last sign-in, active-session
+status, and aggregate collection/item counts. It does not expose notes or verse
+content.
 
 Schema changes use additive migrations in `internal/db`.
 

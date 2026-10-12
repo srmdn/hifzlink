@@ -110,7 +110,7 @@ Requirements when importing Quran text:
 
 ## Database Schema
 
-The database stores only verse relations.
+The database stores curated verse relations and user-created collection state.
 
 Table: `relations`
 
@@ -124,6 +124,11 @@ Table: `relations`
 Example relation:
 
 `60:8 <-> 60:9`
+
+Optional user accounts use Google sign-in. SQLite stores a Google subject ID,
+verified email, display name, and expiring HifzLink sessions; OAuth tokens are
+not retained. The admin overview reports account metadata and aggregate usage
+counts without exposing saved notes or verse text.
 
 ## API Design
 
