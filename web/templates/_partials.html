@@ -72,7 +72,7 @@
         <a class="{{if eq .Lang "id"}}active{{end}}" href="{{.LangIDURL}}">ID</a>
       </nav>
       {{end}}
-      {{if .QFEnabled}}
+      {{if .AuthEnabled}}
         {{if .CurrentUser}}
         <div class="user-menu" data-user-menu>
           <button class="user-avatar-btn" type="button" aria-expanded="false" data-user-menu-toggle aria-label="Open user menu">
@@ -156,7 +156,7 @@
     </nav>
   </div>
   {{end}}
-  {{if .QFEnabled}}
+  {{if .AuthEnabled}}
   <div class="mobile-lang mobile-account">
     <p>Account</p>
     {{if .CurrentUser}}

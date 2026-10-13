@@ -10,7 +10,7 @@
     <span class="catalog-detail-count">{{len .Pairs}} {{.UI.pair}}</span>
   </header>
   {{if .Pairs}}
-  <p class="pairs-hint">{{.UI.pairHint}}</p>
+  <aside class="multi-compare-tip"><strong>{{if eq .Lang "id"}}Bandingkan beberapa ayat sekaligus{{else}}Compare several verses at once{{end}}</strong><p>{{.UI.pairHint}}</p></aside>
   <ul class="pairs-list">
     {{range .Pairs}}
     <li class="pair-item"><div class="line-head"><span class="pair-refs"><a class="ayah-chip" href="{{.Ayah1URL}}?lang={{$.Lang}}">{{.Ayah1}}</a><span class="meta">↔</span><a class="ayah-chip" href="{{.Ayah2URL}}?lang={{$.Lang}}">{{.Ayah2}}</a></span><a class="catalog-compare" href="/compare?ayah1={{.Ayah1}}&ayah2={{.Ayah2}}&lang={{$.Lang}}">{{$.UI.compare}} →</a></div><p class="pair-detail">{{.Ayah1Name}} · {{.Ayah2Name}}</p>{{if .Note}}<p class="pair-note">{{.Note}}</p>{{end}}</li>

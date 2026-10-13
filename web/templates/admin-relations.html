@@ -1,16 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page admin-dashboard admin-relations-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <p class="back"><a href="{{.HomeURL}}">← Back</a></p>
-    <h1>Admin Relations</h1>
-    <p class="meta">Manage mutashabihat relations. Use ayah reference format like <code>60:8</code>.</p>
+  <main class="home-main admin-dashboard-main">
+    <header class="admin-page-header">
+      <div>
+        <p class="home-eyebrow">HifzLink · Curated study data</p>
+        <h1>Mutashabihat relations</h1>
+        <p class="admin-page-lead">Review and maintain verse pairs. Use the surah:ayah format, such as <code>60:8</code>.</p>
+      </div>
+      <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations" aria-current="page">Relations</a></nav>
+    </header>
 
-    <section class="card" id="add-section">
-      <h2>Add Relation</h2>
+    <div class="admin-relations-layout">
+    <section class="admin-relation-create" id="add-section" aria-labelledby="add-relation-title">
+      <p class="home-eyebrow">New pair</p>
+      <h2 id="add-relation-title">Add a relation</h2>
+      <p class="admin-section-copy">Connect two verses that are easy to mix up.</p>
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
       {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
 
@@ -47,9 +55,9 @@
       </form>
     </section>
 
-    <section class="card">
+    <section class="admin-relations-browser" aria-labelledby="existing-relations-title">
       <div class="admin-relations-header">
-        <h2>Existing Relations</h2>
+        <div><p class="home-eyebrow">Library</p><h2 id="existing-relations-title">Existing relations</h2></div>
         {{if .Relations}}<span class="review-count" id="review-count"></span>{{end}}
       </div>
       <div class="admin-search-wrap">
@@ -96,6 +104,7 @@
       <p class="meta">No relations yet.</p>
       {{end}}
     </section>
+    </div>
   </main>
 
   <dialog id="delete-dialog" class="delete-dialog">
@@ -115,7 +124,7 @@
     </div>
   </dialog>
 
-{{template "footer" .}}
+{{template "learning-footer" .}}
 <script>
   (() => {
     // Delete dialog

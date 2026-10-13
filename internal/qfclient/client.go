@@ -3,9 +3,7 @@
 package qfclient
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -15,9 +13,6 @@ import (
 	"sync"
 	"time"
 )
-
-// ErrUnauthorized is returned when the QF API rejects a user token with HTTP 401.
-var ErrUnauthorized = errors.New("qfclient: unauthorized")
 
 // Client talks to the Quran Foundation Content API.
 type Client struct {
@@ -43,14 +38,6 @@ type VerseData struct {
 	AudioURL    string // empty if no recitation available
 }
 
-// BookmarkData is a QF user bookmark (ayah-level).
-type BookmarkData struct {
-	ID        string
-	SurahNum  int
-	AyahNum   int
-	CreatedAt string
-}
-
 // New creates a Client. Returns nil if any required field is empty.
 func New(clientID, clientSecret, authEndpoint, apiBase string) *Client {
 	if clientID == "" || clientSecret == "" || authEndpoint == "" || apiBase == "" {
@@ -62,7 +49,14 @@ func New(clientID, clientSecret, authEndpoint, apiBase string) *Client {
 		authEndpoint: strings.TrimRight(authEndpoint, "/"),
 		apiBase:      strings.TrimRight(apiBase, "/"),
 		cache:        make(map[string]*VerseData),
-		http:         &http.Client{Timeout: 8 * time.Second},
+		http: &http.Client{
+			Timeout: 8 * time.Second,
+			CheckRedirect: func(*http.Request, []*http.Request) error {
+				// API credentials and x-auth-token must not be forwarded to a
+				// redirect target outside the configured Quran Foundation host.
+				return http.ErrUseLastResponse
+			},
+		},
 	}
 }
 
@@ -112,7 +106,7 @@ func (c *Client) FetchVerse(verseKey string, recitationID int) (*VerseData, erro
 			} `json:"audio"`
 		} `json:"verse"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&body); err != nil {
 		return nil, fmt.Errorf("qfclient: decode verse: %w", err)
 	}
 
@@ -173,7 +167,7 @@ func (c *Client) token() (string, error) {
 		AccessToken string `json:"access_token"`
 		ExpiresIn   int    `json:"expires_in"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&tok); err != nil {
 		return "", fmt.Errorf("decode token: %w", err)
 	}
 	if tok.AccessToken == "" {
@@ -189,112 +183,4 @@ func (c *Client) token() (string, error) {
 	c.tokenExpiry = time.Now().Add(time.Duration(expiry-60) * time.Second)
 	log.Printf("qfclient: acquired new access token (expires in %ds)", expiry)
 	return c.accessToken, nil
-}
-
-// userAPIBase returns the base URL for user-scoped API endpoints.
-func (c *Client) userAPIBase() string {
-	return c.apiBase + "/auth/v1"
-}
-
-// AddBookmark saves an ayah as a QF bookmark for the given user.
-// userToken is the user's OAuth2 access token from the session.
-// mushaf 1 = Hafs An Asim (standard).
-func (c *Client) AddBookmark(userToken string, surahNum, ayahNum int) (*BookmarkData, error) {
-	body := map[string]any{
-		"key":         surahNum,
-		"type":        "ayah",
-		"verseNumber": ayahNum,
-		"mushaf":      1,
-	}
-	payload, _ := json.Marshal(body)
-
-	req, err := http.NewRequest(http.MethodPost, c.userAPIBase()+"/bookmarks", bytes.NewReader(payload))
-	if err != nil {
-		return nil, fmt.Errorf("qfclient: build bookmark request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-auth-token", userToken)
-	req.Header.Set("x-client-id", c.clientID)
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("qfclient: add bookmark: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return nil, ErrUnauthorized
-	}
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("qfclient: add bookmark: HTTP %d", resp.StatusCode)
-	}
-
-	var out struct {
-		Success bool `json:"success"`
-		Data    struct {
-			ID          string `json:"id"`
-			Key         int    `json:"key"`
-			VerseNumber int    `json:"verseNumber"`
-			CreatedAt   string `json:"createdAt"`
-		} `json:"data"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
-		return nil, fmt.Errorf("qfclient: decode bookmark: %w", err)
-	}
-	return &BookmarkData{
-		ID:        out.Data.ID,
-		SurahNum:  out.Data.Key,
-		AyahNum:   out.Data.VerseNumber,
-		CreatedAt: out.Data.CreatedAt,
-	}, nil
-}
-
-// GetBookmarks returns all ayah bookmarks for the given user.
-// userToken is the user's OAuth2 access token from the session.
-func (c *Client) GetBookmarks(userToken string) ([]BookmarkData, error) {
-	req, err := http.NewRequest(http.MethodGet, c.userAPIBase()+"/bookmarks?mushafId=1&first=20", nil)
-	if err != nil {
-		return nil, fmt.Errorf("qfclient: build get-bookmarks request: %w", err)
-	}
-	req.Header.Set("x-auth-token", userToken)
-	req.Header.Set("x-client-id", c.clientID)
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("qfclient: get bookmarks: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return nil, ErrUnauthorized
-	}
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("qfclient: get bookmarks: HTTP %d: %s", resp.StatusCode, body)
-	}
-
-	var out struct {
-		Data []struct {
-			ID          string `json:"id"`
-			Key         int    `json:"key"`
-			VerseNumber int    `json:"verseNumber"`
-			CreatedAt   string `json:"createdAt"`
-		} `json:"data"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
-		return nil, fmt.Errorf("qfclient: decode bookmarks: %w", err)
-	}
-
-	bookmarks := make([]BookmarkData, 0, len(out.Data))
-	for _, d := range out.Data {
-		bookmarks = append(bookmarks, BookmarkData{
-			ID:        d.ID,
-			SurahNum:  d.Key,
-			AyahNum:   d.VerseNumber,
-			CreatedAt: d.CreatedAt,
-		})
-	}
-	return bookmarks, nil
 }

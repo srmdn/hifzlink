@@ -12,7 +12,7 @@ This project provides a simple tool to:
 - browse memorization sections by surah or juz
 - search a verse
 - view related similar verses
-- compare verses side-by-side
+- compare two verses side-by-side or compare several connections against one anchor ayah
 - browse similar verses by surah or juz
 
 The goal is to make Quran memorization easier and reduce confusion caused by similar verses.
@@ -110,7 +110,7 @@ Requirements when importing Quran text:
 
 ## Database Schema
 
-The database stores only verse relations.
+The database stores curated verse relations and user-created collection state.
 
 Table: `relations`
 
@@ -124,6 +124,11 @@ Table: `relations`
 Example relation:
 
 `60:8 <-> 60:9`
+
+Optional user accounts use Google sign-in. SQLite stores a Google subject ID,
+verified email, display name, and expiring HifzLink sessions; OAuth tokens are
+not retained. The admin overview reports account metadata and aggregate usage
+counts without exposing saved notes or verse text.
 
 ## API Design
 
@@ -180,7 +185,9 @@ Ayah Page:
 
 Compare Page:
 
-- two verses side-by-side
+- compare two verses side-by-side, or select multiple connected verses from an ayah page
+- show the anchor once and highlight wording differences for each connection
+- keep translations collapsed by default in multi-verse comparisons
 
 Surah Index:
 

@@ -8,7 +8,7 @@ Simple Go web app to help memorizers review similar Quran verses (mutashabihat).
 - SQLite (relations + user sessions)
 - server-rendered HTML templates
 - local JSON Quran dataset (`data/quran.json`)
-- Quran Foundation OAuth2 + Content/Bookmarks API
+- Google Sign-In for user accounts; Quran Foundation Content API for audio
 
 ## Run
 
@@ -26,29 +26,35 @@ HIFZLINK_ADMIN_USER=
 HIFZLINK_ADMIN_PASS=
 HIFZLINK_UMAMI_ID=           # optional Umami analytics site ID
 
-# Quran Foundation OAuth2
+# Google Sign-In (OAuth 2.0 Web client)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:8080/auth/callback
+
+# Quran Foundation Content API (audio only)
 QF_CLIENT_ID=
 QF_CLIENT_SECRET=
 QF_AUTH_ENDPOINT=https://oauth2.quran.foundation
 QF_API_BASE=https://apis.quran.foundation
-QF_REDIRECT_URI=https://your-domain.com/auth/callback
 ```
 
 Copy `.env.example` and fill in the values.
 
 ## Authentication
 
-Users log in with their Quran Foundation account via OAuth2. On first login, a local user record is created automatically. Sessions are stored in SQLite with a 7-day expiry.
+Users sign in with Google OAuth. HifzLink stores the Google account identifier, verified email, display name, and a 30-day HifzLink session in SQLite; Google OAuth tokens are not retained. Set the OAuth callback URL in Google Cloud Console and `GOOGLE_REDIRECT_URI` to the same value. Admin access uses separate credentials and an in-memory session cookie.
+
+The admin user overview shows account email/name, last sign-in, active session status, and collection/item totals. It does not show users' notes or saved verse content.
 
 Admin access uses separate HTTP Basic Auth (env vars above). Admin routes are protected independently of user sessions.
 
 ## Features
 
-- **Mutashabihat pairs**: browse, search, and compare similar verses side-by-side with word-level diff highlighting
+- **Mutashabihat connections**: browse and search similar verses, then compare any selected connections with word-level diff highlighting
+- **Multi-verse compare**: keep one anchor ayah visible while reviewing several connected verses; translations stay collapsed until opened
 - **Practice Mode**: on the compare page, blur one side and test your recall before revealing
 - **Collections**: save ayahs and pairs into personal collections; mark items as mastered to track progress
-- **Dashboard**: recent saved items, mastered badges, QF bookmark integration with last-sync timestamp
-- **QF Bookmarks**: bookmarks synced from your Quran Foundation account are shown on the dashboard and matched to saved pairs
+- **Dashboard**: recent saved items, mastered badges, and personal collection activity
 - **Audio**: play verse audio via the QF Content API on ayah pages
 - **Tafsir**: collapsible Ibn Kathir (EN) and Kemenag RI (ID) tafsir on ayah pages
 - **Surah/Juz metadata**: place of revelation, ayah count, and juz start verse shown on listing pages
@@ -103,11 +109,12 @@ go run ./scripts/seed_relations
 
 ## Admin UI
 
+- `GET /admin/users` account activity and aggregate collection/item counts
 - `GET /admin/relations` relation management page (add/list/edit/delete)
 - relation categories (confusion-pattern taxonomy): `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`
 - category labels and usage hints are shown directly on the admin page
 - invalid category values are normalized to `other`
-- admin routes and `POST /api/relations` require HTTP Basic Auth
+- admin routes and `POST /api/relations` require the separate admin session
 - set credentials via env:
   - `HIFZLINK_ADMIN_USER`
   - `HIFZLINK_ADMIN_PASS`

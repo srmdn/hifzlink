@@ -23,7 +23,7 @@
     <div class="sp-main">
       {{if .Pairs}}
       <div class="sp-pairs-head"><h2>{{.UI.similarPairs}}</h2><span class="sp-pairs-count">{{.PairCount}} {{.UI.pair}}</span></div>
-      <p class="pairs-hint">{{.UI.pairHint}}</p>
+      <aside class="multi-compare-tip"><strong>{{if eq .Lang "id"}}Bandingkan beberapa ayat sekaligus{{else}}Compare several verses at once{{end}}</strong><p>{{.UI.pairHint}}</p></aside>
       <div class="sp-pairs">
         {{range .Pairs}}
         <div class="sp-pair">
