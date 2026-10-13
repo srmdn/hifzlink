@@ -47,6 +47,14 @@ graph TD
     Templates -->|HTML response| Browser
 ```
 
+## Technology constraints
+
+- Backend: Go, the standard library, `net/http`, and SQLite. Do not add a web
+  framework or ORM.
+- Frontend: server-rendered HTML templates, CSS, and small amounts of JavaScript.
+  Do not add a JavaScript framework or a Node.js/npm build toolchain.
+- Keep Quran text complete and Arabic text readable in the interface.
+
 ## Quran dataset
 
 Primary file:
