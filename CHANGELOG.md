@@ -6,6 +6,8 @@ The format is inspired by Keep a Changelog.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-13
+
 ### Added
 
 - Google Sign-In for user accounts and an admin overview of account activity
