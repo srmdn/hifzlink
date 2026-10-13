@@ -911,6 +911,9 @@ func TestHandleDashboardPage(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", rr.Code)
 	}
+	if got := rr.Header().Get("Cache-Control"); got != "no-store" {
+		t.Fatalf("expected authenticated dashboard to disable caching, got Cache-Control %q", got)
+	}
 }
 
 // --- helpers ---

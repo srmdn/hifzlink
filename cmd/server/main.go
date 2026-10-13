@@ -1721,6 +1721,12 @@ func (s *server) handleAPIJuz(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) render(w http.ResponseWriter, name string, data map[string]any) {
+	if _, ok := data["CurrentUser"]; ok {
+		w.Header().Set("Cache-Control", "no-store")
+	}
+	if isAdmin, _ := data["IsAdmin"].(bool); isAdmin {
+		w.Header().Set("Cache-Control", "no-store")
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := s.tmpl.ExecuteTemplate(w, name, data); err != nil {
 		log.Printf("render error template=%s: %v", name, err)
