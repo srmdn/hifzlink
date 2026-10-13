@@ -27,6 +27,11 @@
 .filter-pill { color: var(--color-text-muted); font-size: 12px; text-decoration: none; }
 .filter-pill:hover,.filter-pill.active { color: var(--color-accent); text-decoration: underline; text-underline-offset: 4px; }
 .pairs-hint { margin: 16px 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.7; }
+.multi-compare-tip { display: grid; gap: 4px; margin: 16px 0 18px; padding: 12px 14px; border: 1px solid var(--color-border); border-left: 3px solid var(--color-accent); border-radius: 3px; background: var(--color-surface); }
+.multi-compare-tip strong { color: var(--color-text); font-size: 12px; font-weight: 500; }
+.multi-compare-tip p { margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.7; }
+.multi-compare-tip-link { width: fit-content; margin-top: 3px; color: var(--color-accent); font-size: 12px; text-decoration: none; }
+.multi-compare-tip-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .pairs-list { margin: 0; padding: 0; list-style: none; }
 .pair-item { padding: 20px 0; border-top: 1px solid var(--learning-rule); }
 .pair-item:first-child { border-top: 0; }

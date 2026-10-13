@@ -20,6 +20,13 @@
   </header>
   <p class="compare-share-status" role="status" aria-live="polite"></p>
 
+  <section class="compare-connections-prompt">
+    <p>{{if eq .Lang "id"}}Ingin membandingkan lebih banyak koneksi?{{else}}Want to compare more connections?{{end}}</p>
+    <span>{{if eq .Lang "id"}}Pilih ayat acuan:{{else}}Choose an anchor ayah:{{end}}</span>
+    <a href="/ayah/{{.Ayah1.Surah}}/{{.Ayah1.Ayah}}?lang={{.Lang}}#ayah-related">{{.Ref1}}</a>
+    <a href="/ayah/{{.Ayah2.Surah}}/{{.Ayah2.Ayah}}?lang={{.Lang}}#ayah-related">{{.Ref2}}</a>
+  </section>
+
   <div class="practice-controls" id="practice-controls" role="toolbar" aria-label="{{.UI.practiceControls}}" hidden>
     <button type="button" class="compare-control-primary" id="practice-reveal">{{.UI.reveal}}</button>
     <button type="button" class="compare-control-secondary" id="practice-switch">{{.UI.switchSide}}</button>
@@ -37,13 +44,13 @@
       <p class="compare-verse-label"><span>01</span>{{.UI.verseOne}}</p>
       <p class="compare-verse-meta">{{.Ref1}} · {{.Ayah1.SurahName}} · {{.UI.juz}} {{.Ayah1.Juz}}</p>
       <p class="arabic compare-arabic" lang="ar" dir="rtl">{{.DiffText1}}</p>
-      {{if .Ayah1Translation}}<p class="translation compare-translation">{{.Ayah1Translation}}</p>{{end}}
+      {{if .Ayah1Translation}}<details class="multi-translation"><summary>{{.UI.translation}}</summary><p class="translation compare-translation">{{.Ayah1Translation}}</p></details>{{end}}
     </article>
     <article class="card verse-card">
       <p class="compare-verse-label"><span>02</span>{{.UI.verseTwo}}</p>
       <p class="compare-verse-meta">{{.Ref2}} · {{.Ayah2.SurahName}} · {{.UI.juz}} {{.Ayah2.Juz}}</p>
       <p class="arabic compare-arabic" lang="ar" dir="rtl">{{.DiffText2}}</p>
-      {{if .Ayah2Translation}}<p class="translation compare-translation">{{.Ayah2Translation}}</p>{{end}}
+      {{if .Ayah2Translation}}<details class="multi-translation"><summary>{{.UI.translation}}</summary><p class="translation compare-translation">{{.Ayah2Translation}}</p></details>{{end}}
     </article>
   </section>
 

@@ -16,6 +16,7 @@ func (s *server) handleAdminIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return

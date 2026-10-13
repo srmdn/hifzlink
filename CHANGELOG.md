@@ -10,6 +10,10 @@ The format is inspired by Keep a Changelog.
 
 - Google Sign-In for user accounts and an admin overview of account activity
   and aggregate collection usage.
+
+- Multi-verse comparison from an ayah's connected verses, with pair-specific
+  wording highlights and collapsed translations on compare pages
+
 - Account-free sample verse continuation practice with optional English/Indonesian
   translations and self-rating.
 

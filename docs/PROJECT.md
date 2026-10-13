@@ -12,7 +12,7 @@ This project provides a simple tool to:
 - browse memorization sections by surah or juz
 - search a verse
 - view related similar verses
-- compare verses side-by-side
+- compare two verses side-by-side or compare several connections against one anchor ayah
 - browse similar verses by surah or juz
 
 The goal is to make Quran memorization easier and reduce confusion caused by similar verses.
@@ -185,7 +185,9 @@ Ayah Page:
 
 Compare Page:
 
-- two verses side-by-side
+- compare two verses side-by-side, or select multiple connected verses from an ayah page
+- show the anchor once and highlight wording differences for each connection
+- keep translations collapsed by default in multi-verse comparisons
 
 Surah Index:
 

@@ -55,6 +55,16 @@
 .ayah-related-arabic { margin: 15px 0 10px; color: var(--color-text-secondary); font-family: var(--font-arabic); font-size: clamp(25px,3.3vw,34px); line-height: 1.9; text-align: right; overflow-wrap: anywhere; }
 .ayah-related-translation { max-width: 760px; margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.8; }
 .ayah-related-empty { padding: 22px 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.8; }
+.ayah-related-select>p { margin: 14px 0 10px; color: var(--color-text-muted); font-size: 12px; }
+.ayah-related-select-toolbar { position: sticky; top: 68px; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-surface-glass); backdrop-filter: blur(8px); }
+.ayah-related-selection-count { color: var(--color-text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.ayah-related-select-toolbar button { flex: 0 0 auto; min-height: 40px; padding: 0 14px; border: 1px solid var(--color-accent); border-radius: 4px; background: var(--color-accent); color: var(--color-accent-ink); font: inherit; font-size: 12px; cursor: pointer; }
+.ayah-related-select-toolbar button:hover:not(:disabled) { background: var(--color-accent-strong); }
+.ayah-related-select-toolbar button:disabled { opacity: .55; cursor: not-allowed; }
+.ayah-related-select-label { display: flex; align-items: center; gap: 10px; color: var(--color-text); font-size: 12px; cursor: pointer; }
+.ayah-related-select-label input { width: 16px; height: 16px; margin: 0; accent-color: var(--color-accent); }
+.ayah-related-select .ayah-related-arabic { margin-top: 12px; }
+.ayah-related-select .ayah-related-top { justify-content: flex-start; gap: 20px; }
 .ayah-page .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
 @media(max-width:700px) {
  .ayah-content { width: calc(100% - 44px); padding: 36px 0 64px; }

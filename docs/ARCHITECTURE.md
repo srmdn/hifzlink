@@ -156,9 +156,16 @@ sequenceDiagram
 
 ## Compare mode
 
-Compare view renders two verses side-by-side.
+Compare view supports both the original two-verse comparison and a multi-verse
+view. The multi-verse route takes one `ayah1` anchor and repeated `ayah2`
+references, renders the anchor once, and shows a full verse card for each
+selected connection. Pair-specific relation highlights are applied per card;
+translations are collapsed by default across comparison views to keep them
+compact.
 
-Used to reduce confusion for similar wording.
+The ayah page provides the selection form. Surah and juz pages remain browse
+entry points, while selected connections are compared together from the ayah
+page.
 
 ## Performance
 

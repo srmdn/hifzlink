@@ -381,12 +381,16 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	var filterPills []filterPill
 	var queryLabel string
 	var errMsg string
+	var anchorConnectionsURL string
+	var anchorConnectionsRef string
 
 	if q != "" {
 		var dbRels []db.Relation
 		var err error
 
 		if surahNum, ayahNum, parseErr := relations.ParseAyahRef(q); parseErr == nil {
+			anchorConnectionsRef = relations.FormatAyahRef(surahNum, ayahNum)
+			anchorConnectionsURL = withLang(fmt.Sprintf("/ayah/%d/%d", surahNum, ayahNum), lang) + "#ayah-related"
 			if lang == "id" {
 				queryLabel = fmt.Sprintf("pasangan yang memuat ayat %s", relations.FormatAyahRef(surahNum, ayahNum))
 			} else {
@@ -475,15 +479,17 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "search.html", s.learningData(r, map[string]any{
-		"Title":            "Search pairs",
-		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
-		"Query":            q,
-		"QueryLabel":       queryLabel,
-		"Results":          results,
-		"ErrMsg":           errMsg,
-		"FilterPills":      filterPills,
-		"CategoryFilter":   categoryFilter,
-		"CategoryLabelMap": categoryLabelMap,
+		"Title":                "Search pairs",
+		"Description":          "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
+		"Query":                q,
+		"QueryLabel":           queryLabel,
+		"Results":              results,
+		"ErrMsg":               errMsg,
+		"FilterPills":          filterPills,
+		"CategoryFilter":       categoryFilter,
+		"CategoryLabelMap":     categoryLabelMap,
+		"AnchorConnectionsURL": anchorConnectionsURL,
+		"AnchorConnectionsRef": anchorConnectionsRef,
 	}))
 }
 
@@ -579,6 +585,10 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a1 := r.URL.Query().Get("ayah1")
+	if targets := r.URL.Query()["ayah2"]; len(targets) > 1 {
+		s.handleMultiComparePage(w, r, a1, targets)
+		return
+	}
 	a2 := r.URL.Query().Get("ayah2")
 	s1, y1, err := relations.ParseAyahRef(a1)
 	if err != nil {

@@ -268,6 +268,9 @@ func TestHandleAdminUsersRequiresAdminSession(t *testing.T) {
 	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "reader@example.com") {
 		t.Fatalf("expected admin user overview, got %d: %s", response.Code, response.Body.String())
 	}
+	if got := response.Header().Get("Cache-Control"); got != "no-store" {
+		t.Fatalf("expected user overview to disable caching, got Cache-Control %q", got)
+	}
 }
 
 // --- /api/ayah/{surah}/{ayah} ---

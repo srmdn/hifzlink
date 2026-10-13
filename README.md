@@ -50,7 +50,8 @@ Admin access uses separate HTTP Basic Auth (env vars above). Admin routes are pr
 
 ## Features
 
-- **Mutashabihat pairs**: browse, search, and compare similar verses side-by-side with word-level diff highlighting
+- **Mutashabihat connections**: browse and search similar verses, then compare any selected connections with word-level diff highlighting
+- **Multi-verse compare**: keep one anchor ayah visible while reviewing several connected verses; translations stay collapsed until opened
 - **Practice Mode**: on the compare page, blur one side and test your recall before revealing
 - **Collections**: save ayahs and pairs into personal collections; mark items as mastered to track progress
 - **Dashboard**: recent saved items, mastered badges, and personal collection activity
