@@ -2,20 +2,20 @@
   {
     "ayah1": "60:8",
     "ayah2": "60:9",
-    "category": "word_swap",
-    "note": "Both begin identically but 60:8 says 'lam yuqatilukum' (did not fight you) while 60:9 says 'qatalukum' (fought you), changing the ruling entirely."
+    "category": "",
+    "note": "mutashabihat"
   },
   {
     "ayah1": "2:255",
     "ayah2": "3:2",
     "category": "lafzi",
-    "note": "Both open with 'Allahu la ilaha illa huwa al-Hayy al-Qayyum' — word-for-word identical divine attribute declaration."
+    "note": "both open with اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ"
   },
   {
     "ayah1": "2:255",
     "ayah2": "20:111",
     "category": "lafzi",
-    "note": "Both contain 'al-Hayy al-Qayyum' as paired divine names but in different contexts — Ayat al-Kursi vs. the Day of Judgment."
+    "note": "الْحَيُّ الْقَيُّومُ — same divine attribute, different context"
   },
   {
     "ayah1": "3:2",
@@ -26,133 +26,133 @@
   {
     "ayah1": "2:48",
     "ayah2": "2:123",
-    "category": "order_change",
+    "category": "lafzi",
     "note": "Both warn that no intercession or ransom will be accepted on the Day, but 2:48 places 'shafa'ah' before ''adl' while 2:123 reverses the order."
   },
   {
     "ayah1": "2:58",
     "ayah2": "7:161",
-    "category": "order_change",
+    "category": "",
     "note": "Both command entering saying 'hittah' while prostrating, but the order of 'sujjadan' and 'hittah' is reversed between the two verses."
   },
   {
     "ayah1": "2:60",
     "ayah2": "7:160",
-    "category": "word_swap",
+    "category": "lafzi",
     "note": "Both describe water springing from the rock for Moses but 2:60 uses 'infajarat' (burst strongly) while 7:160 uses 'inbajassat' (gushed forth)."
   },
   {
     "ayah1": "2:136",
     "ayah2": "3:84",
-    "category": "word_swap",
+    "category": "lafzi",
     "note": "Both declare belief in all the prophets with near-identical wording but differ in 'ilayna'/'alayna' and the phrasing of 'what was given to the prophets'."
   },
   {
     "ayah1": "2:242",
     "ayah2": "3:103",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 2:242 ends with 'ta'qilun' (reason) and 3:103 ends with 'tahtadun' (be guided)."
   },
   {
     "ayah1": "2:285",
     "ayah2": "2:286",
-    "category": "ending_variation",
+    "category": "",
     "note": "Closing verses of Al-Baqarah in the same passage — both are supplications but differ in ending: 2:285 ends with 'wa ilayka al-masir' and 2:286 ends with 'fansurna 'ala al-qawm al-kafirin'."
   },
   {
     "ayah1": "3:3",
     "ayah2": "5:48",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both describe the Quran as 'musaddiqan lima bayna yadayhi' but 5:48 adds 'wa muhaymina 'alayhi' (a guardian over it) which is absent in 3:3."
   },
   {
     "ayah1": "3:47",
     "ayah2": "19:35",
-    "category": "word_swap",
+    "category": "",
     "note": "Both contain the divine command 'kun fayakun' in the context of miraculous creation but differ in the connecting particles and surrounding phrase structure."
   },
   {
     "ayah1": "3:49",
     "ayah2": "5:110",
-    "category": "pronoun_shift",
+    "category": "",
     "note": "Both list the miracles of Isa in nearly identical language but 3:49 uses 'fihi' (masculine pronoun for the bird) while 5:110 uses 'fiha' (feminine)."
   },
   {
     "ayah1": "3:103",
     "ayah2": "5:89",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both use 'kadhalika yubayyinu Allahu lakum ayatihi' but 3:103 ends with 'tahtadun' (be guided) and 5:89 ends with 'tashkurun' (be grateful)."
   },
   {
     "ayah1": "3:126",
     "ayah2": "8:10",
-    "category": "word_swap",
+    "category": "",
     "note": "Both reassure believers that victory comes only from Allah and end with 'azizun hakim' but differ in the pronoun and the structure of the preceding clause."
   },
   {
     "ayah1": "4:135",
     "ayah2": "5:8",
-    "category": "order_change",
+    "category": "",
     "note": "Both command standing firmly for justice as witnesses for Allah, but 4:135 says 'qawwamina bi al-qist shuhada'a lillah' while 5:8 reverses to 'qawwamina lillahi shuhada'a bi al-qist'."
   },
   {
     "ayah1": "6:50",
     "ayah2": "11:31",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both have the prophet declaring 'I do not say I possess the treasures of Allah nor that I am an angel' but 6:50 adds 'lakum' (to you) in 'wa la aqulu lakum inni malak' while 11:31 omits it."
   },
   {
     "ayah1": "6:151",
     "ayah2": "17:31",
-    "category": "word_swap",
+    "category": "",
     "note": "Both forbid killing children out of poverty but 6:151 says 'min imlaq' (from current poverty) while 17:31 says 'khashyata imlaq' (fearing future poverty) — a significant difference in meaning."
   },
   {
     "ayah1": "7:81",
     "ayah2": "27:55",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both describe Lot's people approaching men with desire but 7:81 ends with 'musrifun' (transgressors) while 27:55 ends with 'tajhalun' (acting ignorantly)."
   },
   {
     "ayah1": "7:188",
     "ayah2": "10:49",
-    "category": "order_change",
+    "category": "",
     "note": "Both have the Prophet saying he has no power over benefit or harm for himself, but 7:188 says 'naf'an wa la darran' while 10:49 reverses to 'darran wa la naf'an'."
   },
   {
     "ayah1": "9:114",
     "ayah2": "11:75",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both describe Ibrahim as 'awwah halim' but 11:75 reverses the order to 'halim awwah' and adds 'munib' (ever-returning to Allah) at the end."
   },
   {
     "ayah1": "15:1",
     "ayah2": "27:1",
-    "category": "order_change",
+    "category": "",
     "note": "15:1 says 'ayat al-kitabi wa Qur'anin mubin' while 27:1 says 'ayat al-Qur'ani wa kitabin mubin' — the words Quran and Kitab are swapped in position."
   },
   {
     "ayah1": "16:66",
     "ayah2": "23:21",
-    "category": "pronoun_shift",
+    "category": "",
     "note": "Both describe taking drink from the bellies of cattle but 16:66 uses the masculine 'butunihi' while 23:21 uses the feminine 'butuniha'."
   },
   {
     "ayah1": "17:9",
     "ayah2": "18:2",
-    "category": "word_swap",
+    "category": "",
     "note": "Both end with giving glad tidings to the believers but 17:9 uses 'yubashiru' (indicative) while 18:2 uses 'yubashira' (subjunctive) — a single vowel difference in the verb form."
   },
   {
     "ayah1": "18:72",
     "ayah2": "18:75",
-    "category": "addition_omission",
+    "category": "",
     "note": "Khidr's repeated reproach to Musa — 18:72 says 'alam aqul innaka lan tastati'a' while 18:75 adds 'laka' after 'aqul', a single word difference tested in tajwid revision."
   },
   {
     "ayah1": "19:15",
     "ayah2": "19:33",
-    "category": "pronoun_shift",
+    "category": "",
     "note": "Both pronounce peace on the day of birth, death, and resurrection — 19:15 is Allah's third-person declaration about Yahya ('alayhi) while 19:33 is Isa speaking in first person ('alayya)."
   },
   {
@@ -164,7 +164,7 @@
   {
     "ayah1": "21:91",
     "ayah2": "66:12",
-    "category": "pronoun_shift",
+    "category": "",
     "note": "Both describe the divine spirit being breathed into Maryam but 21:91 uses 'fiha' (into her, feminine) while 66:12 uses 'fihi' (into it, masculine), referring to different grammatical antecedents."
   },
   {
@@ -182,55 +182,55 @@
   {
     "ayah1": "23:51",
     "ayah2": "34:11",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both contain the command 'wa'malu salihan' (do righteous deeds) followed by a divine attribute but 23:51 ends with ''alim' (All-Knowing) while 34:11 ends with 'basir' (All-Seeing)."
   },
   {
     "ayah1": "28:20",
     "ayah2": "36:20",
-    "category": "order_change",
+    "category": "",
     "note": "Both say 'ja'a rajulun min aqsa al-madinah' but 28:20 places 'rajulun' before the location phrase while 36:20 places it after — 'min aqsa al-madinah rajulun'."
   },
   {
     "ayah1": "29:62",
     "ayah2": "34:36",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both state that Allah expands and restricts provision for whom He wills but 29:62 ends with 'bi kulli shay'in 'alim' while 34:36 ends with 'akthara al-nas la ya'lamun'."
   },
   {
     "ayah1": "36:35",
     "ayah2": "36:73",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both appear in Ya-Sin describing blessings from Allah's creation and end with 'afala yashkurun' — a within-surah lafzi pair that trips recitors mid-surah."
   },
   {
     "ayah1": "37:47",
     "ayah2": "56:19",
-    "category": "word_swap",
+    "category": "",
     "note": "Both describe the wine of Paradise as harmless but 37:47 uses 'la yunzafun' (they will not be drained/intoxicated) while 56:19 uses 'la yunzifun' — a root vowel shift changing the verb pattern."
   },
   {
     "ayah1": "37:59",
     "ayah2": "44:35",
-    "category": "word_swap",
+    "category": "",
     "note": "Both deny there is anything beyond the first death but 37:59 says 'mawtatana al-ula' while 44:35 says 'mawtatuna al-ula' — a single letter difference in the possessive suffix."
   },
   {
     "ayah1": "38:74",
     "ayah2": "2:34",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both describe Iblis refusing to prostrate and being among the disbelievers but 38:74 adds 'istakbara' (acted arrogantly) before 'wa kana min al-kafirin', which 2:34 omits."
   },
   {
     "ayah1": "40:56",
     "ayah2": "41:36",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both counsel seeking refuge in Allah against arrogance or satanic whispers and end with 'al-Sami'' but 40:56 pairs it with 'al-Basir' while 41:36 pairs it with 'al-'Alim'."
   },
   {
     "ayah1": "52:24",
     "ayah2": "56:17",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both describe immortal youths serving in Paradise but 52:24 adds the simile 'ka'annahum lu'lu'un maknun' (like preserved pearls) while 56:17 describes them without this simile."
   },
   {
@@ -248,31 +248,31 @@
   {
     "ayah1": "55:13",
     "ayah2": "55:16",
-    "category": "lafzi",
-    "note": "The refrain 'fa bi ayyi ala'i rabbikuma tukadhdhiban' is repeated 31 times in Al-Rahman — 55:13 and 55:16 are an adjacent pair."
+    "category": "",
+    "note": "repeated rhetorical verse in Ar-Rahman"
   },
   {
     "ayah1": "55:13",
     "ayah2": "55:18",
     "category": "lafzi",
-    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:18 are separated by two verses, testing whether the recitor continues or skips."
+    "note": "repeated refrain in Ar-Rahman"
   },
   {
     "ayah1": "55:13",
     "ayah2": "55:21",
     "category": "lafzi",
-    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:21."
+    "note": "repeated refrain in Ar-Rahman"
   },
   {
     "ayah1": "55:13",
     "ayah2": "55:23",
     "category": "lafzi",
-    "note": "Repeated refrain of Al-Rahman — 55:13 and 55:23."
+    "note": "repeated refrain in Ar-Rahman"
   },
   {
     "ayah1": "56:8",
     "ayah2": "56:27",
-    "category": "ending_variation",
+    "category": "",
     "note": "Both use the rhetorical question 'wa ashab al-yamin ma ashab al-yamin' but 56:8 introduces all three groups together while 56:27 begins the dedicated description of the Companions of the Right."
   },
   {
@@ -290,7 +290,7 @@
   {
     "ayah1": "59:23",
     "ayah2": "59:24",
-    "category": "ending_variation",
+    "category": "",
     "note": "Consecutive closing verses of Al-Hashr listing clusters of divine names — 59:23 ends with 'subhanallah 'amma yushrikun' while 59:24 ends with 'al-'aziz al-hakim'."
   },
   {
@@ -320,13 +320,13 @@
   {
     "ayah1": "73:19",
     "ayah2": "76:29",
-    "category": "word_swap",
+    "category": "",
     "note": "73:19 says 'fa man sha'a attakhadha ila rabbihi sabila' while 76:29 says 'fa man sha'a ittakhadha ila rabbihi sabila' — a subtle difference in verb form (attakhadha vs. ittakhadha)."
   },
   {
     "ayah1": "74:54",
     "ayah2": "80:11",
-    "category": "pronoun_shift",
+    "category": "",
     "note": "74:54 says 'innahu tadhkira' (masculine pronoun) while 80:11 says 'innaha tadhkira' (feminine) — a single letter that shifts the grammatical gender of the reference."
   },
   {
@@ -338,19 +338,19 @@
   {
     "ayah1": "78:4",
     "ayah2": "102:3",
-    "category": "word_swap",
+    "category": "",
     "note": "Both use the 'kalla sa/sawfa ta'lamun' warning refrain but 78:4-5 uses 'sa ya'lamun' while 102:3-4 uses 'sawfa ta'lamun' with 'thumma kalla' escalating the second warning."
   },
   {
     "ayah1": "81:6",
     "ayah2": "82:3",
-    "category": "word_swap",
+    "category": "",
     "note": "Both describe the seas at the Last Day but 81:6 says 'sujjirat' (set ablaze) while 82:3 says 'fujjirat' (made to burst forth) — same root structure, different verb."
   },
   {
     "ayah1": "82:1",
     "ayah2": "84:1",
-    "category": "word_swap",
+    "category": "",
     "note": "Both describe the sky splitting open — 82:1 uses 'infatarat' while 84:1 uses 'inshaqqat' — two verbs from different roots with overlapping meaning."
   },
   {
@@ -362,25 +362,25 @@
   {
     "ayah1": "83:7",
     "ayah2": "83:19",
-    "category": "word_swap",
+    "category": "",
     "note": "Both use the parallel rhetorical question 'wa ma adraka ma...' — 83:7-8 asks about Sijjin (record of the wicked) and 83:18-19 asks about 'Illiyyun (record of the righteous)."
   },
   {
     "ayah1": "89:27",
     "ayah2": "89:28",
-    "category": "ending_variation",
+    "category": "",
     "note": "The address to the tranquil soul spans two short consecutive verses — 89:27 'ya ayyatuha al-nafs al-mutma'innah' and 89:28 'irji'i ila rabbiki radiyatan mardiyyah' — memorizers frequently merge or split them incorrectly."
   },
   {
     "ayah1": "91:9",
     "ayah2": "91:10",
-    "category": "word_swap",
+    "category": "",
     "note": "Consecutive antithetical verses — 91:9 'qad aflaha man zakkaha' (successful is he who purifies it) and 91:10 'qad khaba man dassaha' (failed is he who buries it) — swapping them is a common error."
   },
   {
     "ayah1": "93:6",
     "ayah2": "93:8",
-    "category": "ending_variation",
+    "category": "",
     "note": "Verses 93:6, 93:7, and 93:8 form a trio of 'a lam yajidka' questions — the endings 'fa awa', 'fa hada', and 'fa aghna' are easy to mix up in sequence."
   },
   {
@@ -392,25 +392,25 @@
   {
     "ayah1": "101:6",
     "ayah2": "101:8",
-    "category": "word_swap",
+    "category": "",
     "note": "Parallel conditional structures in Al-Qari'ah: 101:6 describes those with heavy scales entering a pleasing life while 101:8 describes those with light scales entering the Hawiyah — similar structure, opposite outcomes."
   },
   {
     "ayah1": "102:3",
     "ayah2": "102:4",
-    "category": "addition_omission",
+    "category": "",
     "note": "Both verses use 'kalla sawfa ta'lamun' but 102:4 adds 'thumma kalla' at the start, escalating the warning — omitting 'thumma' is a frequent recitation error."
   },
   {
     "ayah1": "107:4",
     "ayah2": "107:5",
-    "category": "addition_omission",
+    "category": "",
     "note": "107:4 says 'fa waylun lil-musallin' and 107:5 specifies 'alladhina hum 'an salatihim sahun' — memorizers often attach the qualifier from 107:5 directly to 107:4 or split them incorrectly."
   },
   {
     "ayah1": "112:3",
     "ayah2": "112:4",
-    "category": "ending_variation",
+    "category": "",
     "note": "Final two verses of Al-Ikhlas — 112:3 'lam yalid wa lam yulad' and 112:4 'wa lam yakun lahu kufuwan ahad' — short and adjacent, often merged or their boundary misplaced."
   },
   {
@@ -470,7 +470,7 @@
   {
     "ayah1": "57:1",
     "ayah2": "59:1",
-    "category": "word_swap",
+    "category": "",
     "note": "57:1 opens 'sabbaha lillahi ma fi al-samawati wa al-ard' (no second 'ma fi') while 59:1 says 'wa ma fi al-ard' — a single-word insertion that is one of the most tested distinctions among the five Musabbihat surahs."
   },
   {
@@ -488,7 +488,7 @@
   {
     "ayah1": "57:1",
     "ayah2": "62:1",
-    "category": "word_swap",
+    "category": "",
     "note": "57:1 uses 'sabbaha' (past tense) while 62:1 uses 'yusabbihu' (present tense) — the tense shift across the Musabbihat surahs is a key awareness point for revision."
   },
   {
@@ -668,13 +668,13 @@
   {
     "ayah1": "99:7",
     "ayah2": "99:8",
-    "category": "word_swap",
+    "category": "",
     "note": "Az-Zalzalah closes with a mirror pair: 99:7 'fa man ya'mal mithqal dharratin khayran yarahu' and 99:8 'wa man ya'mal mithqala dharratin sharran yarahu' — khayran vs sharran is the only change."
   },
   {
     "ayah1": "109:2",
     "ayah2": "109:4",
-    "category": "word_swap",
+    "category": "",
     "note": "109:2 'la a'budu ma ta'budun' (verbal sentence) and 109:4 'wa la ana 'abidun ma 'abadtum' (nominal sentence) cover the same meaning in different grammatical forms — a subtle internal shift memorizers frequently conflate."
   },
   {
@@ -686,49 +686,49 @@
   {
     "ayah1": "113:1",
     "ayah2": "114:1",
-    "category": "word_swap",
+    "category": "",
     "note": "Both opening verses begin with 'qul a'udhu bi rabb' but differ in the next word: 'al-falaq' in Al-Falaq vs 'al-nas' in Al-Nas — reciting one opening with the other's continuation is a common error in nightly prayers."
   },
   {
     "ayah1": "87:1",
     "ayah2": "56:74",
-    "category": "word_swap",
+    "category": "",
     "note": "87:1 'sabbih isma rabbika al-a'la' and 56:74 'fa sabbih bismi rabbika al-'azim' both command glorifying the Lord's name but differ in the divine attribute: al-a'la (Most High) vs al-'azim (Most Great)."
   },
   {
     "ayah1": "84:7",
     "ayah2": "84:10",
-    "category": "word_swap",
+    "category": "",
     "note": "84:7 'fa amma man utiya kitabahu bi yaminihi' and 84:10 'wa amma man utiya kitabahu wara'a zahrihi' are the parallel conditionals in Al-Inshiqaq — right hand vs behind the back."
   },
   {
     "ayah1": "88:1",
     "ayah2": "79:15",
-    "category": "word_swap",
+    "category": "",
     "note": "88:1 'hal ataka hadith al-ghashiyah' and 79:15 'hal ataka hadith Musa' both use the rhetorical 'hal ataka hadith...' (Has the account of ... reached you?) formula — the same opening introducing different narratives."
   },
   {
     "ayah1": "92:5",
     "ayah2": "92:8",
-    "category": "word_swap",
+    "category": "",
     "note": "92:5 'fa amma man a'ta wa ittaqa' and 92:8 'wa amma man bakhila wa istagh-na' form the antithetical frame of Al-Layl — fa amma / wa amma parallels with opposite consequences."
   },
   {
     "ayah1": "95:4",
     "ayah2": "95:5",
-    "category": "ending_variation",
+    "category": "",
     "note": "95:4 'la qad khalaqna al-insan fi ahsan taqwim' and 95:5 'thumma radadnahu asfala safilin' are the core antithetical pair of At-Tin — the boundary between these consecutive verses is frequently misplaced."
   },
   {
     "ayah1": "96:1",
     "ayah2": "96:3",
-    "category": "word_swap",
+    "category": "",
     "note": "96:1 'iqra' bismi rabbika alladhi khalaq' and 96:3 'iqra' wa rabbuka al-akram' both begin with the command 'iqra'' but continue differently — the repeated command two verses apart with a different continuation."
   },
   {
     "ayah1": "85:1",
     "ayah2": "86:1",
-    "category": "word_swap",
+    "category": "",
     "note": "85:1 'wa al-sama' dhati al-buruj' and 86:1 'wa al-sama' wa al-tariq' are back-to-back surah openings both beginning with an oath by the sky — al-buruj (the constellations) vs al-tariq (the night-comer)."
   },
   {
@@ -740,25 +740,25 @@
   {
     "ayah1": "50:39",
     "ayah2": "20:130",
-    "category": "word_swap",
+    "category": "",
     "note": "50:39 'fa isbir 'ala ma yaquluna wa sabbih bi hamdi rabbika qabla tuluu' al-shams wa qabla al-ghurub' and 20:130 are nearly identical but 20:130 adds 'qabla ghurubaha' with the feminine pronoun — a single-letter difference that recitors frequently miss."
   },
   {
     "ayah1": "75:31",
     "ayah2": "75:32",
-    "category": "word_swap",
+    "category": "",
     "note": "75:31 'fa la saddaqa wa la salla' and 75:32 'wa lakin kadhdhaba wa tawalla' are a consecutive antithetical pair in Al-Qiyamah whose parallel structure makes the verse boundary easy to misplace."
   },
   {
     "ayah1": "60:4",
     "ayah2": "60:6",
-    "category": "word_swap",
+    "category": "",
     "note": "60:4 'qad kanat lakum uswatun hasanatun fi Ibrahim' and 60:6 'laqad kana lakum fihim uswatun hasanatun' both invoke Ibrahim as an example in Al-Mumtahanah but differ in the introductory verb and preposition."
   },
   {
     "ayah1": "2:62",
     "ayah2": "5:69",
-    "category": "order_change",
+    "category": "lafzi",
     "note": "Both list the four groups — believers, Jews, Christians, and Sabians — in an identical promise formula but 2:62 uses 'wa al-sabi'ina' while 5:69 shifts to 'wa al-sabi'una', a grammatical case change alongside the same sequence."
   },
   {
@@ -776,19 +776,19 @@
   {
     "ayah1": "2:126",
     "ayah2": "14:35",
-    "category": "word_swap",
+    "category": "lafzi",
     "note": "2:126 'Rabbi aj'al hadha baladan aminan' uses the indefinite 'baladan' while 14:35 'Rabbi aj'al hadha al-balad aminan' uses the definite 'al-balad' — Ibrahim's prayer for Mecca appears twice with this single article difference."
   },
   {
     "ayah1": "4:36",
     "ayah2": "17:23",
-    "category": "order_change",
+    "category": "",
     "note": "Both command worshipping Allah alone and treating parents with goodness (ihsan) — 4:36 says 'u'budu Allah wa la tushrikuu bihi... wa bil-walidayni ihsana' while 17:23 says 'alla ta'budu illa iyyahu wa bil-walidayni ihsana' with a different construction."
   },
   {
     "ayah1": "31:14",
     "ayah2": "46:15",
-    "category": "word_swap",
+    "category": "",
     "note": "31:14 'wa wasayna al-insana bi walidayhi' and 46:15 'wa wasayna al-insan bi walidayhi ihsana' both open with the same wasiyyah formula about parents — 46:15 adds 'ihsana' which 31:14 does not carry at that point."
   },
   {
@@ -812,7 +812,7 @@
   {
     "ayah1": "4:13",
     "ayah2": "4:14",
-    "category": "ending_variation",
+    "category": "",
     "note": "Consecutive antithetical verses — 4:13 ends with 'wa dhalika al-fawz al-'azim' (the great attainment) for those who obey Allah and 4:14 ends with 'wa lahu 'adhabun muhin' (a humiliating punishment) for those who disobey — parallel structure with opposite outcomes."
   },
   {
@@ -824,49 +824,49 @@
   {
     "ayah1": "3:8",
     "ayah2": "3:9",
-    "category": "ending_variation",
+    "category": "",
     "note": "Consecutive Rabbana supplications in Ali Imran — 3:8 ends with 'innaka anta al-wahhab' and 3:9 ends with 'inna Allah la yukhlif al-mi'ad' — the two duas follow each other and their endings are easy to swap."
   },
   {
     "ayah1": "3:191",
     "ayah2": "3:192",
-    "category": "ending_variation",
+    "category": "",
     "note": "Consecutive Rabbana duas closing Ali Imran — 3:191 ends with 'fa qina 'adhab al-nar' and 3:192 ends with 'wa ma lil-zalimin min ansar' — short back-to-back supplications whose endings are a common memorization confusion."
   },
   {
     "ayah1": "9:111",
     "ayah2": "61:10",
-    "category": "word_swap",
+    "category": "",
     "note": "9:111 'inna Allah ishtara mina al-mu'minin anfusahum wa amwalahum bi anna lahum al-jannah' and 61:10-11 both describe the divine exchange of lives and wealth for Paradise — the same 'anfus + amwal' pair appears in both, but with different wording and context."
   },
   {
     "ayah1": "80:17",
     "ayah2": "74:19",
-    "category": "word_swap",
+    "category": "",
     "note": "80:17 'qutila al-insan ma akfarah' (cursed is man, how ungrateful he is) and 74:19 'qutila kayfa qaddar' (cursed is how he calculated) both use the exclamatory 'qutila' curse formula with different objects — man's ingratitude vs man's planning."
   },
   {
     "ayah1": "2:40",
     "ayah2": "5:20",
-    "category": "word_swap",
+    "category": "",
     "note": "2:40 'ya bani Isra'il udhkuru ni'mati allati an'amtu 'alaykum' and 5:20 'ya qawmi udhkuru ni'mat Allah 'alaykum' both begin with the reminder of Allah's favor — the Baqarah address is to Bani Isra'il while Al-Ma'idah quotes Musa addressing his people."
   },
   {
     "ayah1": "2:233",
     "ayah2": "65:6",
-    "category": "word_swap",
+    "category": "",
     "note": "2:233 and 65:6 both address nursing, child custody, and parental rights after separation using similar legal language — the primary Baqarah passage and the At-Talaq parallel share much of the same vocabulary."
   },
   {
     "ayah1": "7:40",
     "ayah2": "7:41",
-    "category": "ending_variation",
+    "category": "",
     "note": "Consecutive penalty verses for those who deny the signs — 7:40 ends with 'wa kadhalika najzi al-mujrimin' and 7:41 ends with 'wa kadhalika najzi al-zalimin' — a single word difference (mujrimin vs zalimin) in back-to-back verse endings."
   },
   {
     "ayah1": "2:25",
     "ayah2": "3:15",
-    "category": "word_swap",
+    "category": "",
     "note": "2:25 describes the rivers of Paradise 'tajri min tahtiha al-anhar' in its reward promise for believers, while 3:15 echoes the same Paradise promise in nearly identical terms — both use 'jannatin tajri min tahtiha al-anhar' in a reward context."
   },
   {
@@ -878,13 +878,13 @@
   {
     "ayah1": "69:19",
     "ayah2": "69:25",
-    "category": "word_swap",
+    "category": "",
     "note": "69:19 'fa amma man utiya kitabahu bi yaminihi' and 69:25 'wa amma man utiya kitabahu bi shimalihi' form the primary parallel pair of Al-Haqqah — right hand vs left hand, with the continuation of each differing entirely."
   },
   {
     "ayah1": "18:29",
     "ayah2": "76:3",
-    "category": "word_swap",
+    "category": "",
     "note": "18:29 'fa man sha'a fa l-yu'min wa man sha'a fa l-yakfur' and 76:3 'inna hadaynahu al-sabil imma shakiran wa imma kafura' both state that guidance is given and humans choose — one in a threat context, the other in a declaration of human freedom."
   },
   {
@@ -914,7 +914,7 @@
   {
     "ayah1": "2:23",
     "ayah2": "2:278",
-    "category": "structural",
+    "category": "word_swap",
     "note": "Both end with an 'in kuntum X' conditional — 2:23 challenges doubters with 'in kuntum sadiqin' (if you are truthful) while 2:278 addresses believers with 'in kuntum mu'minin' (if you truly believe), same challenge structure with a swapped qualifier."
   },
   {
@@ -1696,5 +1696,17 @@
     "ayah2": "62:4",
     "category": "lafzi",
     "note": "Verbatim closing formula: 'that is the bounty of Allah which He gives to whom He wills; Allah is the possessor of great bounty'; 57:21 closes the call to race toward Allah's forgiveness, 62:4 follows the description of the Prophet sent among the unlettered."
+  },
+  {
+    "ayah1": "9:32",
+    "ayah2": "61:8",
+    "category": "lafzi",
+    "note": "Verses are almost the same word-for-word — very small differences."
+  },
+  {
+    "ayah1": "2:1",
+    "ayah2": "3:1",
+    "category": "",
+    "note": ""
   }
 ]
