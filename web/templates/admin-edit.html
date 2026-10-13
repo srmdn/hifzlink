@@ -1,23 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page admin-dashboard admin-edit-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <p class="back"><a href="{{.BackURL}}">← Back to Relations</a></p>
-    <h1>Edit Relation</h1>
-    <p class="meta">{{.Relation.Ayah1}} ↔ {{.Relation.Ayah2}} · {{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}{{if .RelationUpdatedAt}} · Last updated: {{.RelationUpdatedAt}}{{end}}</p>
+  <main class="home-main admin-dashboard-main">
+    <a class="admin-back" href="{{.BackURL}}">← Back to relations</a>
+    <header class="admin-page-header admin-edit-heading">
+      <div>
+        <p class="home-eyebrow">Curated study data · Edit pair</p>
+        <h1>{{.Relation.Ayah1}} <span aria-hidden="true">↔</span> {{.Relation.Ayah2}}</h1>
+        <p class="admin-page-lead">{{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}{{if .RelationUpdatedAt}} · Last updated {{.RelationUpdatedAt}}{{end}}</p>
+      </div>
+      <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations" aria-current="page">Relations</a></nav>
+    </header>
 
     {{if or .DiffText1 .DiffText2}}
-    <section class="card admin-diff-preview">
-      <p class="meta">Current diff</p>
+    <section class="admin-diff-preview" aria-label="Current verse differences">
+      <p class="home-eyebrow">Current difference</p>
       <div class="compare-grid">
-        <article class="card verse-card">
+        <article class="admin-verse-diff">
           <p class="meta">{{.Relation.Ayah1}} · {{.Relation.Ayah1Name}}</p>
           <p class="arabic" lang="ar">{{.DiffText1}}</p>
         </article>
-        <article class="card verse-card">
+        <article class="admin-verse-diff">
           <p class="meta">{{.Relation.Ayah2}} · {{.Relation.Ayah2Name}}</p>
           <p class="arabic" lang="ar">{{.DiffText2}}</p>
         </article>
@@ -25,7 +31,7 @@
     </section>
     {{end}}
 
-    <section class="card">
+    <section class="admin-edit-surface" aria-label="Edit relation details">
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
 
       <form action="/admin/relations/{{.Relation.ID}}/edit?return_category={{.ReturnCategory}}" method="post" class="admin-form">
@@ -81,7 +87,7 @@
     </section>
   </main>
 
-{{template "footer" .}}
+{{template "learning-footer" .}}
 <script>
   (() => {
     // Word picker

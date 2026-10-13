@@ -8,11 +8,11 @@
     <h1>Dashboard</h1>
     <p class="lead">Resume your murojaah quickly from recent saves and collections.</p>
 
-    {{if .QFEnabled}}{{if not .CurrentUser}}
+    {{if .AuthEnabled}}{{if not .CurrentUser}}
     <section class="card" style="text-align:center;padding:2rem 1.5rem">
       <h2 style="margin-bottom:0.5rem">Sign in to sync your collections</h2>
-      <p class="meta" style="margin-bottom:1.25rem">Login with your Quran.Foundation account to save and sync mutashabihat pairs across devices.</p>
-      <a class="btn" href="{{.LoginURL}}">Login with Quran.Foundation</a>
+      <p class="meta" style="margin-bottom:1.25rem">Sign in with Google to save your mutashabihat collections across devices.</p>
+      <a class="btn" href="{{.LoginURL}}">Continue with Google</a>
     </section>
     {{end}}{{end}}
 
@@ -70,24 +70,6 @@
       {{end}}
     </section>
 
-    {{if .QFBookmarks}}
-    <section class="card">
-      <h2>Quran Foundation Bookmarks</h2>
-      <p class="meta">Synced from your Quran.Foundation account.{{if .QFLastSynced}} Last synced: {{.QFLastSynced}}.{{end}}</p>
-      <div class="qf-bookmarks-grid">
-        {{range .QFBookmarks}}
-        <div class="qf-bookmark-item">
-          <span class="qf-bookmark-ref">{{.Ref}}</span>
-          <div class="qf-bookmark-links">
-            <a class="qf-bookmark-link qf-bookmark-link--internal" href="{{.URL}}">hifz.click</a>
-            <a class="qf-bookmark-link qf-bookmark-link--external" href="{{.QuranComURL}}" target="_blank" rel="noopener noreferrer">quran.com ↗</a>
-          </div>
-        </div>
-        {{end}}
-      </div>
-    </section>
-    {{end}}
-
     <section class="card">
       <h2>Recent Saved Items</h2>
       {{if .RecentItems}}
@@ -95,7 +77,7 @@
         {{range .RecentItems}}
         <li class="admin-relation-item">
           <div class="line-head">
-            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .SyncedToQF}} <span class="qf-synced-badge">QF</span>{{end}}{{if .Mastered}} <span class="mastered-badge">Mastered ✓</span>{{end}}</span>
+            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .Mastered}} <span class="mastered-badge">Mastered ✓</span>{{end}}</span>
             <div class="admin-row-actions">
               <a class="btn-sm" href="{{.PrimaryURL}}">Open Ayah</a>
               {{if .SecondaryURL}}<a class="btn-sm" href="{{.SecondaryURL}}">Open Compare</a>{{end}}

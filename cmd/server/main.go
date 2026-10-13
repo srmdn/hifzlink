@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,20 +32,26 @@ type server struct {
 	tmpl    *template.Template
 	baseDir string
 
-	adminUser    string
-	adminPass    string
-	adminToken   string // random token for admin session cookie, generated at startup
-	adminLimiter *adminRateLimiter
-	csrfSecret   []byte // HMAC key for CSRF token derivation
+	adminUser          string
+	adminPass          string
+	adminToken         string // random key used to derive admin CSRF tokens
+	adminSessionsMu    sync.Mutex
+	adminSessions      map[string]time.Time // server-side admin session expiry by token
+	adminLimiter       *adminRateLimiter
+	adminGlobalLimiter *adminRateLimiter
+	csrfSecret         []byte // HMAC key for CSRF token derivation
 
 	umamiID string
 
-	// Quran Foundation OAuth2
+	// Quran Foundation Content API credentials (audio only).
 	qfClientID     string
 	qfClientSecret string
 	qfAuthEndpoint string
 	qfAPIBase      string
-	qfRedirectURI  string // overrides auto-detected redirect URI (QF_REDIRECT_URI)
+
+	googleClientID     string
+	googleClientSecret string
+	googleRedirectURI  string
 
 	// Quran Foundation Content API client (nil when QF is not configured)
 	qf *qfclient.Client
@@ -54,19 +59,19 @@ type server struct {
 
 // adminRateLimiter is a simple sliding-window rate limiter for admin endpoints.
 type adminRateLimiter struct {
-	mu      sync.Mutex
-	entries map[string][]time.Time
+	mu          sync.Mutex
+	entries     map[string][]time.Time
+	maxAttempts int
+	window      time.Duration
 }
 
-func newAdminRateLimiter() *adminRateLimiter {
-	return &adminRateLimiter{entries: make(map[string][]time.Time)}
+func newAdminRateLimiter(maxAttempts int, window time.Duration) *adminRateLimiter {
+	return &adminRateLimiter{entries: make(map[string][]time.Time), maxAttempts: maxAttempts, window: window}
 }
 
 func (l *adminRateLimiter) allow(ip string) bool {
-	const maxAttempts = 20
-	const window = time.Minute
 	now := time.Now()
-	cutoff := now.Add(-window)
+	cutoff := now.Add(-l.window)
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	times := l.entries[ip]
@@ -78,7 +83,7 @@ func (l *adminRateLimiter) allow(ip string) bool {
 		}
 	}
 	times = times[:i]
-	if len(times) >= maxAttempts {
+	if len(times) >= l.maxAttempts {
 		l.entries[ip] = times
 		return false
 	}
@@ -89,8 +94,7 @@ func (l *adminRateLimiter) allow(ip string) bool {
 // prune removes IPs that have no request history within the rate-limit window,
 // preventing the entries map from growing without bound.
 func (l *adminRateLimiter) prune() {
-	const window = time.Minute
-	cutoff := time.Now().Add(-window)
+	cutoff := time.Now().Add(-l.window)
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	for ip, times := range l.entries {
@@ -195,23 +199,27 @@ func main() {
 	}
 
 	s := &server{
-		quran:        quran,
-		trans:        translations,
-		tafsir:       tafsirStore,
-		db:           dbStore,
-		rels:         relations.NewService(dbStore, quran),
-		tmpl:         tmpl,
-		baseDir:      baseDir,
-		adminUser:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
-		adminPass:    strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
-		adminLimiter: newAdminRateLimiter(),
-		umamiID:      strings.TrimSpace(os.Getenv("HIFZLINK_UMAMI_ID")),
+		quran:              quran,
+		trans:              translations,
+		tafsir:             tafsirStore,
+		db:                 dbStore,
+		rels:               relations.NewService(dbStore, quran),
+		tmpl:               tmpl,
+		baseDir:            baseDir,
+		adminUser:          strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_USER")),
+		adminPass:          strings.TrimSpace(os.Getenv("HIFZLINK_ADMIN_PASS")),
+		adminLimiter:       newAdminRateLimiter(5, 15*time.Minute),
+		adminGlobalLimiter: newAdminRateLimiter(30, 15*time.Minute),
+		umamiID:            strings.TrimSpace(os.Getenv("HIFZLINK_UMAMI_ID")),
 
 		qfClientID:     strings.TrimSpace(os.Getenv("QF_CLIENT_ID")),
 		qfClientSecret: strings.TrimSpace(os.Getenv("QF_CLIENT_SECRET")),
 		qfAuthEndpoint: strings.TrimSpace(os.Getenv("QF_AUTH_ENDPOINT")),
 		qfAPIBase:      strings.TrimSpace(os.Getenv("QF_API_BASE")),
-		qfRedirectURI:  strings.TrimSpace(os.Getenv("QF_REDIRECT_URI")),
+
+		googleClientID:     strings.TrimSpace(os.Getenv("GOOGLE_CLIENT_ID")),
+		googleClientSecret: strings.TrimSpace(os.Getenv("GOOGLE_CLIENT_SECRET")),
+		googleRedirectURI:  strings.TrimSpace(os.Getenv("GOOGLE_REDIRECT_URI")),
 	}
 	s.qf = qfclient.New(s.qfClientID, s.qfClientSecret, s.qfAuthEndpoint, s.qfAPIBase)
 	if s.qf != nil {
@@ -236,6 +244,7 @@ func main() {
 		defer ticker.Stop()
 		for range ticker.C {
 			s.adminLimiter.prune()
+			s.adminGlobalLimiter.prune()
 		}
 	}()
 
@@ -268,6 +277,8 @@ func main() {
 	mux.HandleFunc("/collections/items/delete", s.handleCollectionItemsDelete)
 	mux.HandleFunc("/collections/items/mastered/", s.handleToggleMastered)
 	mux.HandleFunc("/admin/login", s.handleAdminLogin)
+	mux.HandleFunc("/admin", s.handleAdminIndex)
+	mux.HandleFunc("/admin/users", s.handleAdminUsers)
 	mux.HandleFunc("/admin/logout", s.handleAdminLogout)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 	mux.HandleFunc("/admin/relations/", s.handleAdminRelationEdit)
@@ -370,12 +381,16 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	var filterPills []filterPill
 	var queryLabel string
 	var errMsg string
+	var anchorConnectionsURL string
+	var anchorConnectionsRef string
 
 	if q != "" {
 		var dbRels []db.Relation
 		var err error
 
 		if surahNum, ayahNum, parseErr := relations.ParseAyahRef(q); parseErr == nil {
+			anchorConnectionsRef = relations.FormatAyahRef(surahNum, ayahNum)
+			anchorConnectionsURL = withLang(fmt.Sprintf("/ayah/%d/%d", surahNum, ayahNum), lang) + "#ayah-related"
 			if lang == "id" {
 				queryLabel = fmt.Sprintf("pasangan yang memuat ayat %s", relations.FormatAyahRef(surahNum, ayahNum))
 			} else {
@@ -464,15 +479,17 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, "search.html", s.learningData(r, map[string]any{
-		"Title":            "Search pairs",
-		"Description":      "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
-		"Query":            q,
-		"QueryLabel":       queryLabel,
-		"Results":          results,
-		"ErrMsg":           errMsg,
-		"FilterPills":      filterPills,
-		"CategoryFilter":   categoryFilter,
-		"CategoryLabelMap": categoryLabelMap,
+		"Title":                "Search pairs",
+		"Description":          "Search for Quran verses and find their mutashabihat — similar verses that are easy to confuse. Try it yourself at hifz.click.",
+		"Query":                q,
+		"QueryLabel":           queryLabel,
+		"Results":              results,
+		"ErrMsg":               errMsg,
+		"FilterPills":          filterPills,
+		"CategoryFilter":       categoryFilter,
+		"CategoryLabelMap":     categoryLabelMap,
+		"AnchorConnectionsURL": anchorConnectionsURL,
+		"AnchorConnectionsRef": anchorConnectionsRef,
 	}))
 }
 
@@ -568,6 +585,10 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a1 := r.URL.Query().Get("ayah1")
+	if targets := r.URL.Query()["ayah2"]; len(targets) > 1 {
+		s.handleMultiComparePage(w, r, a1, targets)
+		return
+	}
 	a2 := r.URL.Query().Get("ayah2")
 	s1, y1, err := relations.ParseAyahRef(a1)
 	if err != nil {
@@ -687,12 +708,6 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	s.render(w, "compare.html", viewData)
 }
 
-type qfBookmarkView struct {
-	Ref         string
-	URL         string
-	QuranComURL string
-}
-
 type dashboardItemView struct {
 	ItemType      string
 	ItemTypeLabel string
@@ -703,7 +718,6 @@ type dashboardItemView struct {
 	PrimaryURL    string
 	SecondaryURL  string
 	CreatedAt     string
-	SyncedToQF    bool
 	Mastered      bool
 	Note          string
 }
@@ -733,35 +747,6 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 
 	lang := pageLang(r)
 
-	// Fetch QF bookmarks first so we can cross-reference saved items.
-	var qfBookmarks []qfBookmarkView
-	var qfLastSynced string
-	qfSynced := map[string]bool{} // "surah:ayah" keys
-	if s.qf != nil {
-		bms, bmErr := s.qf.GetBookmarks(sess.AccessToken)
-		if errors.Is(bmErr, qfclient.ErrUnauthorized) {
-			if newToken, refreshErr := s.refreshSession(sess); refreshErr == nil {
-				bms, bmErr = s.qf.GetBookmarks(newToken)
-			} else {
-				log.Printf("auth: refresh session for dashboard: %v", refreshErr)
-			}
-		}
-		if bmErr != nil {
-			log.Printf("qfclient: get bookmarks: %v", bmErr)
-		} else {
-			qfLastSynced = time.Now().In(wib).Format("Jan 2, 2006, 15:04 WIB")
-			for _, b := range bms {
-				ref := relations.FormatAyahRef(b.SurahNum, b.AyahNum)
-				qfBookmarks = append(qfBookmarks, qfBookmarkView{
-					Ref:         ref,
-					URL:         withLang(fmt.Sprintf("/ayah/%d/%d", b.SurahNum, b.AyahNum), lang),
-					QuranComURL: fmt.Sprintf("https://quran.com/%d/%d", b.SurahNum, b.AyahNum),
-				})
-				qfSynced[fmt.Sprintf("%d:%d", b.SurahNum, b.AyahNum)] = true
-			}
-		}
-	}
-
 	items := make([]dashboardItemView, 0, len(recentItems))
 	var resumeAyahURL string
 	var resumeRelationURL string
@@ -777,7 +762,6 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:     formatTimestamp(item.CreatedAt),
 			Note:          item.Note,
 			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
-			SyncedToQF:    qfSynced[fmt.Sprintf("%d:%d", item.Ayah1Surah, item.Ayah1Ayah)],
 			Mastered:      item.Mastered,
 		}
 		if item.ItemType == "relation" {
@@ -816,8 +800,6 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		"ResumePairURL":     resumeRelationURL,
 		"SavedPairsCount":   savedPairsCount,
 		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
-		"QFBookmarks":       qfBookmarks,
-		"QFLastSynced":      qfLastSynced,
 	}))
 }
 
@@ -1086,26 +1068,6 @@ func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		internalError(w, r, err)
 		return
-	}
-
-	// If user is logged in and QF is configured, sync the primary ayah as a QF bookmark.
-	if s.qf != nil && inserted {
-		sessCopy := *sess // snapshot; goroutine may outlive request
-		go func() {
-			_, err := s.qf.AddBookmark(sessCopy.AccessToken, item.Ayah1Surah, item.Ayah1Ayah)
-			if errors.Is(err, qfclient.ErrUnauthorized) {
-				newToken, refreshErr := s.refreshSession(&sessCopy)
-				if refreshErr != nil {
-					log.Printf("qfclient: refresh for bookmark sync: %v", refreshErr)
-					return
-				}
-				if _, err = s.qf.AddBookmark(newToken, item.Ayah1Surah, item.Ayah1Ayah); err != nil {
-					log.Printf("qfclient: sync bookmark %d:%d after refresh: %v", item.Ayah1Surah, item.Ayah1Ayah, err)
-				}
-			} else if err != nil {
-				log.Printf("qfclient: sync bookmark %d:%d: %v", item.Ayah1Surah, item.Ayah1Ayah, err)
-			}
-		}()
 	}
 
 	returnTo := strings.TrimSpace(r.FormValue("return_to"))
@@ -1542,7 +1504,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 		}
 
 		categoryOptions := adminCategoryOptions()
-		s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
+		s.render(w, "admin-edit.html", s.learningData(r, map[string]any{
 			"Title":             "Edit Relation",
 			"NoIndex":           true,
 			"Relation":          rel,
@@ -1598,7 +1560,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 			if returnCat != "" {
 				backURL = withLang("/admin/relations?category="+returnCat, postLang)
 			}
-			s.render(w, "admin-edit.html", s.withCommonViewData(r, map[string]any{
+			s.render(w, "admin-edit.html", s.learningData(r, map[string]any{
 				"Title":           "Edit Relation",
 				"NoIndex":         true,
 				"Relation":        rel,
@@ -1759,6 +1721,12 @@ func (s *server) handleAPIJuz(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) render(w http.ResponseWriter, name string, data map[string]any) {
+	if _, ok := data["CurrentUser"]; ok {
+		w.Header().Set("Cache-Control", "no-store")
+	}
+	if isAdmin, _ := data["IsAdmin"].(bool); isAdmin {
+		w.Header().Set("Cache-Control", "no-store")
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := s.tmpl.ExecuteTemplate(w, name, data); err != nil {
 		log.Printf("render error template=%s: %v", name, err)
@@ -1834,17 +1802,16 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 	}
 
 	// Auth state for templates.
-	data["QFEnabled"] = s.qfConfigured()
+	data["AuthEnabled"] = s.googleConfigured()
 	data["LoginURL"] = "/auth/login"
 	data["LogoutURL"] = "/auth/logout"
-	data["AdminURL"] = "/admin/relations"
+	data["AdminURL"] = "/admin/users"
 	data["AdminLogoutURL"] = "/admin/logout"
 	if sess, ok := s.currentSession(r); ok {
 		data["CurrentUser"] = userView{Name: sess.Name, Email: sess.Email}
 		data["CSRFToken"] = s.csrfTokenFor(sess.ID)
 	}
-	if c, err := r.Cookie(cookieAdminSession); err == nil && c.Value != "" &&
-		subtle.ConstantTimeCompare([]byte(c.Value), []byte(s.adminToken)) == 1 {
+	if c, err := r.Cookie(cookieAdminSession); err == nil && s.validAdminSession(c.Value) {
 		data["IsAdmin"] = true
 		data["AdminCSRFToken"] = s.csrfTokenFor(s.adminToken)
 	}
@@ -2057,7 +2024,7 @@ Update-Cadence: irregular
 - /compare: Side-by-side verse comparison with word-level highlights
 
 ## About
-HifzLink captures confusion patterns between nearly identical Quran verses (mutashabihat). It indexes all 6,236 ayahs and curates pairs where reciters commonly slip from one verse to another. Free to use, open source, no account required for browsing. Login with Quran Foundation to save pairs to personal collections.
+HifzLink helps memorizers review similar Quran verses (mutashabihat). It indexes all 6,236 ayahs and curates pairs where reciters commonly slip from one verse to another. Free to use and open source, with no account required for browsing. Sign in with Google to save pairs to personal collections.
 
 ## Contact
 https://hifz.click
@@ -2163,7 +2130,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		data[k] = v
 	}
 
-	s.render(w, "admin-relations.html", s.withCommonViewData(r, data))
+	s.render(w, "admin-relations.html", s.learningData(r, data))
 }
 
 type breadcrumbItem struct {
@@ -2254,17 +2221,14 @@ func resolveBaseDir() (string, error) {
 }
 
 // requireAdmin checks for a valid admin session cookie.
-// TODO(auth): unify admin auth with QF OAuth. Plan: add HIFZLINK_ADMIN_EMAIL env var;
-// if CurrentUser.Email == adminEmail, set IsAdmin=true in the QF session. The admin
-// form and in-memory token go away entirely. Blocked on QF granting admin scope.
-// See docs/projects/hifzlink/AUTH-SECURITY.md for the full plan.
+// Admin access remains separate from Google user accounts.
 func (s *server) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
 	if s == nil || strings.TrimSpace(s.adminUser) == "" || strings.TrimSpace(s.adminPass) == "" {
 		http.Error(w, "admin auth not configured (set HIFZLINK_ADMIN_USER and HIFZLINK_ADMIN_PASS)", http.StatusServiceUnavailable)
 		return false
 	}
 	c, err := r.Cookie(cookieAdminSession)
-	if err == nil && c.Value != "" && subtle.ConstantTimeCompare([]byte(c.Value), []byte(s.adminToken)) == 1 {
+	if err == nil && s.validAdminSession(c.Value) {
 		return true
 	}
 	http.Redirect(w, r, "/admin/login", http.StatusSeeOther)

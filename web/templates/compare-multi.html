@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
+{{template "head" .}}
+<body class="learning-page catalog-page compare-page multi-compare-page">
+{{template "topbar" .}}
+<main class="compare-content">
+  <p class="compare-back"><a href="{{.MultiBackURL}}">← {{if eq .Lang "id"}}Kembali ke ayat acuan{{else}}Back to anchor ayah{{end}}</a></p>
+  <header class="compare-heading">
+    <div class="compare-heading-copy">
+      <p class="catalog-kicker">{{.UI.similar}}</p>
+      <h1>{{.MultiHeading}}</h1>
+      <p class="compare-references"><span>{{.Root.Ref}}</span><span aria-hidden="true">→</span><span>{{len .Peers}} {{if eq .Lang "id"}}ayat terhubung{{else}}connected verses{{end}}</span></p>
+      <p class="catalog-intro">{{.MultiLead}}</p>
+    </div>
+    <div class="compare-actions">
+      <button type="button" class="compare-action compare-action-secondary" id="share-btn" data-share-url="{{.ShareURL}}" data-share-text="{{.UI.shareText}}">{{.UI.sharePair}}</button>
+    </div>
+  </header>
+  <p class="compare-share-status" role="status" aria-live="polite"></p>
+  <div class="compare-difference-bar">
+    <p class="highlight-legend"><span class="difference-swatch" aria-hidden="true"></span>{{.UI.highlightLegend}}</p>
+    <button type="button" class="compare-highlight-toggle" id="toggle-highlights" aria-pressed="true">{{.UI.hideHighlights}}</button>
+  </div>
+
+  <section class="multi-anchor-section" aria-labelledby="multi-anchor-title">
+    <p class="multi-section-label" id="multi-anchor-title">{{if eq .Lang "id"}}Ayat acuan{{else}}Anchor ayah{{end}}</p>
+    <article class="card verse-card multi-anchor-card">
+      <p class="compare-verse-meta">{{.Root.Ref}} · {{.Root.SurahName}} · {{.UI.juz}} {{.Root.Juz}}</p>
+      <p class="arabic compare-arabic" lang="ar" dir="rtl">{{.Root.DiffText}}</p>
+      {{if .Root.Translation}}<details class="multi-translation"><summary>{{.UI.translation}}</summary><p class="translation compare-translation">{{.Root.Translation}}</p></details>{{end}}
+    </article>
+  </section>
+
+  <section class="multi-peer-section" aria-label="{{if eq .Lang "id"}}Ayat terhubung{{else}}Connected verses{{end}}">
+    <div class="multi-peer-grid">
+      {{range $index, $peer := .Peers}}
+      <article class="card verse-card multi-peer-card" id="verse-{{$index}}">
+        <p class="compare-verse-label"><span>{{printf "%02d" $peer.Number}}</span>{{if eq $.Lang "id"}}Terhubung ke {{$peer.Ref}}{{else}}Connected verse {{$peer.Ref}}{{end}}</p>
+        <p class="compare-verse-meta">{{$peer.Ref}} · {{$peer.SurahName}} · {{$.UI.juz}} {{$peer.Juz}}</p>
+        <p class="arabic compare-arabic" lang="ar" dir="rtl">{{$peer.DiffText}}</p>
+        {{if $peer.Translation}}<details class="multi-translation"><summary>{{$.UI.translation}}</summary><p class="translation compare-translation">{{$peer.Translation}}</p></details>{{end}}
+        {{if $peer.Note}}<details class="multi-relation-note"><summary>{{$.UI.relationNote}}</summary><p>{{$peer.Note}}</p></details>{{end}}
+      </article>
+      {{end}}
+    </div>
+  </section>
+</main>
+{{template "learning-footer" .}}
+<script>
+(() => {
+  const share = document.getElementById("share-btn");
+  const status = document.querySelector(".compare-share-status");
+  if (share && status) {
+    const shareURL = new URL(share.dataset.shareUrl, window.location.origin).href;
+    let statusTimer;
+    const announce = message => {
+      status.textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => { status.textContent = ""; }, 4000);
+    };
+    share.addEventListener("click", async () => {
+      if (navigator.share) {
+        try { await navigator.share({ title: document.title, text: share.dataset.shareText, url: shareURL }); return; }
+        catch (error) { if (error?.name === "AbortError") return; }
+      }
+      try {
+        if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+        await navigator.clipboard.writeText(shareURL);
+        announce("{{.UI.shareCopied}}");
+      } catch (_) { announce("{{.UI.shareFailed}}"); }
+    });
+  }
+  const grid = document.querySelector(".multi-peer-grid");
+  const toggle = document.getElementById("toggle-highlights");
+  if (grid && toggle) toggle.addEventListener("click", () => {
+    const shown = toggle.getAttribute("aria-pressed") === "true";
+    document.querySelector(".multi-compare-page").classList.toggle("no-highlights", shown);
+    toggle.setAttribute("aria-pressed", String(!shown));
+    toggle.textContent = shown ? "{{.UI.showHighlights}}" : "{{.UI.hideHighlights}}";
+  });
+})();
+</script>
+</body>
+</html>

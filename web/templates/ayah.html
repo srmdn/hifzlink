@@ -41,7 +41,7 @@
       {{else}}<p>{{.AyahUI.noCollections}} <a href="{{.CollectionsURL}}">{{.AyahUI.createCollection}}</a>.</p>{{end}}
       {{if .SaveStatus}}<p class="ayah-save-status" role="status">{{.SaveStatus}}</p>{{end}}
     </section>
-  {{else if .QFEnabled}}
+  {{else if .AuthEnabled}}
     <p class="ayah-save-prompt"><a href="{{.LoginURL}}?lang={{.Lang}}">{{.AyahUI.saveLogin}}</a></p>
   {{end}}
 
@@ -52,24 +52,54 @@
   </details>
   {{end}}
 
-  <section class="ayah-related">
+  <section class="ayah-related" id="ayah-related">
     <div class="ayah-related-heading"><div><p class="catalog-kicker">{{.UI.similar}}</p><h2>{{.AyahUI.relatedHeading}}</h2><p>{{.AyahUI.relatedLead}}</p></div></div>
     {{if .Related}}
-    <ol class="ayah-related-list">
-      {{range .Related}}
-      <li class="ayah-related-item">
-        <div class="ayah-related-top"><a class="ayah-related-ref" href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{.SurahName}} · {{.Surah}}:{{.Ayah}}</a><a class="ayah-compare-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">{{$.AyahUI.compare}} →</a></div>
-        <p class="ayah-related-arabic" lang="ar" dir="rtl">{{.Text}}</p>
-        {{if .Translation}}<p class="ayah-related-translation" lang="{{$.Lang}}">{{.Translation}}</p>{{end}}
-      </li>
-      {{end}}
-    </ol>
+    <form class="ayah-related-select" action="/compare" method="get" data-lang="{{.Lang}}" data-max-selection="100">
+      <input type="hidden" name="ayah1" value="{{.AyahRef}}" />
+      <input type="hidden" name="lang" value="{{.Lang}}" />
+      <p>{{if eq .Lang "id"}}Pilih hingga 100 ayat untuk dibandingkan dengan ayat acuan {{.AyahRef}}. Semua pilihan akan tampil bersama di satu halaman.{{else}}Choose up to 100 verses to compare with anchor {{.AyahRef}}. Your selections will appear together on one page.{{end}}</p>
+      <div class="ayah-related-select-toolbar">
+        <span class="ayah-related-selection-count" id="ayah-selection-count" role="status" aria-live="polite">{{if eq .Lang "id"}}0 ayat dipilih{{else}}0 verses selected{{end}}</span>
+        <button type="submit" disabled>{{if eq .Lang "id"}}Bandingkan 0 ayat{{else}}Compare 0 verses{{end}}</button>
+      </div>
+      <ol class="ayah-related-list">
+        {{range .Related}}
+        <li class="ayah-related-item">
+          <label class="ayah-related-select-label"><input type="checkbox" name="ayah2" value="{{.Surah}}:{{.Ayah}}" /><span>{{.SurahName}} · {{.Surah}}:{{.Ayah}}</span></label>
+          <p class="ayah-related-arabic" lang="ar" dir="rtl">{{.Text}}</p>
+          {{if .Translation}}<p class="ayah-related-translation" lang="{{$.Lang}}">{{.Translation}}</p>{{end}}
+          <div class="ayah-related-top"><a class="ayah-related-ref" href="/ayah/{{.Surah}}/{{.Ayah}}?lang={{$.Lang}}">{{if eq $.Lang "id"}}Buka ayat{{else}}Open ayah{{end}}</a><a class="ayah-compare-link" href="/compare?ayah1={{$.AyahRef}}&ayah2={{.Surah}}:{{.Ayah}}&lang={{$.Lang}}">{{$.AyahUI.compare}} →</a></div>
+        </li>
+        {{end}}
+      </ol>
+    </form>
     {{else}}<p class="ayah-related-empty">{{.AyahUI.noRelated}}</p>{{end}}
   </section>
 </main>
 {{template "learning-footer" .}}
 <script>
 (() => {
+  const compareForm = document.querySelector(".ayah-related-select");
+  if (compareForm) {
+    const checkboxes = compareForm.querySelectorAll('input[name="ayah2"]');
+    const submit = compareForm.querySelector('button[type="submit"]');
+    const countLabel = compareForm.querySelector("#ayah-selection-count");
+    const maxSelection = Number(compareForm.dataset.maxSelection);
+    const updateSelection = () => {
+      const count = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+      checkboxes.forEach(checkbox => { checkbox.disabled = count >= maxSelection && !checkbox.checked; });
+      submit.disabled = count === 0;
+      const isIndonesian = compareForm.dataset.lang === "id";
+      countLabel.textContent = isIndonesian ? `${count} ayat dipilih` : `${count} ${count === 1 ? "verse" : "verses"} selected`;
+      submit.textContent = isIndonesian ? `Bandingkan ${count} ayat` : `Compare ${count} ${count === 1 ? "verse" : "verses"}`;
+    };
+    checkboxes.forEach(checkbox => checkbox.addEventListener("change", updateSelection));
+    compareForm.addEventListener("submit", event => {
+      if (!Array.from(checkboxes).some(checkbox => checkbox.checked)) event.preventDefault();
+    });
+  }
+
   const share = document.getElementById("share-btn");
   const status = document.querySelector(".ayah-share-status");
   if (!share || !status) return;

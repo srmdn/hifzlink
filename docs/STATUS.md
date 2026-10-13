@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: August 22, 2026
+Last updated: October 12, 2026
 
 ## Current state
 
@@ -14,8 +14,9 @@ implemented.
   collections, dashboard, and admin
 - EN/ID translation toggle implemented (`ar`, `en`, `id`)
 - landing page with product overview, live statistics, and browse actions
-- Quran Foundation OAuth2 login with expiring local sessions
-- Quran Foundation bookmark synchronization and audio integration
+- Google sign-in with expiring local sessions; Quran Foundation remains an
+  optional verse-audio provider
+- Admin user overview with last sign-in and aggregate collection/item totals
 - user collections, saved pairs, mastery state, and dashboard
 - CSS split into focused files: `base.css`, `topbar.css`, `components.css`, `admin.css`, `pages.css`
 - responsive button system (`.btn`, `.btn-sm`, `.btn-outline`, `.btn-danger`)
@@ -104,7 +105,7 @@ entries. Only curated pairs belong in the application seed.
 ## Important decisions
 
 - Quran text, translations, tafsir, and relations use local-first data.
-- Account login, bookmark synchronization, audio, and selected content features
+- Google account login, admin user overview, audio, and selected content features
   use Quran Foundation APIs when configured.
 - Quran text source: Tanzil
 - translation sources:

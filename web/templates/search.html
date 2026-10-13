@@ -21,7 +21,7 @@
       <section class="search-results" aria-labelledby="search-results-title">
         <div class="search-results-heading"><h2 id="search-results-title">{{len .Results}} {{.UI.searchResults}} <span>{{.QueryLabel}}{{if .CategoryFilter}} · {{index .CategoryLabelMap .CategoryFilter}}{{end}}</span></h2></div>
         {{if .FilterPills}}<nav class="filter-pills" aria-label="{{.UI.all}} results by pattern">{{range .FilterPills}}<a href="{{.URL}}" class="filter-pill{{if .Active}} active{{end}}"{{if .Active}} aria-current="page"{{end}}>{{.Label}}</a>{{end}}</nav>{{end}}
-        <p class="pairs-hint">{{.UI.searchHint}}</p>
+        <aside class="multi-compare-tip"><strong>{{if eq .Lang "id"}}Bandingkan beberapa ayat sekaligus{{else}}Compare several verses at once{{end}}</strong><p>{{.UI.searchHint}}</p>{{if .AnchorConnectionsURL}}<a class="multi-compare-tip-link" href="{{.AnchorConnectionsURL}}">{{if eq .Lang "id"}}Pilih koneksi dari {{.AnchorConnectionsRef}}{{else}}Choose connections from {{.AnchorConnectionsRef}}{{end}} →</a>{{end}}</aside>
         <ul class="pairs-list">{{range .Results}}
           <li class="pair-item">
             <div class="line-head"><span class="pair-refs"><a class="ayah-chip" href="{{.Ayah1URL}}">{{.Ayah1}}</a><span class="meta">↔</span><a class="ayah-chip" href="{{.Ayah2URL}}">{{.Ayah2}}</a></span><a class="catalog-compare" href="{{.CompareURL}}">{{$.UI.compare}} <span aria-hidden="true">→</span></a></div>

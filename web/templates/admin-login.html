@@ -1,25 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
 {{template "head" .}}
-<body>
+<body class="learning-page admin-login-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <div class="admin-login-wrap">
-      <h1 class="admin-login-title">Admin</h1>
+  <main class="admin-login-main">
+    <section class="admin-login-card" aria-labelledby="admin-login-title">
+      <p class="home-eyebrow">PRIVATE AREA</p>
+      <h1 id="admin-login-title">Admin sign in</h1>
+      <p class="admin-login-lead">Sign in to review account activity and maintain HifzLink.</p>
       {{if .LoginError}}
       <p class="error-msg admin-login-error" role="alert">Invalid credentials. Try again.</p>
       {{end}}
-      <form class="admin-login-form card" method="POST" action="/admin/login" autocomplete="off">
+      <form class="admin-login-form" method="POST" action="/admin/login">
         <label for="admin-user">Username</label>
-        <input id="admin-user" name="user" type="text" required autofocus autocomplete="username" />
+        <input id="admin-user" name="user" type="text" required autocomplete="username" />
         <label for="admin-pass">Password</label>
         <input id="admin-pass" name="pass" type="password" required autocomplete="current-password" />
-        <button type="submit" class="btn">Sign in</button>
+        <button type="submit" class="home-button primary">Sign in <span aria-hidden="true">→</span></button>
       </form>
-    </div>
+      <p class="admin-login-note">This area is restricted to the site administrator.</p>
+    </section>
   </main>
 
-{{template "footer" .}}
+{{template "learning-footer" .}}
 </body>
 </html>
