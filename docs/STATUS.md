@@ -1,12 +1,15 @@
 # Project status
 
-Last updated: October 12, 2026
+Last updated: October 13, 2026
 
 ## Current state
 
-HifzLink is in active post-v0.2.3 development. The public browsing,
-mutashabihat comparison, account, collection, and administration workflows are
-implemented.
+HifzLink's current product release is `v0.4.0`, deployed from `main`. The
+release includes Google sign-in and multi-ayah comparison alongside the public
+browsing, collections, practice, and administration workflows.
+
+The next product focus is a read-only audit of mutashabihat sourcing, curation,
+review, validation, and how the learning workflow uses the data.
 
 - full Quran Arabic dataset loaded locally (`6236` ayahs)
 - local SQLite relation storage working with migration system
@@ -31,7 +34,6 @@ implemented.
 - old thematic category values migrated to `other` on startup via DB migration
 - admin auth auto-loaded from `.env` at startup (no shell export needed for local dev)
 - em dashes removed from all visitor-facing templates; replaced with natural sentence structure
-- unit and handler tests passing (`go test ./...`)
 - GitHub Actions CI runs tests, dataset validation, translation validation, and
   the server build for `staging` and `main` changes
 - production VPS migration from legacy `production` to `main` is complete
@@ -105,8 +107,8 @@ entries. Only curated pairs belong in the application seed.
 ## Important decisions
 
 - Quran text, translations, tafsir, and relations use local-first data.
-- Google account login, admin user overview, audio, and selected content features
-  use Quran Foundation APIs when configured.
+- Google sign-in uses Google OAuth. Quran Foundation remains an optional
+  provider for verse audio and content.
 - Quran text source: Tanzil
 - translation sources:
   - English: Quran.com default verse-route translation (Clear Quran / Dr.
@@ -139,19 +141,14 @@ Manual smoke URLs:
 - `/collections?lang=ar`
 - `/dashboard?lang=ar`
 
-## Handoff notes for other agents
+## Related guidance
 
-Start with these files in order:
+- [Project scope](./PROJECT.md) describes product goals and boundaries.
+- [Architecture](./ARCHITECTURE.md) describes the system and its data flow.
+- [Design](./DESIGN.md) covers visual and interaction patterns.
+- [Translations](./TRANSLATIONS.md) covers localization data and workflow.
+- [Roadmap](./ROADMAP.md) lists planned and deferred work.
+- [Git workflow](./GIT-WORKFLOW.md) covers branches and product releases.
 
-1. `docs/PROJECT.md`
-2. `docs/ARCHITECTURE.md`
-3. `docs/DESIGN.md`
-4. `docs/TRANSLATIONS.md`
-5. `docs/ROADMAP.md`
-
-Then run:
-
-```bash
-go run ./scripts/validate
-go run ./cmd/server
-```
+Choose the documents and checks relevant to the task; this status page is not a
+mandatory checklist for every change.

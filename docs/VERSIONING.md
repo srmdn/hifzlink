@@ -1,21 +1,32 @@
-# Versioning Policy
+# Product Versioning
 
-This project follows Semantic Versioning.
+HifzLink uses Semantic Versioning for meaningful product releases. It is a
+website, so routine deployments do not each need a product version or GitHub
+Release.
 
-Format:
+Use `MAJOR.MINOR.PATCH`:
 
-- `MAJOR.MINOR.PATCH`
+- `MAJOR`: a stable `1.0.0` release or a later breaking change.
+- `MINOR`: a notable feature or substantial user-facing change. Before `1.0.0`,
+  breaking changes may also be included in a minor release.
+- `PATCH`: an important bug or security fix that does not add a notable
+  capability.
 
-Rules:
+Small visual polish, minor features, and internal maintenance do not need a
+version bump or GitHub Release. Record user-visible changes under
+`[Unreleased]` in `CHANGELOG.md`. Keep the exact source commit identifiable by
+its Git SHA for every production deployment.
 
-- `MAJOR`: incompatible API or behavior changes
-- `MINOR`: backward-compatible features
-- `PATCH`: backward-compatible fixes
+## Preparing a product release
 
-## Current Stage
+When changes merit a product release:
 
-Before `1.0.0`, breaking changes may happen in minor releases.
+1. Before promoting the verified changes from `staging` to `main`, finalize the
+   matching `CHANGELOG.md` section with the version and release date.
+2. After the changes reach `main`, create a Git tag matching the version, such
+   as `v0.5.0`, on that verified source commit.
+3. Publish a GitHub Release for that tag using the changelog section as its
+   release notes.
 
-## Release Notes
-
-Each release should be tagged in Git and summarized in `CHANGELOG.md`.
+For routine deployments, retain the `[Unreleased]` changelog entries and do not
+create a semantic version tag or GitHub Release.

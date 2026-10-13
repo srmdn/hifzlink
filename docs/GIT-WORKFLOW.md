@@ -60,10 +60,16 @@ verified on `staging`, open a second pull request from `staging` to `main`.
 
 ## Release source from `main`
 
-After staging verification:
+After staging verification, use
+[`docs/VERSIONING.md`](./VERSIONING.md) to decide whether the changes merit a
+versioned product release.
 
-1. Merge the verified `staging` pull request into `main`.
-2. Tag the verified source release and update `CHANGELOG.md`.
+1. For a meaningful product release, finalize the dated version section in
+   `CHANGELOG.md` before promotion.
+2. Merge the verified `staging` pull request into `main`.
+3. For a versioned release, tag the verified `main` commit and publish a
+   GitHub Release. For routine deployments, do not create a semantic version
+   tag or GitHub Release; identify the deployed source by its commit SHA.
 
 ## Historical branch migration record
 
