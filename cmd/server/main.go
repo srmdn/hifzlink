@@ -709,17 +709,16 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 }
 
 type dashboardItemView struct {
-	ItemType      string
-	ItemTypeLabel string
-	CollectionID  int64
-	Collection    string
-	Ref1          string
-	Ref2          string
-	PrimaryURL    string
-	SecondaryURL  string
-	CreatedAt     string
-	Mastered      bool
-	Note          string
+	ItemType     string
+	CollectionID int64
+	Collection   string
+	Ref1         string
+	Ref2         string
+	PrimaryURL   string
+	SecondaryURL string
+	CreatedAt    string
+	Mastered     bool
+	Note         string
 }
 
 func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
@@ -739,7 +738,7 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		internalError(w, r, err)
 		return
 	}
-	recentItems, err := s.db.RecentCollectionItems(12, sess.UserID)
+	recentItems, err := s.db.RecentCollectionItems(6, sess.UserID)
 	if err != nil {
 		internalError(w, r, err)
 		return
@@ -748,34 +747,31 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 	lang := pageLang(r)
 
 	items := make([]dashboardItemView, 0, len(recentItems))
-	var resumeAyahURL string
-	var resumeRelationURL string
+	var resumeItem dashboardItemView
 
 	for _, item := range recentItems {
 		ref1 := relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah)
 		view := dashboardItemView{
-			ItemType:      item.ItemType,
-			ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
-			CollectionID:  item.Collection,
-			Collection:    item.CollectionName,
-			Ref1:          ref1,
-			CreatedAt:     formatTimestamp(item.CreatedAt),
-			Note:          item.Note,
-			PrimaryURL:    withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
-			Mastered:      item.Mastered,
+			ItemType:     item.ItemType,
+			CollectionID: item.Collection,
+			Collection:   item.CollectionName,
+			Ref1:         ref1,
+			CreatedAt:    formatTimestamp(item.CreatedAt),
+			Note:         item.Note,
+			PrimaryURL:   withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
+			Mastered:     item.Mastered,
 		}
 		if item.ItemType == "relation" {
 			ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
 			view.Ref2 = ref2
 			view.SecondaryURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang)
-			if resumeRelationURL == "" {
-				resumeRelationURL = view.SecondaryURL
-			}
-		}
-		if resumeAyahURL == "" {
-			resumeAyahURL = view.PrimaryURL
 		}
 		items = append(items, view)
+	}
+	hasSavedItems := len(items) > 0
+	if hasSavedItems {
+		resumeItem = items[0]
+		items = items[1:]
 	}
 
 	allCollections, err := s.db.Collections(sess.UserID)
@@ -790,14 +786,16 @@ func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.render(w, "dashboard.html", s.withCommonViewData(r, map[string]any{
+	s.render(w, "dashboard.html", s.learningData(r, map[string]any{
 		"Title":             "Dashboard",
+		"Description":       "Resume your Quran review and organize similar ayat.",
 		"NoIndex":           true,
+		"DashboardPage":     true,
 		"RecentCollections": toCollectionViews(collections),
-		"AllCollections":    toCollectionViews(allCollections),
+		"CollectionsCount":  len(allCollections),
 		"RecentItems":       items,
-		"ResumeAyahURL":     resumeAyahURL,
-		"ResumePairURL":     resumeRelationURL,
+		"ResumeItem":        resumeItem,
+		"HasSavedItems":     hasSavedItems,
 		"SavedPairsCount":   savedPairsCount,
 		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
 	}))

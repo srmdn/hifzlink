@@ -6,6 +6,11 @@ The format is inspired by Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed
+
+- Redesigned the signed-in dashboard around a clear resume action, recent saved
+  items, and compact collection management, with Indonesian and English copy.
+
 ## [0.4.0] - 2026-10-13
 
 ### Added
