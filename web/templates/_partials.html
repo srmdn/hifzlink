@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="{{asset "components.css"}}" />
   <link rel="stylesheet" href="{{asset "admin.css"}}" />
   <link rel="stylesheet" href="{{asset "pages.css"}}" />
+  {{if .DashboardPage}}<link rel="stylesheet" href="{{asset "dashboard.css"}}" />{{end}}
   {{if .LearningUI}}<link rel="stylesheet" href="{{asset "home.css"}}" /><link rel="stylesheet" href="{{asset "practice.css"}}" />{{if eq .LearningSection "surah"}}<link rel="stylesheet" href="{{asset "surah-detail.css"}}" />{{end}}<link rel="stylesheet" href="{{asset "catalog.css"}}" />{{if eq .LearningSection "compare"}}<link rel="stylesheet" href="{{asset "compare.css"}}" />{{end}}{{if eq .LearningSection "ayah"}}<link rel="stylesheet" href="{{asset "ayah.css"}}" />{{end}}{{if eq .LearningSection "legal"}}<link rel="stylesheet" href="{{asset "legal.css"}}" />{{end}}{{end}}
   {{if .UmamiID}}<script defer src="https://analytics.srmdn.com/script.js" data-website-id="{{.UmamiID}}"></script>{{end}}
   {{if .JSONLD}}<script type="application/ld+json">{{.JSONLD}}</script>{{end}}
@@ -84,7 +85,7 @@
               {{if .IsAdmin}}<span class="user-dropdown-role">Admin</span>{{end}}
             </div>
             <nav class="user-dropdown-nav">
-              <a class="user-dropdown-item" href="{{.DashboardURL}}">Dashboard</a>
+              <a class="user-dropdown-item" href="{{.DashboardURL}}" {{if eq .LearningSection "dashboard"}}aria-current="page"{{end}}>Dashboard</a>
               <form method="POST" action="{{.LogoutURL}}">
                 <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <button type="submit" class="user-dropdown-item user-dropdown-btn">Sign out</button>

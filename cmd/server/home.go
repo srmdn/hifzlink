@@ -44,6 +44,8 @@ func (s *server) learningData(r *http.Request, data map[string]any) map[string]a
 	data["LearningUI"] = true
 	data["LearningSection"] = ""
 	switch {
+	case strings.HasPrefix(r.URL.Path, "/dashboard"):
+		data["LearningSection"] = "dashboard"
 	case strings.HasPrefix(r.URL.Path, "/practice"):
 		data["LearningSection"] = "practice"
 	case strings.HasPrefix(r.URL.Path, "/surah"):
