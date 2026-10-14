@@ -1,103 +1,129 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{.Lang}}">
 {{template "head" .}}
-<body>
+<body class="learning-page dashboard-page">
 {{template "topbar" .}}
 
-  <main class="container">
-    <h1>Dashboard</h1>
-    <p class="lead">Resume your murojaah quickly from recent saves and collections.</p>
+  <main class="home-main dashboard-main">
+    <header class="dashboard-heading">
+      <p class="home-eyebrow">{{if eq .Lang "id"}}Ruang murojaah{{else}}Your study space{{end}}</p>
+      <h1>{{if eq .Lang "id"}}Dashboard{{else}}Your dashboard{{end}}</h1>
+      <p class="dashboard-lead">{{if eq .Lang "id"}}Lanjutkan dari simpanan terakhir atau temukan ayat dengan lafaz serupa.{{else}}Pick up from your saved work or find ayat with similar wording.{{end}}</p>
+    </header>
 
-    {{if .AuthEnabled}}{{if not .CurrentUser}}
-    <section class="card" style="text-align:center;padding:2rem 1.5rem">
-      <h2 style="margin-bottom:0.5rem">Sign in to sync your collections</h2>
-      <p class="meta" style="margin-bottom:1.25rem">Sign in with Google to save your mutashabihat collections across devices.</p>
-      <a class="btn" href="{{.LoginURL}}">Continue with Google</a>
+    {{if .StatusNotice}}<p class="dashboard-notice" role="status">{{.StatusNotice}}</p>{{end}}
+
+    {{if .HasSavedItems}}
+    {{$last := .ResumeItem}}
+    <section class="dashboard-hero" aria-labelledby="dashboard-resume-title">
+      <div class="dashboard-hero-copy">
+        <p class="dashboard-eyebrow">{{if eq .Lang "id"}}LANJUTKAN MUROJAAH{{else}}PICK UP WHERE YOU LEFT OFF{{end}}</p>
+        <h2 id="dashboard-resume-title">{{if eq .Lang "id"}}Simpanan terakhirmu{{else}}Your latest saved item{{end}}</h2>
+        <p class="dashboard-reference">{{if $last.Ref2}}{{$last.Ref1}} <span aria-hidden="true">↔</span> {{$last.Ref2}}{{else}}{{$last.Ref1}}{{end}}</p>
+        <p class="dashboard-context">{{if eq .Lang "id"}}Di koleksi{{else}}In{{end}} <a href="/collections/{{$last.CollectionID}}?lang={{$.Lang}}">{{$last.Collection}}</a></p>
+      </div>
+      {{if $last.SecondaryURL}}
+      <a class="home-button primary dashboard-action" href="{{$last.SecondaryURL}}">{{if eq .Lang "id"}}Lanjutkan murojaah{{else}}Continue review{{end}} <span aria-hidden="true">→</span></a>
+      {{else}}
+      <a class="home-button primary dashboard-action" href="{{$last.PrimaryURL}}">{{if eq .Lang "id"}}Buka ayat{{else}}Open ayah{{end}} <span aria-hidden="true">→</span></a>
+      {{end}}
     </section>
-    {{end}}{{end}}
-
-    {{if and .ResumePairURL (gt .SavedPairsCount 0)}}
-    <section class="card review-prompt">
-      <p class="review-prompt-text">You have <strong>{{.SavedPairsCount}} saved {{if eq .SavedPairsCount 1}}pair{{else}}pairs{{end}}</strong>. Keep your hifz sharp.</p>
-      <a class="btn" href="{{.ResumePairURL}}">Start Review Session</a>
+    {{else}}
+    <section class="dashboard-hero dashboard-hero-empty" aria-labelledby="dashboard-start-title">
+      <div class="dashboard-hero-copy">
+        <p class="dashboard-eyebrow">{{if eq .Lang "id"}}MULAI DARI SINI{{else}}A GOOD PLACE TO START{{end}}</p>
+        <h2 id="dashboard-start-title">{{if eq .Lang "id"}}Temukan ayat yang mirip dalam hafalanmu{{else}}Find similar ayat in your memorization{{end}}</h2>
+        <p class="dashboard-start-copy">{{if eq .Lang "id"}}Bandingkan lafaz, lalu simpan pasangan yang ingin kamu ulangi.{{else}}Compare the wording, then save pairs you want to revisit.{{end}}</p>
+      </div>
+      <div class="dashboard-hero-actions">
+        <a class="home-button primary dashboard-action" href="{{.SearchURL}}">{{if eq .Lang "id"}}Cari ayat mirip{{else}}Find similar ayat{{end}} <span aria-hidden="true">→</span></a>
+        <a class="dashboard-text-link" href="/compare?ayah1=60:8&amp;ayah2=60:9&amp;lang={{.Lang}}">{{if eq .Lang "id"}}Coba pasangan contoh{{else}}Try a sample pair{{end}}</a>
+      </div>
     </section>
     {{end}}
 
-    <section class="card">
-      <h2>Quick Resume</h2>
-      <div class="hero-meta">
-        {{if .ResumeAyahURL}}
-        <a class="btn-sm" href="{{.ResumeAyahURL}}">Resume Last Ayah</a>
-        {{else}}
-        <span class="meta">No ayah saved yet.</span>
-        {{end}}
-        {{if .ResumePairURL}}
-        <a class="btn-sm" href="{{.ResumePairURL}}">Resume Last Pair</a>
-        {{else}}
-        <span class="meta">No relation pair saved yet.</span>
-        {{end}}
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Collections</h2>
-      {{if .StatusNotice}}<p class="admin-success" role="status">{{.StatusNotice}}</p>{{end}}
-      {{if .CollectionError}}<p class="error-msg admin-error" role="alert">{{.CollectionError}}</p>{{end}}
-      <form action="/collections" method="post" class="collection-form">
-        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
-        <input type="hidden" name="lang" value="{{.Lang}}" />
-        <label for="collection-name">New collection</label>
-        <input id="collection-name" name="name" value="{{.FormName}}" required autocomplete="off" placeholder="Weekly review" />
-        <button type="submit" class="btn">Create</button>
-        <input name="description" value="{{.FormDescription}}" autocomplete="off" placeholder="Description (optional)" />
-      </form>
-      {{if .AllCollections}}
-      <ul class="simple-list" style="margin-top:1rem">
-        {{range .AllCollections}}
-        <li>
-          <a href="/collections/{{.ID}}?lang={{$.Lang}}">{{.Name}}</a>
-          <p class="meta">Created: {{.CreatedAt}} · Items: {{.ItemCount}}</p>
-          {{if .Description}}<p class="meta note">{{.Description}}</p>{{end}}
-        </li>
-        {{end}}
-      </ul>
-      {{else}}
-      <div class="empty-state" style="margin-top:0.75rem">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        <p class="meta">No collections yet. Create your first one above.</p>
-        <p class="meta">Collections let you organize pairs by topic, juz, or review session.</p>
-      </div>
-      {{end}}
-    </section>
-
-    <section class="card">
-      <h2>Recent Saved Items</h2>
-      {{if .RecentItems}}
-      <ul class="admin-relations-list">
-        {{range .RecentItems}}
-        <li class="admin-relation-item">
-          <div class="line-head">
-            <span class="pair-refs">{{.Ref1}}{{if .Ref2}} <span class="meta">↔</span> {{.Ref2}}{{end}}{{if .Mastered}} <span class="mastered-badge">Mastered ✓</span>{{end}}</span>
-            <div class="admin-row-actions">
-              <a class="btn-sm" href="{{.PrimaryURL}}">Open Ayah</a>
-              {{if .SecondaryURL}}<a class="btn-sm" href="{{.SecondaryURL}}">Open Compare</a>{{end}}
-            </div>
+    <div class="dashboard-columns">
+      <section class="dashboard-panel" aria-labelledby="dashboard-saved-title">
+        <div class="dashboard-panel-heading">
+          <div>
+            <p class="home-eyebrow">{{if eq .Lang "id"}}TERBARU{{else}}RECENT{{end}}</p>
+            <h2 id="dashboard-saved-title">{{if eq .Lang "id"}}Simpanan murojaah{{else}}Saved for review{{end}}</h2>
           </div>
-          <p class="meta">{{.ItemTypeLabel}} · Collection: <a href="/collections/{{.CollectionID}}?lang={{$.Lang}}">{{.Collection}}</a> · Saved: {{.CreatedAt}}</p>
-          {{if .Note}}<p class="meta note">{{.Note}}</p>{{end}}
-        </li>
+          {{if .SavedPairsCount}}<span class="dashboard-count">{{.SavedPairsCount}} {{if eq .Lang "id"}}pasangan{{else}}pairs{{end}}</span>{{end}}
+        </div>
+
+        {{if .RecentItems}}
+        <ul class="dashboard-list dashboard-saved-list">
+          {{range .RecentItems}}
+          <li class="dashboard-list-item">
+            <div class="dashboard-item-main">
+              <p class="dashboard-item-reference">{{.Ref1}}{{if .Ref2}} <span aria-hidden="true">↔</span> {{.Ref2}}{{end}}{{if .Mastered}} <span class="mastered-badge">{{if eq $.Lang "id"}}Dikuasai{{else}}Mastered{{end}}</span>{{end}}</p>
+              <p class="dashboard-item-meta">{{if eq $.Lang "id"}}Di{{else}}In{{end}} <a href="/collections/{{.CollectionID}}?lang={{$.Lang}}">{{.Collection}}</a> <span aria-hidden="true">·</span> {{.CreatedAt}}</p>
+              {{if .Note}}<p class="dashboard-item-note">{{.Note}}</p>{{end}}
+            </div>
+            <div class="dashboard-item-actions">
+              {{if .SecondaryURL}}<a href="{{.SecondaryURL}}">{{if eq $.Lang "id"}}Bandingkan{{else}}Compare{{end}} <span aria-hidden="true">→</span></a>{{else}}<a href="{{.PrimaryURL}}">{{if eq $.Lang "id"}}Buka ayat{{else}}Open ayah{{end}} <span aria-hidden="true">→</span></a>{{end}}
+            </div>
+          </li>
+          {{end}}
+        </ul>
+        {{else if .HasSavedItems}}
+        <div class="dashboard-empty">
+          <p>{{if eq .Lang "id"}}Simpanan terbaru ada di bagian atas.{{else}}Your latest saved item is ready above.{{end}}</p>
+        </div>
+        {{else}}
+        <div class="dashboard-empty">
+          <p>{{if eq .Lang "id"}}Belum ada ayat atau pasangan yang disimpan.{{else}}No ayat or pairs saved yet.{{end}}</p>
+          <span>{{if eq .Lang "id"}}Simpan ayat atau pasangan dari halaman pencarian dan perbandingan.{{else}}Save ayat or pairs from search and comparison pages.{{end}}</span>
+        </div>
         {{end}}
-      </ul>
-      {{else}}
-      <div class="empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        <p class="meta">No saved pairs yet.</p>
-        <p class="meta">Start with a popular pair: <a href="/compare?ayah1=60:8&ayah2=60:9&lang={{.Lang}}">60:8 vs 60:9</a> or <a href="{{.SearchURL}}">Search</a> for any verse.</p>
-      </div>
-      {{end}}
-    </section>
+      </section>
+
+      <section class="dashboard-panel" aria-labelledby="dashboard-collections-title">
+        <div class="dashboard-panel-heading">
+          <div>
+            <p class="home-eyebrow">{{if eq .Lang "id"}}TERORGANISASI{{else}}ORGANIZED{{end}}</p>
+            <h2 id="dashboard-collections-title">{{if eq .Lang "id"}}Koleksi{{else}}Collections{{end}}</h2>
+          </div>
+          {{if .CollectionsCount}}<span class="dashboard-count">{{.CollectionsCount}}</span>{{end}}
+        </div>
+
+        {{if .RecentCollections}}
+        <ul class="dashboard-list dashboard-collection-list">
+          {{range .RecentCollections}}
+          <li class="dashboard-list-item dashboard-collection-item">
+            <div class="dashboard-item-main">
+              <a class="dashboard-collection-name" href="/collections/{{.ID}}?lang={{$.Lang}}">{{.Name}}</a>
+              <p class="dashboard-item-meta">{{.ItemCount}} {{if eq $.Lang "id"}}item{{else}}items{{end}}{{if .Description}} <span aria-hidden="true">·</span> {{.Description}}{{end}}</p>
+            </div>
+            <a class="dashboard-collection-open" href="/collections/{{.ID}}?lang={{$.Lang}}" aria-label="{{if eq $.Lang "id"}}Buka koleksi{{else}}Open collection{{end}} {{.Name}}"><span aria-hidden="true">→</span></a>
+          </li>
+          {{end}}
+        </ul>
+        {{if gt .CollectionsCount (len .RecentCollections)}}<a class="dashboard-text-link dashboard-all-link" href="{{.CollectionsURL}}">{{if eq .Lang "id"}}Lihat semua koleksi{{else}}View all collections{{end}} →</a>{{end}}
+        {{else}}
+        <div class="dashboard-empty dashboard-collection-empty">
+          <p>{{if eq .Lang "id"}}Kelompokkan pasangan ayatmu{{else}}Group the pairs you want to revisit{{end}}</p>
+          <span>{{if eq .Lang "id"}}Buat koleksi untuk topik, juz, atau sesi murojaah.{{else}}Create a collection for a topic, juz, or review session.{{end}}</span>
+        </div>
+        {{end}}
+
+        <details class="dashboard-create">
+          <summary class="home-button dashboard-create-toggle">{{if eq .Lang "id"}}Buat koleksi{{else}}Create a collection{{end}} <span aria-hidden="true">+</span></summary>
+          <form action="/collections" method="post" class="dashboard-collection-form">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+            <input type="hidden" name="lang" value="{{.Lang}}" />
+            <label for="collection-name">{{if eq .Lang "id"}}Nama koleksi{{else}}Collection name{{end}}</label>
+            <input id="collection-name" name="name" required autocomplete="off" placeholder="{{if eq .Lang "id"}}Contoh: Murojaah Juz 30{{else}}For example: Juz 30 review{{end}}" />
+            <label for="collection-description">{{if eq .Lang "id"}}Deskripsi (opsional){{else}}Description (optional){{end}}</label>
+            <input id="collection-description" name="description" autocomplete="off" placeholder="{{if eq .Lang "id"}}Catatan singkat{{else}}A short note{{end}}" />
+            <button type="submit" class="home-button primary">{{if eq .Lang "id"}}Simpan koleksi{{else}}Save collection{{end}}</button>
+          </form>
+        </details>
+      </section>
+    </div>
   </main>
 
-{{template "footer" .}}
+{{template "site-footer" .}}
 </body>
 </html>
