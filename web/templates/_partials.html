@@ -251,7 +251,7 @@
 </script>
 {{end}}
 
-{{define "footer"}}
+{{define "site-footer"}}
 <script>
   (() => {
     document.querySelectorAll('.collection-save-form, .collection-form').forEach((form) => {
@@ -262,6 +262,9 @@
     });
   })();
 </script>
+{{if .LearningUI}}
+<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.free}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
+{{else}}
 <footer class="footer">
   <div class="container footer-inner">
     <a href="https://github.com/srmdn/hifzlink" rel="noopener noreferrer" target="_blank">Open source</a>
@@ -271,4 +274,5 @@
     <a href="/terms">Terms</a>
   </div>
 </footer>
+{{end}}
 {{end}}
