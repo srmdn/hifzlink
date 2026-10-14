@@ -574,7 +574,7 @@ func (s *server) handleAyahPage(w http.ResponseWriter, r *http.Request) {
 	viewData["JuzURL"] = withLang(fmt.Sprintf("/juz/%d", a.Juz), lang)
 	viewData["ShareURL"] = canonicalPath
 	viewData["CanonicalURL"] = "https://" + r.Host + canonicalPath
-	viewData["OGImageAlt"] = "hifzlink dark green Quran reading preview"
+	viewData["OGImageAlt"] = "HifzLink social card about reviewing similar Quran verses"
 	s.render(w, "ayah.html", viewData)
 }
 
@@ -704,7 +704,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	sharePath := fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", neturl.QueryEscape(ref1str), neturl.QueryEscape(ref2str))
 	viewData["ShareURL"] = withLang(sharePath, lang)
 	viewData["CanonicalURL"] = "https://" + r.Host + withLang(sharePath, lang)
-	viewData["OGImageAlt"] = "hifzlink dark green card for Quran verse comparison"
+	viewData["OGImageAlt"] = "HifzLink social card about reviewing similar Quran verses"
 	s.render(w, "compare.html", viewData)
 }
 
@@ -1790,8 +1790,8 @@ func (s *server) withCommonViewData(r *http.Request, data map[string]any) map[st
 
 	base := "https://" + r.Host
 	data["CanonicalURL"] = base + r.URL.Path
-	data["OGImageURL"] = base + "/static/og-image.png?v=2"
-	data["OGImageAlt"] = "hifzlink — Quran mutashabihat review"
+	data["OGImageURL"] = base + "/static/og-image-v3.png?v=1"
+	data["OGImageAlt"] = "HifzLink social card about reviewing similar Quran verses"
 	if _, ok := data["Description"]; !ok {
 		data["Description"] = "Master Quran mutashabihat: review similar verses and strengthen your memorization."
 	}

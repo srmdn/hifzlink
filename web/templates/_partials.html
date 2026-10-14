@@ -4,6 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{.Title}}</title>
   <meta name="description" content="{{.Description}}" />
+  <meta name="theme-color" content="#141c18" />
   <link rel="canonical" href="{{.CanonicalURL}}" />
   {{if .NoIndex}}<meta name="robots" content="noindex, nofollow" />{{end}}
 
@@ -29,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="{{asset "favicon.svg"}}" />
+  <link rel="icon" type="image/svg+xml" sizes="any" href="{{asset "favicon.svg"}}" />
   <link rel="stylesheet" href="{{asset "base.css"}}" />
   <link rel="stylesheet" href="{{asset "topbar.css"}}" />
   <link rel="stylesheet" href="{{asset "components.css"}}" />
@@ -263,7 +264,41 @@
   })();
 </script>
 {{if .LearningUI}}
-<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><span>{{.UI.free}}</span><a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.source}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
+<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><span>{{.UI.free}}</span>{{if and (not .NoIndex) (not .ShareURL)}}<button class="learning-footer-share" type="button" data-share-page data-share-text="{{.UI.sharePageText}}">{{.UI.sharePage}}</button><span class="learning-footer-share-status" data-share-page-status role="status" aria-live="polite"></span>{{end}}<a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.source}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
+{{if and (not .NoIndex) (not .ShareURL)}}
+<script>
+(() => {
+  const button = document.querySelector("[data-share-page]");
+  const status = document.querySelector("[data-share-page-status]");
+  if (!button || !status) return;
+  let statusTimer;
+  const announce = message => {
+    status.textContent = message;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => { status.textContent = ""; }, 4000);
+  };
+  button.addEventListener("click", async () => {
+    const pageURL = new URL(window.location.href);
+    pageURL.hash = "";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, text: button.dataset.shareText, url: pageURL.href });
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(pageURL.href);
+      announce("{{.UI.sharePageCopied}}");
+    } catch (_) {
+      announce("{{.UI.shareFailed}}");
+    }
+  });
+})();
+</script>
+{{end}}
 {{else}}
 <footer class="footer">
   <div class="container footer-inner">
