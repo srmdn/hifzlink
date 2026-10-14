@@ -10,6 +10,9 @@ The format is inspired by Keep a Changelog.
 
 - Redesigned the signed-in dashboard around a clear resume action, recent saved
   items, and compact collection management, with Indonesian and English copy.
+- Routed all pages through one shared footer component while preserving the
+  learning and account-page variants; page titles continue to come from each
+  page's title data.
 
 ## [0.4.0] - 2026-10-13
 
