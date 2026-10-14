@@ -138,7 +138,7 @@ func (s *server) handleMultiComparePage(w http.ResponseWriter, r *http.Request, 
 		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{{Name: "Home", Path: withLang("/", lang)}, {Name: heading, Path: withLang(sharePath, lang)}}),
 	})
 	data["MultiBackURL"] = withLang(fmt.Sprintf("/ayah/%d/%d", rootSurah, rootAyah), lang)
-	data["OGImageAlt"] = "HifzLink comparison of connected Quran verses"
+	data["OGImageAlt"] = "HifzLink social card about reviewing similar Quran verses"
 	s.render(w, "compare-multi.html", data)
 }
 
