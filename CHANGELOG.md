@@ -15,6 +15,8 @@ The format is inspired by Keep a Changelog.
   page's title data.
 - Clarified the footer's free-to-use message and separated it from the source
   code link in Indonesian and English.
+- Added page sharing to public browse pages and refreshed the social preview
+  card and page metadata in Indonesian and English.
 
 ## [0.4.0] - 2026-10-13
 
