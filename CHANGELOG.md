@@ -17,6 +17,8 @@ The format is inspired by Keep a Changelog.
   code link in Indonesian and English.
 - Added page sharing to public browse pages and refreshed the social preview
   card and page metadata in Indonesian and English.
+- Replaced the generic book favicon with a linked H monogram in HifzLink's
+  green and gold palette.
 
 ## [0.4.0] - 2026-10-13
 
