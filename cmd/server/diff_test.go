@@ -70,3 +70,22 @@ func TestLCSIndices_basic(t *testing.T) {
 		}
 	}
 }
+
+func TestSuggestedHighlightIndicesIgnoresDiacriticsAndAlifVariants(t *testing.T) {
+	a, b := suggestedHighlightIndices("إِنَّ اللَّهَ غَفُورٌ", "ان الله رَحِيمٌ")
+	if len(a) != 1 || a[0] != 2 || len(b) != 1 || b[0] != 2 {
+		t.Fatalf("suggested highlights = %v / %v, want [2] / [2]", a, b)
+	}
+}
+
+func TestValidateHighlightIndexList(t *testing.T) {
+	got, err := validateHighlightIndexList("0,2", 3)
+	if err != nil || joinHighlightIndices(got) != "0,2" {
+		t.Fatalf("valid highlights = %v, %v", got, err)
+	}
+	for _, raw := range []string{"3", "1,1", "2,1", "x"} {
+		if _, err := validateHighlightIndexList(raw, 3); err == nil {
+			t.Errorf("expected %q to be rejected", raw)
+		}
+	}
+}

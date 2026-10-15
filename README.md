@@ -111,13 +111,30 @@ go run ./scripts/seed_relations
 
 - `GET /admin/users` account activity and aggregate collection/item counts
 - `GET /admin/relations` relation management page (add/list/edit/delete)
-- relation categories (confusion-pattern taxonomy): `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `other`
+- `GET /admin/curation` private queue for automatic verse-pair suggestions
+- relation categories (confusion-pattern taxonomy): `lafzi`, `addition_omission`, `word_swap`, `ending_variation`, `order_change`, `pronoun_shift`, `structural`, `other`
 - category labels and usage hints are shown directly on the admin page
 - invalid category values are normalized to `other`
 - admin routes and `POST /api/relations` require the separate admin session
 - set credentials via env:
   - `HIFZLINK_ADMIN_USER`
   - `HIFZLINK_ADMIN_PASS`
+
+`data/curation_candidates.json` initializes a separate SQLite review queue.
+Automatic category suggestions are provisional. Rejecting a candidate leaves
+the public catalog unchanged; accepting it adds the selected category and note
+as a reviewed relation. Word-level highlight suggestions are also provisional
+and editable before acceptance; they point to words in the original Arabic text.
+Candidate review decisions persist across restarts.
+
+Published candidates are separated into **Auto-curated · needs review** and
+**Manually reviewed** in the admin curation page. Both groups remain public.
+Marking a pair as reviewed preserves its category, public note, and highlights;
+the expandable editor can save corrections and mark it reviewed together.
+Either action updates the admin-only internal note with the reviewer and UTC
+timestamp while preserving the Codex origin. Relation edits and review toggles
+also update this internal record in the same transaction. Public notes remain
+separate from internal notes.
 
 ## Collections
 

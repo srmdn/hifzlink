@@ -19,6 +19,7 @@ import (
 	"github.com/srmdn/hifzlink/internal/db"
 	"github.com/srmdn/hifzlink/internal/relations"
 	"github.com/srmdn/hifzlink/internal/search"
+	webassets "github.com/srmdn/hifzlink/web"
 )
 
 func newTestServer(t *testing.T) *server {
@@ -75,6 +76,7 @@ func newTestServer(t *testing.T) *server {
 		csrfSecret:         []byte("test-csrf-secret"),
 		tmpl: template.Must(template.New("root").Parse(`
 			{{define "admin-relations.html"}}{{.AdminError}}{{end}}
+			{{define "admin-curation.html"}}{{.PendingCount}} candidates{{end}}
 			{{define "admin-users.html"}}{{range .AdminUsers}}{{.Email}}{{end}}{{end}}
 			{{define "collections.html"}}{{.CollectionError}}{{end}}
 			{{define "collection-detail.html"}}{{.StatusNotice}}{{end}}
@@ -913,6 +915,123 @@ func TestHandleDashboardPage(t *testing.T) {
 	}
 	if got := rr.Header().Get("Cache-Control"); got != "no-store" {
 		t.Fatalf("expected authenticated dashboard to disable caching, got Cache-Control %q", got)
+	}
+}
+
+func TestAdminCurationAcceptAddsReviewedRelation(t *testing.T) {
+	s := newTestServer(t)
+	added, err := s.db.ImportCurationCandidates([]db.CurationCandidate{{
+		Ayah1Surah: 1, Ayah1Ayah: 1, Ayah2Surah: 60, Ayah2Ayah: 8,
+		SuggestedCategory: "lafzi", ReviewPriority: "high", MatchType: "verbatim",
+	}})
+	if err != nil || added != 1 {
+		t.Fatalf("import candidate = %d, %v", added, err)
+	}
+	items, err := s.db.CurationCandidates("pending", 10, 0)
+	if err != nil || len(items) != 1 {
+		t.Fatalf("load candidate = %d, %v", len(items), err)
+	}
+
+	get := httptest.NewRequest(http.MethodGet, "/admin/curation", nil)
+	addAdminCookie(get, s.adminToken)
+	getResponse := httptest.NewRecorder()
+	s.handleAdminCuration(getResponse, get)
+	if getResponse.Code != http.StatusOK || !strings.Contains(getResponse.Body.String(), "1 candidates") {
+		t.Fatalf("GET /admin/curation = %d %q", getResponse.Code, getResponse.Body.String())
+	}
+
+	form := url.Values{}
+	form.Set("csrf_token", s.csrfTokenFor(s.adminToken))
+	form.Set("id", strconv.FormatInt(items[0].ID, 10))
+	form.Set("decision", "accept")
+	form.Set("category", "word_swap")
+	form.Set("note", "Reviewed correction")
+	form.Set("highlights_ayah1", "1")
+	form.Set("highlights_ayah2", "2")
+	form.Set("lang", "id")
+	post := httptest.NewRequest(http.MethodPost, "/admin/curation", strings.NewReader(form.Encode()))
+	post.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	addAdminCookie(post, s.adminToken)
+	postResponse := httptest.NewRecorder()
+	s.handleAdminCuration(postResponse, post)
+	if postResponse.Code != http.StatusSeeOther || !strings.Contains(postResponse.Header().Get("Location"), "/admin/curation?status=pending&result=accepted&lang=id") {
+		t.Fatalf("POST /admin/curation = %d, location %q", postResponse.Code, postResponse.Header().Get("Location"))
+	}
+	relations, err := s.db.All()
+	if err != nil || len(relations) != 1 {
+		t.Fatalf("accepted relations = %d, %v", len(relations), err)
+	}
+	if relations[0].Category != "word_swap" || !relations[0].Reviewed || relations[0].Highlights != `{"ayah1":[1],"ayah2":[2]}` {
+		t.Fatalf("accepted relation values = %#v", relations[0])
+	}
+}
+
+func TestEmbeddedTemplatesParseWithCurationQueue(t *testing.T) {
+	staticFiles, err := embeddedStaticFiles()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assets, err := newAssetVersions(staticFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := template.New("").Funcs(assetFuncs(assets)).ParseFS(webassets.Files, "templates/*.html"); err != nil {
+		t.Fatalf("parse embedded templates: %v", err)
+	}
+}
+
+func TestAdminCurationRendersEditableSuggestedHighlights(t *testing.T) {
+	s := newTestServer(t)
+	if _, err := s.db.ImportCurationCandidates([]db.CurationCandidate{{
+		Ayah1Surah: 1, Ayah1Ayah: 1, Ayah2Surah: 60, Ayah2Ayah: 8,
+		SuggestedCategory: "lafzi", ReviewPriority: "high", MatchType: "verbatim",
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	staticFiles, err := embeddedStaticFiles()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assets, err := newAssetVersions(staticFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.tmpl, err = template.New("").Funcs(assetFuncs(assets)).ParseFS(webassets.Files, "templates/*.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/curation", nil)
+	addAdminCookie(req, s.adminToken)
+	response := httptest.NewRecorder()
+	s.handleAdminCuration(response, req)
+	body := response.Body.String()
+	if response.Code != http.StatusOK || !strings.Contains(body, "Suggested highlights") || !strings.Contains(body, `name="highlights_ayah1" value="0"`) {
+		t.Fatalf("GET /admin/curation did not render editable word suggestions: status=%d body has editor=%t", response.Code, strings.Contains(body, "Suggested highlights"))
+	}
+}
+
+func TestImportCurationCandidatesValidatesAndImports(t *testing.T) {
+	s := newTestServer(t)
+	path := t.TempDir() + "/candidates.json"
+	valid := `[{"ayah1":"1:1","ayah2":"60:8","suggested_category":"lafzi","category_suggestion_confidence":"tentative","category_suggestion_basis":"shared_exact_phrase","review_priority":"high","type":"verbatim","phrase_len":4,"jaccard":0.7}]`
+	if err := os.WriteFile(path, []byte(valid), 0600); err != nil {
+		t.Fatal(err)
+	}
+	added, err := importCurationCandidates(s.db, s.quran, path)
+	if err != nil || added != 1 {
+		t.Fatalf("import valid candidate = %d, %v", added, err)
+	}
+	if _, _, _, err := s.db.CurationCandidateCounts(); err != nil {
+		t.Fatal(err)
+	}
+
+	invalid := `[{"ayah1":"60:8","ayah2":"1:1","suggested_category":"lafzi","review_priority":"high"}]`
+	if err := os.WriteFile(path, []byte(invalid), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := importCurationCandidates(s.db, s.quran, path); err == nil {
+		t.Fatal("expected reversed noncanonical candidate to be rejected")
 	}
 }
 
