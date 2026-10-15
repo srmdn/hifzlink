@@ -13,6 +13,12 @@
       <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations">Relations</a><a href="/admin/curation" aria-current="page">Curation</a></nav>
     </header>
 
+    <details class="admin-category-guide">
+      <summary>{{if eq .Lang "id"}}Panduan label kurasi{{else}}Curation label guide{{end}}</summary>
+      <p class="meta">{{if eq .Lang "id"}}Pilih satu pola utama. Kemiripan seluruh ayat didahulukan; jika hanya berbagi frasa, gunakan label frasa awal, tengah, atau akhir.{{else}}Choose one primary pattern. Whole-verse patterns take priority; use phrase labels when similarity is limited to part of the verses.{{end}}</p>
+      <ul>{{range .CategoryOptions}}<li><strong>{{.Label}}</strong>: {{.Hint}}</li>{{end}}</ul>
+    </details>
+    <p class="highlight-legend"><span class="difference-swatch" aria-hidden="true"></span>{{if eq .Lang "id"}}Sorotan menunjukkan perbedaan lafaz. Tanda waqaf diabaikan; perbedaan harakat tetap diperhatikan.{{else}}Highlights mark wording differences. Stop signs are ignored; vocalization differences are retained.{{end}}</p>
     <section class="admin-relations-browser" aria-labelledby="candidate-list-title">
       {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
       {{if .ResultNotice}}<p class="admin-success" role="status">{{.ResultNotice}}</p>{{end}}
@@ -49,7 +55,7 @@
               <span class="meta">{{.Ayah1Name}} / {{.Ayah2Name}}</span>
             </div>
             <div class="admin-row-actions">
-              <span class="category-badge">Suggested: {{.SuggestedLabel}}</span>
+              <span class="category-badge">{{if eq $.Lang "id"}}Kategori aktif{{else}}Active category{{end}}: {{if .ActiveLabel}}{{.ActiveLabel}}{{else}}—{{end}}</span>
               <span class="meta">{{.Priority}} priority</span>
             </div>
           </div>
@@ -57,7 +63,7 @@
             <article class="admin-verse-diff"><p class="meta">{{.Ayah1}}</p><p class="arabic" lang="ar" dir="rtl">{{.Ayah1Text}}</p></article>
             <article class="admin-verse-diff"><p class="meta">{{.Ayah2}}</p><p class="arabic" lang="ar" dir="rtl">{{.Ayah2Text}}</p></article>
           </div>
-          <p class="meta admin-candidate-evidence">Match: {{.MatchType}}{{if .PhraseLen}} · shared phrase: {{.PhraseLen}} words{{end}}{{if .Jaccard}} · word overlap: {{printf "%.3f" .Jaccard}}{{end}} · why this label: {{.BasisLabel}} ({{.Confidence}} evidence)</p>
+          <p class="meta admin-candidate-evidence">Original detection: {{.MatchType}}{{if .PhraseLen}} · shared phrase: {{.PhraseLen}} words{{end}}{{if .Jaccard}} · word overlap: {{printf "%.3f" .Jaccard}}{{end}} · suggested label: {{.SuggestedLabel}} · why this suggestion: {{.BasisLabel}} ({{.Confidence}} evidence) · whole-verse word alignment: {{.CoverageLabel}}</p>
           {{if ne $.Status "pending"}}
           <p class="meta">{{if eq $.Status "auto"}}Auto-curated · manual review pending{{else if eq $.Status "manual"}}Manually reviewed{{else}}Rejected{{end}}{{if .Category}} · {{index $.CategoryLabelMap .Category}}{{end}}</p>
           {{if .InternalNote}}<p class="meta admin-internal-note"><strong>Admin-only note:</strong> {{.InternalNote}}</p>{{end}}
@@ -92,7 +98,7 @@
             <label for="note-{{.ID}}">Public note (optional)</label>
             <textarea id="note-{{.ID}}" name="note" rows="2" maxlength="2000" placeholder="What should the memorizer notice?" autocomplete="off">{{.Note}}</textarea>
             <div class="word-picker-section curation-highlight-editor">
-              <p class="word-picker-label">{{if eq $.Status "pending"}}Suggested highlights · provisional.{{else}}Current saved highlights.{{end}} Click words to adjust; the Arabic text is unchanged.</p>
+              <p class="word-picker-label">{{if eq $.Status "pending"}}Suggested highlights · provisional.{{else}}Current saved highlights.{{end}} Select only differing words. Click once to add or remove a highlight; the Arabic text is unchanged.</p>
               <div class="word-picker" data-ayah="1" data-suggested="{{.SuggestedHighlights1}}" aria-label="Adjust highlights for {{.Ayah1}}">
                 {{range $i, $w := .Ayah1Words}}<span class="word-picker-word" data-idx="{{$i}}" role="button" tabindex="0" aria-pressed="false">{{$w}}</span> {{end}}
               </div>

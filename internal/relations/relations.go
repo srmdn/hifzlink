@@ -341,7 +341,8 @@ func normalizeCategory(value string) string {
 	switch c {
 	case "lafzi", "maana", "siyam", "aqidah", "adab", "other",
 		"word_swap", "addition_omission", "order_change",
-		"ending_variation", "pronoun_shift", "structural":
+		"ending_variation", "pronoun_shift", "structural",
+		"shared_opening", "shared_phrase", "shared_ending":
 		return c
 	default:
 		return ""

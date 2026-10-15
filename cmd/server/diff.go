@@ -6,7 +6,8 @@ import (
 	"html/template"
 	"strconv"
 	"strings"
-	"unicode"
+
+	"github.com/srmdn/hifzlink/internal/curation"
 )
 
 // HighlightData holds manually chosen word indices for each ayah in a pair.
@@ -105,6 +106,17 @@ func joinHighlightIndices(indices []int) string {
 	return strings.Join(parts, ",")
 }
 
+// suggestedHighlightIndices returns original token positions for wording differences.
+// Stop signs are ignored; meaningful harakat remain part of the comparison.
+func suggestedHighlightIndices(text1, text2 string) ([]int, []int) {
+	return curation.DifferenceIndices(text1, text2)
+}
+
+func diffHighlight(text1, text2 string) (template.HTML, template.HTML) {
+	h1, h2 := suggestedHighlightIndices(text1, text2)
+	return applyHighlights(text1, h1), applyHighlights(text2, h2)
+}
+
 // lcsIndices returns the indices in a and b that are aligned by the
 // Longest Common Subsequence. Both slices are returned in ascending order.
 func lcsIndices(a, b []string) ([]int, []int) {
@@ -140,86 +152,4 @@ func lcsIndices(a, b []string) ([]int, []int) {
 		}
 	}
 	return ai, bi
-}
-
-// suggestedHighlightIndices marks words that do not align between two ayahs.
-// Matching ignores Quranic combining marks, tatweel, and common alif variants;
-// returned positions still address the original, untouched verse tokens.
-func suggestedHighlightIndices(text1, text2 string) ([]int, []int) {
-	words1, words2 := strings.Fields(text1), strings.Fields(text2)
-	normalized1, normalized2 := make([]string, len(words1)), make([]string, len(words2))
-	for i, word := range words1 {
-		normalized1[i] = normalizeArabicWord(word)
-	}
-	for i, word := range words2 {
-		normalized2[i] = normalizeArabicWord(word)
-	}
-	shared1, shared2 := lcsIndices(normalized1, normalized2)
-	matched1, matched2 := make(map[int]bool, len(shared1)), make(map[int]bool, len(shared2))
-	for _, i := range shared1 {
-		matched1[i] = true
-	}
-	for _, i := range shared2 {
-		matched2[i] = true
-	}
-	var highlight1, highlight2 []int
-	for i := range words1 {
-		if !matched1[i] {
-			highlight1 = append(highlight1, i)
-		}
-	}
-	for i := range words2 {
-		if !matched2[i] {
-			highlight2 = append(highlight2, i)
-		}
-	}
-	return highlight1, highlight2
-}
-
-func normalizeArabicWord(word string) string {
-	var b strings.Builder
-	for _, r := range word {
-		if r == '\u0640' || unicode.Is(unicode.Mn, r) {
-			continue
-		}
-		switch r {
-		case 'أ', 'إ', 'آ', 'ٱ':
-			r = 'ا'
-		}
-		b.WriteRune(r)
-	}
-	return b.String()
-}
-
-// diffHighlight compares two Arabic texts word-by-word using LCS and returns
-// safe HTML for each with shared words unmarked and unique words highlighted.
-func diffHighlight(text1, text2 string) (template.HTML, template.HTML) {
-	w1 := strings.Fields(text1)
-	w2 := strings.Fields(text2)
-
-	idx1, idx2 := lcsIndices(w1, w2)
-
-	shared1 := make(map[int]bool, len(idx1))
-	for _, i := range idx1 {
-		shared1[i] = true
-	}
-	shared2 := make(map[int]bool, len(idx2))
-	for _, i := range idx2 {
-		shared2[i] = true
-	}
-
-	return renderHighlighted(w1, shared1), renderHighlighted(w2, shared2)
-}
-
-func renderHighlighted(words []string, shared map[int]bool) template.HTML {
-	parts := make([]string, len(words))
-	for i, w := range words {
-		escaped := html.EscapeString(w)
-		if shared[i] {
-			parts[i] = escaped
-		} else {
-			parts[i] = `<mark class="word-unique">` + escaped + `</mark>`
-		}
-	}
-	return template.HTML(strings.Join(parts, " "))
 }
