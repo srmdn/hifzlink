@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // HighlightData holds manually chosen word indices for each ayah in a pair.
@@ -77,6 +78,33 @@ func parseIndexList(s string) []int {
 	return out
 }
 
+func validateHighlightIndexList(raw string, wordCount int) ([]int, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil, nil
+	}
+	parts := strings.Split(raw, ",")
+	indices := make([]int, 0, len(parts))
+	previous := -1
+	for _, part := range parts {
+		value, err := strconv.Atoi(strings.TrimSpace(part))
+		if err != nil || value < 0 || value >= wordCount || value <= previous {
+			return nil, strconv.ErrSyntax
+		}
+		indices = append(indices, value)
+		previous = value
+	}
+	return indices, nil
+}
+
+func joinHighlightIndices(indices []int) string {
+	parts := make([]string, len(indices))
+	for i, index := range indices {
+		parts[i] = strconv.Itoa(index)
+	}
+	return strings.Join(parts, ",")
+}
+
 // lcsIndices returns the indices in a and b that are aligned by the
 // Longest Common Subsequence. Both slices are returned in ascending order.
 func lcsIndices(a, b []string) ([]int, []int) {
@@ -112,6 +140,55 @@ func lcsIndices(a, b []string) ([]int, []int) {
 		}
 	}
 	return ai, bi
+}
+
+// suggestedHighlightIndices marks words that do not align between two ayahs.
+// Matching ignores Quranic combining marks, tatweel, and common alif variants;
+// returned positions still address the original, untouched verse tokens.
+func suggestedHighlightIndices(text1, text2 string) ([]int, []int) {
+	words1, words2 := strings.Fields(text1), strings.Fields(text2)
+	normalized1, normalized2 := make([]string, len(words1)), make([]string, len(words2))
+	for i, word := range words1 {
+		normalized1[i] = normalizeArabicWord(word)
+	}
+	for i, word := range words2 {
+		normalized2[i] = normalizeArabicWord(word)
+	}
+	shared1, shared2 := lcsIndices(normalized1, normalized2)
+	matched1, matched2 := make(map[int]bool, len(shared1)), make(map[int]bool, len(shared2))
+	for _, i := range shared1 {
+		matched1[i] = true
+	}
+	for _, i := range shared2 {
+		matched2[i] = true
+	}
+	var highlight1, highlight2 []int
+	for i := range words1 {
+		if !matched1[i] {
+			highlight1 = append(highlight1, i)
+		}
+	}
+	for i := range words2 {
+		if !matched2[i] {
+			highlight2 = append(highlight2, i)
+		}
+	}
+	return highlight1, highlight2
+}
+
+func normalizeArabicWord(word string) string {
+	var b strings.Builder
+	for _, r := range word {
+		if r == '\u0640' || unicode.Is(unicode.Mn, r) {
+			continue
+		}
+		switch r {
+		case 'أ', 'إ', 'آ', 'ٱ':
+			r = 'ا'
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
 }
 
 // diffHighlight compares two Arabic texts word-by-word using LCS and returns

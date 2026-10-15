@@ -255,11 +255,11 @@ func (s *Service) RelationByID(id int64) (AdminRelationView, bool, error) {
 	}, true, nil
 }
 
-func (s *Service) SetReviewed(id int64, reviewed bool) error {
+func (s *Service) SetReviewed(id int64, reviewed bool, reviewer ...string) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid relation id")
 	}
-	if err := s.db.SetReviewed(id, reviewed); err != nil {
+	if err := s.db.SetReviewed(id, reviewed, reviewer...); err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("relation not found")
 		}
@@ -281,7 +281,7 @@ func (s *Service) DeleteByID(id int64) error {
 	return nil
 }
 
-func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highlights string) error {
+func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highlights string, reviewer ...string) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid relation id")
 	}
@@ -316,7 +316,7 @@ func (s *Service) UpdateByID(id int64, ayah1Ref, ayah2Ref, note, category, highl
 		Note:       strings.TrimSpace(note),
 		Category:   normalizeCategory(category),
 		Highlights: strings.TrimSpace(highlights),
-	})
+	}, reviewer...)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("relation not found")

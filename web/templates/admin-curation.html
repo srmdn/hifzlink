@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
+{{template "head" .}}
+<body class="learning-page admin-dashboard admin-relations-page">
+{{template "topbar" .}}
+  <main class="home-main admin-dashboard-main">
+    <header class="admin-page-header">
+      <div>
+        <p class="home-eyebrow">HifzLink · Admin curation</p>
+        <h1>Curation review</h1>
+        <p class="admin-page-lead">Auto-curated and manually reviewed pairs are in the public catalog. These groups track your admin review progress.</p>
+      </div>
+      <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations">Relations</a><a href="/admin/curation" aria-current="page">Curation</a></nav>
+    </header>
+
+    <section class="admin-relations-browser" aria-labelledby="candidate-list-title">
+      {{if .AdminError}}<p class="error-msg admin-error" role="alert">{{.AdminError}}</p>{{end}}
+      {{if .ResultNotice}}<p class="admin-success" role="status">{{.ResultNotice}}</p>{{end}}
+      <div class="admin-filter-bar">
+        <a class="admin-filter-btn {{if eq .Status "auto"}}active{{end}}" href="/admin/curation?status=auto&lang={{.Lang}}">Auto-curated · needs review ({{.AutoCount}})</a>
+        <a class="admin-filter-btn {{if eq .Status "manual"}}active{{end}}" href="/admin/curation?status=manual&lang={{.Lang}}">Manually reviewed ({{.ManualCount}})</a>
+        <a class="admin-filter-btn {{if eq .Status "pending"}}active{{end}}" href="/admin/curation?status=pending&lang={{.Lang}}">Unpublished candidates ({{.PendingCount}})</a>
+        <a class="admin-filter-btn {{if eq .Status "rejected"}}active{{end}}" href="/admin/curation?status=rejected&lang={{.Lang}}">Rejected ({{.RejectedCount}})</a>
+      </div>
+
+      {{if and (eq .Status "pending") (gt .PendingCount 0)}}
+      <form action="/admin/curation" method="post" class="admin-form admin-bulk-curation-form">
+        <input type="hidden" name="csrf_token" value="{{.AdminCSRFToken}}" />
+        <input type="hidden" name="lang" value="{{.Lang}}" />
+        <input type="hidden" name="decision" value="accept_all" />
+        <p class="meta">This adds every pending pair to the public catalog with the suggested category and highlights. An admin-only note will mark the batch as Codex auto-curation awaiting your review.</p>
+        <button type="submit" class="btn">Accept all {{.PendingCount}} pending candidates</button>
+      </form>
+      {{end}}
+
+      <div class="admin-relations-header">
+        <div><p class="home-eyebrow">{{if eq .Status "auto"}}Published · awaiting manual review{{else if eq .Status "manual"}}Published · reviewed by an admin{{else if eq .Status "pending"}}Not yet in the public catalog{{else}}Rejected suggestions{{end}}</p><h2 id="candidate-list-title">{{.Total}} pairs</h2></div>
+        <span class="meta">Page {{.Page}} of {{.PageCount}}</span>
+      </div>
+      <p class="meta">{{if eq .Status "auto"}}Review the verses, category, and highlights. Mark a pair as reviewed when it is correct, or edit it first. The internal note updates with your name and review time.{{else if eq .Status "manual"}}Manual review is complete. The internal note keeps the pair's origin and review details.{{else}}Category suggestions are provisional. Compare both ayahs before accepting; edit the category or public note if needed.{{end}}</p>
+
+      {{if .Candidates}}
+      <ol class="admin-relations-list admin-candidate-list">
+        {{range .Candidates}}
+        <li class="admin-relation-item admin-candidate-item">
+          <div class="line-head">
+            <div class="admin-relation-refs">
+              <span class="pair-refs">{{.Ayah1}} <span class="meta">↔</span> {{.Ayah2}}</span>
+              <span class="meta">{{.Ayah1Name}} / {{.Ayah2Name}}</span>
+            </div>
+            <div class="admin-row-actions">
+              <span class="category-badge">Suggested: {{.SuggestedLabel}}</span>
+              <span class="meta">{{.Priority}} priority</span>
+            </div>
+          </div>
+          <div class="compare-grid admin-candidate-verses">
+            <article class="admin-verse-diff"><p class="meta">{{.Ayah1}}</p><p class="arabic" lang="ar" dir="rtl">{{.Ayah1Text}}</p></article>
+            <article class="admin-verse-diff"><p class="meta">{{.Ayah2}}</p><p class="arabic" lang="ar" dir="rtl">{{.Ayah2Text}}</p></article>
+          </div>
+          <p class="meta admin-candidate-evidence">Match: {{.MatchType}}{{if .PhraseLen}} · shared phrase: {{.PhraseLen}} words{{end}}{{if .Jaccard}} · word overlap: {{printf "%.3f" .Jaccard}}{{end}} · why this label: {{.BasisLabel}} ({{.Confidence}} evidence)</p>
+          {{if ne $.Status "pending"}}
+          <p class="meta">{{if eq $.Status "auto"}}Auto-curated · manual review pending{{else if eq $.Status "manual"}}Manually reviewed{{else}}Rejected{{end}}{{if .Category}} · {{index $.CategoryLabelMap .Category}}{{end}}</p>
+          {{if .InternalNote}}<p class="meta admin-internal-note"><strong>Admin-only note:</strong> {{.InternalNote}}</p>{{end}}
+          {{end}}
+          {{if eq $.Status "auto"}}
+          <form action="/admin/curation" method="post" class="curation-mark-reviewed-form">
+            <input type="hidden" name="csrf_token" value="{{$.AdminCSRFToken}}" />
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <input type="hidden" name="lang" value="{{$.Lang}}" />
+            <input type="hidden" name="return_status" value="auto" />
+            <input type="hidden" name="return_page" value="{{$.Page}}" />
+            <button type="submit" class="btn" name="decision" value="mark_reviewed">Mark as reviewed</button>
+          </form>
+          <details class="curation-edit-details">
+            <summary>Edit category, public note, and highlights</summary>
+          {{end}}
+          {{if or (eq $.Status "pending") (eq $.Status "auto")}}
+          <form action="/admin/curation" method="post" class="admin-form admin-candidate-review-form">
+            <input type="hidden" name="csrf_token" value="{{$.AdminCSRFToken}}" />
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <input type="hidden" name="lang" value="{{$.Lang}}" />
+            <input type="hidden" name="return_status" value="{{$.Status}}" />
+            <input type="hidden" name="return_page" value="{{$.Page}}" />
+            <label for="category-{{.ID}}">Category</label>
+            <select id="category-{{.ID}}" name="category">
+              <option value="">Uncategorized</option>
+              {{$candidate := .}}
+              {{range $.CategoryOptions}}
+              <option value="{{.Key}}" {{if eq $candidate.Category .Key}}selected{{end}}>{{.Label}}</option>
+              {{end}}
+            </select>
+            <label for="note-{{.ID}}">Public note (optional)</label>
+            <textarea id="note-{{.ID}}" name="note" rows="2" maxlength="2000" placeholder="What should the memorizer notice?" autocomplete="off">{{.Note}}</textarea>
+            <div class="word-picker-section curation-highlight-editor">
+              <p class="word-picker-label">{{if eq $.Status "pending"}}Suggested highlights · provisional.{{else}}Current saved highlights.{{end}} Click words to adjust; the Arabic text is unchanged.</p>
+              <div class="word-picker" data-ayah="1" data-suggested="{{.SuggestedHighlights1}}" aria-label="Adjust highlights for {{.Ayah1}}">
+                {{range $i, $w := .Ayah1Words}}<span class="word-picker-word" data-idx="{{$i}}" role="button" tabindex="0" aria-pressed="false">{{$w}}</span> {{end}}
+              </div>
+              <input type="hidden" name="highlights_ayah1" value="{{.SuggestedHighlights1}}" />
+              <div class="word-picker" data-ayah="2" data-suggested="{{.SuggestedHighlights2}}" aria-label="Adjust highlights for {{.Ayah2}}">
+                {{range $i, $w := .Ayah2Words}}<span class="word-picker-word" data-idx="{{$i}}" role="button" tabindex="0" aria-pressed="false">{{$w}}</span> {{end}}
+              </div>
+              <input type="hidden" name="highlights_ayah2" value="{{.SuggestedHighlights2}}" />
+              <button type="button" class="btn-outline clear-highlights-btn">Clear highlights</button>
+            </div>
+            <div class="admin-edit-actions">
+              {{if eq $.Status "pending"}}
+              <button type="submit" class="btn" name="decision" value="accept">Accept and mark reviewed</button>
+              <button type="submit" class="btn-outline" name="decision" value="reject">Reject candidate</button>
+              {{else}}
+              <button type="submit" class="btn" name="decision" value="save_review">Save &amp; mark reviewed</button>
+              {{end}}
+            </div>
+          </form>
+          {{end}}
+          {{if eq $.Status "auto"}}</details>{{end}}
+          {{if eq $.Status "manual"}}
+          {{if .Note}}<p class="meta note"><strong>Public note:</strong> {{.Note}}</p>{{end}}
+          <a class="admin-edit-link" href="/admin/relations/{{.RelationID}}/edit?lang={{$.Lang}}">Edit reviewed pair</a>
+          {{end}}
+        </li>
+        {{end}}
+      </ol>
+      {{else}}
+      <p class="meta">No candidates in this view.</p>
+      {{end}}
+
+      <nav class="admin-filter-bar" aria-label="Candidate pages">
+        {{if .HasPrevious}}<a class="admin-filter-btn" href="{{.PreviousURL}}">← Previous</a>{{end}}
+        {{if .HasNext}}<a class="admin-filter-btn" href="{{.NextURL}}">Next →</a>{{end}}
+      </nav>
+    </section>
+  </main>
+{{template "site-footer" .}}
+<script>
+  (() => {
+    document.querySelectorAll(".admin-candidate-review-form").forEach((form) => {
+      const pickers = [...form.querySelectorAll(".word-picker")];
+      const inputs = [...form.querySelectorAll('input[name^="highlights_"]')];
+      const update = (picker, input) => {
+        const selected = [...picker.querySelectorAll(".word-picker-word.selected")]
+          .map((word) => word.dataset.idx);
+        input.value = selected.join(",");
+      };
+      pickers.forEach((picker, index) => {
+        const input = inputs[index];
+        const initial = new Set((picker.dataset.suggested || "").split(",").filter(Boolean));
+        const words = [...picker.querySelectorAll(".word-picker-word")];
+        const toggle = (word) => {
+          word.classList.toggle("selected");
+          word.setAttribute("aria-pressed", word.classList.contains("selected") ? "true" : "false");
+          update(picker, input);
+        };
+        words.forEach((word) => {
+          if (initial.has(word.dataset.idx)) {
+            word.classList.add("selected");
+            word.setAttribute("aria-pressed", "true");
+          }
+          word.addEventListener("click", () => toggle(word));
+          word.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggle(word); }
+          });
+        });
+      });
+      form.querySelector(".clear-highlights-btn")?.addEventListener("click", () => {
+        pickers.forEach((picker, index) => {
+          picker.querySelectorAll(".word-picker-word.selected").forEach((word) => {
+            word.classList.remove("selected");
+            word.setAttribute("aria-pressed", "false");
+          });
+          inputs[index].value = "";
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>

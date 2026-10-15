@@ -142,6 +142,18 @@ type adminCategoryOption struct {
 	Hint  string
 }
 
+type curationCandidateInput struct {
+	Ayah1                        string  `json:"ayah1"`
+	Ayah2                        string  `json:"ayah2"`
+	SuggestedCategory            string  `json:"suggested_category"`
+	CategorySuggestionConfidence string  `json:"category_suggestion_confidence"`
+	CategorySuggestionBasis      string  `json:"category_suggestion_basis"`
+	ReviewPriority               string  `json:"review_priority"`
+	Type                         string  `json:"type"`
+	PhraseLen                    int     `json:"phrase_len"`
+	Jaccard                      float64 `json:"jaccard"`
+}
+
 // userView holds the safe, template-visible subset of a session.
 type userView struct {
 	Name  string
@@ -183,6 +195,14 @@ func main() {
 		log.Fatalf("failed to open db: %v", err)
 	}
 	defer dbStore.Close()
+
+	candidateCount, err := importCurationCandidates(dbStore, quran, filepath.Join(baseDir, "data", "curation_candidates.json"))
+	if err != nil {
+		log.Fatalf("failed to load curation candidates: %v", err)
+	}
+	if candidateCount > 0 {
+		log.Printf("curation: imported %d new review candidates", candidateCount)
+	}
 
 	staticFiles, err := embeddedStaticFiles()
 	if err != nil {
@@ -282,6 +302,7 @@ func main() {
 	mux.HandleFunc("/admin/logout", s.handleAdminLogout)
 	mux.HandleFunc("/admin/relations", s.handleAdminRelations)
 	mux.HandleFunc("/admin/relations/", s.handleAdminRelationEdit)
+	mux.HandleFunc("/admin/curation", s.handleAdminCuration)
 
 	mux.HandleFunc("/robots.txt", s.handleRobotsTxt)
 	mux.HandleFunc("/sitemap.xml", s.handleSitemap)
@@ -1387,7 +1408,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 			if r.FormValue("highlights_modified") == "1" {
 				highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
 			}
-			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
+			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights, s.adminUser); err != nil {
 				s.renderAdminRelationsPage(w, r, map[string]any{
 					"AdminError": adminErrorMessage(err),
 				})
@@ -1405,7 +1426,7 @@ func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			reviewed := r.FormValue("reviewed") == "1"
-			if err := s.rels.SetReviewed(id, reviewed); err != nil {
+			if err := s.rels.SetReviewed(id, reviewed, s.adminUser); err != nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, `{"error":"update failed"}`)
@@ -1540,7 +1561,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 			highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
 		}
 
-		if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
+		if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights, s.adminUser); err != nil {
 			rel, _, _ := s.rels.RelationByID(id)
 			var w1, w2 []string
 			s1, y1, err1 := relations.ParseAyahRef(ayah1)
@@ -2176,6 +2197,66 @@ func breadcrumbJSONLD(base string, crumbs []breadcrumbItem) template.JS {
 	return template.JS(b)
 }
 
+// importCurationCandidates validates versioned suggestions before adding new pairs
+// to the private review queue. Existing decisions remain untouched.
+func importCurationCandidates(store *db.Store, quran *search.Store, path string) (int, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return 0, fmt.Errorf("read %s: %w", path, err)
+	}
+	var inputs []curationCandidateInput
+	if err := json.Unmarshal(data, &inputs); err != nil {
+		return 0, fmt.Errorf("decode %s: %w", path, err)
+	}
+
+	allowedCategories := map[string]bool{
+		"lafzi": true, "addition_omission": true, "word_swap": true,
+		"ending_variation": true, "order_change": true, "pronoun_shift": true,
+		"structural": true, "other": true,
+	}
+	candidates := make([]db.CurationCandidate, 0, len(inputs))
+	seen := make(map[[4]int]struct{}, len(inputs))
+	for i, input := range inputs {
+		s1, a1, err := relations.ParseAyahRef(input.Ayah1)
+		if err != nil {
+			return 0, fmt.Errorf("candidate %d ayah1: %w", i+1, err)
+		}
+		s2, a2, err := relations.ParseAyahRef(input.Ayah2)
+		if err != nil {
+			return 0, fmt.Errorf("candidate %d ayah2: %w", i+1, err)
+		}
+		if _, ok := quran.Get(s1, a1); !ok {
+			return 0, fmt.Errorf("candidate %d references unknown ayah %s", i+1, input.Ayah1)
+		}
+		if _, ok := quran.Get(s2, a2); !ok {
+			return 0, fmt.Errorf("candidate %d references unknown ayah %s", i+1, input.Ayah2)
+		}
+		if s1 > s2 || (s1 == s2 && a1 >= a2) {
+			return 0, fmt.Errorf("candidate %d is not in canonical ayah order", i+1)
+		}
+		if !allowedCategories[input.SuggestedCategory] {
+			return 0, fmt.Errorf("candidate %d has unsupported category suggestion %q", i+1, input.SuggestedCategory)
+		}
+		if input.ReviewPriority != "high" && input.ReviewPriority != "medium" && input.ReviewPriority != "exploratory" {
+			return 0, fmt.Errorf("candidate %d has invalid review priority %q", i+1, input.ReviewPriority)
+		}
+		key := [4]int{s1, a1, s2, a2}
+		if _, exists := seen[key]; exists {
+			return 0, fmt.Errorf("candidate %d duplicates an earlier canonical pair", i+1)
+		}
+		seen[key] = struct{}{}
+		candidates = append(candidates, db.CurationCandidate{
+			Ayah1Surah: s1, Ayah1Ayah: a1, Ayah2Surah: s2, Ayah2Ayah: a2,
+			SuggestedCategory:  input.SuggestedCategory,
+			CategoryConfidence: input.CategorySuggestionConfidence,
+			CategoryBasis:      input.CategorySuggestionBasis,
+			ReviewPriority:     input.ReviewPriority, MatchType: input.Type,
+			PhraseLen: input.PhraseLen, Jaccard: input.Jaccard,
+		})
+	}
+	return store.ImportCurationCandidates(candidates)
+}
+
 // loadDotEnv reads key=value pairs from path and sets them via os.Setenv,
 // skipping any key that is already set in the environment.
 func loadDotEnv(path string) {
@@ -2285,6 +2366,7 @@ func adminCategoryOptions() []adminCategoryOption {
 		{Key: "ending_variation", Label: "Ending variation", Hint: "Same opening, but the ending differs."},
 		{Key: "order_change", Label: "Order change", Hint: "Same words, different sequence."},
 		{Key: "pronoun_shift", Label: "Pronoun shift", Hint: "A pronoun changes — e.g. هُوَ vs هُمْ, or كُمْ vs هُمْ."},
+		{Key: "structural", Label: "Structural", Hint: "Similar grammatical or rhetorical pattern with different wording."},
 		{Key: "other", Label: "Other", Hint: "Use only when none of the patterns fit clearly."},
 	}
 }

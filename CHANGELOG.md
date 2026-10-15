@@ -20,6 +20,18 @@ The format is inspired by Keep a Changelog.
 - Replaced the generic book favicon with an interlocking link mark in
   HifzLink's green and gold palette.
 
+### Added
+
+- Separated published automatic curation from manually reviewed pairs in the
+  admin dashboard. Review actions and edits update the private reviewer note
+  and timestamp while retaining automatic provenance.
+- Added a private admin queue for automatically detected verse-pair candidates.
+  Candidates remain separate from the public catalog until an administrator
+  accepts them; acceptance saves the reviewed category and note as a relation.
+- Added provisional word-level highlight suggestions to the curation queue.
+  Administrators can adjust or clear them before acceptance; saved indices
+  reference the unchanged Arabic verse text.
+
 ## [0.4.0] - 2026-10-13
 
 ### Added

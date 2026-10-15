@@ -95,6 +95,7 @@ Responsibilities:
 - Load Quran, translation, and tafsir datasets.
 - Handle public, account, collection, and administration routes.
 - Store relations and account-specific state in SQLite.
+- Import versioned curation suggestions into a private admin review queue.
 - Verify user identity through Google OAuth and load verse audio through the
   optional Quran Foundation Content API.
 - Render and serve HTML pages and static assets.
@@ -110,6 +111,17 @@ Primary tables:
 
 - `relations`: curated ayah pairs, categories, highlights, source, and review
   state.
+- `curation_candidates`: automatically detected ayah pairs, provisional
+  category suggestions, and pending/accepted/rejected review decisions. The
+  review page also suggests editable word highlights against unchanged Quran
+  text. Pending candidates are excluded from public relation queries;
+  individual acceptance inserts a reviewed relation and its selected highlight
+  indices in the same SQLite transaction. Bulk acceptance publishes automatic
+  relations with manual review still pending. Accepted candidates link to a
+  stable relation ID; admin groups use the relation's review flag. Review or edit
+  actions update that flag and the admin-only note, reviewer, and UTC timestamp
+  together. Automatic provenance remains intact after human review, and internal
+  notes are excluded from public relation data.
 - `users`: Google subject identifier, verified email, profile name, and sign-in
   timestamps.
 - `sessions`: expiring HifzLink sessions. Google OAuth tokens are not retained.
