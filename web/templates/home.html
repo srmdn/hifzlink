@@ -41,6 +41,21 @@
       <p class="home-story-body">{{.UI.storyBody}}</p>
     </div>
   </section>
+  <section class="home-catalog" aria-labelledby="catalog-title">
+    <div class="home-catalog-count">
+      {{if .HasRelationCount}}<strong>{{.RelationCount}}</strong>{{else}}<strong aria-hidden="true">—</strong>{{end}}
+      <span>{{if eq .Lang "id"}}pasangan ayat{{else}}verse pairs{{end}}</span>
+    </div>
+    <div class="home-catalog-copy">
+      <h2 id="catalog-title">{{if eq .Lang "id"}}Katalog HifzLink{{else}}The HifzLink catalog{{end}}</h2>
+      {{if eq .Lang "id"}}
+      <p>Jumlah ini menunjukkan pasangan ayat mutasyabihat yang tercatat di katalog HifzLink saat ini, bukan jumlah definitif seluruh ayat mutasyabihat dalam Al-Qur’an. Cakupan dan pengelompokan dapat berubah mengikuti sumber, kriteria, dan kurasi.</p>
+      {{else}}
+      <p>This is the number of mutashabihat verse pairs currently listed in HifzLink’s catalog, not a definitive count of all mutashabihat verses in the Quran. Coverage and grouping may change as sources, criteria, and curation are updated.</p>
+      {{end}}
+      <a class="home-link" href="{{.MethodologyURL}}">{{.UI.methodology}} <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
   <section class="home-browse" aria-labelledby="browse-title">
     <div><h2 id="browse-title">{{.UI.choose}}</h2><p>{{.UI.readSub}}</p></div>
     <nav aria-label="{{.UI.browse}}"><a href="{{.SurahIndexURL}}">{{.UI.bySurah}}</a><a href="{{.JuzIndexURL}}">{{.UI.byJuz}}</a></nav>

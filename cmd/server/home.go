@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -54,6 +55,8 @@ func (s *server) learningData(r *http.Request, data map[string]any) map[string]a
 		data["LearningSection"] = "ayah"
 	case r.URL.Path == "/privacy", r.URL.Path == "/terms":
 		data["LearningSection"] = "legal"
+	case r.URL.Path == "/methodology":
+		data["LearningSection"] = "legal"
 	case strings.HasPrefix(r.URL.Path, "/juz"):
 		data["LearningSection"] = "juz"
 	case strings.HasPrefix(r.URL.Path, "/search"), strings.HasPrefix(r.URL.Path, "/compare"):
@@ -67,6 +70,7 @@ func (s *server) learningData(r *http.Request, data map[string]any) map[string]a
 	data["WeeklyURL"] = withLang("/practice?surah=78", pageLang(r))
 	data["OpeningURL"] = withLang("/compare?ayah1=78:4&ayah2=102:3", pageLang(r))
 	data["ContinuationURL"] = withLang("/compare?ayah1=78:5&ayah2=102:4", pageLang(r))
+	data["MethodologyURL"] = withLang("/methodology", pageLang(r))
 	return data
 }
 
@@ -109,12 +113,43 @@ func (s *server) handleHome(w http.ResponseWriter, r *http.Request) {
 		title = "hifzlink: latihan ayat mutasyabihat"
 		description = "Latih lanjutan ayat dan pelajari perbedaan ayat Quran yang mirip di HifzLink."
 	}
+	relationCount, countErr := s.db.CountRelations()
+	if countErr != nil {
+		log.Printf("count relations for homepage: %v", countErr)
+	}
 	s.render(w, "home.html", s.learningData(r, map[string]any{
-		"Title":         title,
-		"Description":   description,
-		"Continuation":  s.continuation(78, pageLang(r)),
-		"FeaturedPairs": s.featuredPairs(pageLang(r)),
-		"JSONLD":        websiteJSONLD("https://" + r.Host),
+		"Title":            title,
+		"Description":      description,
+		"Continuation":     s.continuation(78, pageLang(r)),
+		"FeaturedPairs":    s.featuredPairs(pageLang(r)),
+		"RelationCount":    relationCount,
+		"HasRelationCount": countErr == nil,
+		"JSONLD":           websiteJSONLD("https://" + r.Host),
+	}))
+}
+
+func (s *server) handleMethodology(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	lang := pageLang(r)
+	title := "Sources & methodology — hifzlink"
+	description := "How HifzLink defines, groups, sources, and reviews similar Quran verse pairs."
+	if lang == "id" {
+		title = "Sumber & metodologi — hifzlink"
+		description = "Definisi, pengelompokan, sumber, dan proses kurasi pasangan ayat di HifzLink."
+	}
+	relationCount, countErr := s.db.CountRelations()
+	if countErr != nil {
+		log.Printf("count relations for methodology page: %v", countErr)
+	}
+	s.render(w, "methodology.html", s.learningData(r, map[string]any{
+		"Title":            title,
+		"Description":      description,
+		"RelationCount":    relationCount,
+		"HasRelationCount": countErr == nil,
 	}))
 }
 
@@ -149,7 +184,7 @@ func (s *server) handlePractice(w http.ResponseWriter, r *http.Request) {
 func homeCopy(lang string) map[string]string {
 	if lang == "id" {
 		return map[string]string{
-			"practice": "Latihan", "browse": "Baca per surah", "similar": "Ayat mirip", "language": "Bahasa antarmuka", "menuOpen": "Buka menu", "menuClose": "Tutup menu",
+			"practice": "Latihan", "browse": "Baca per surah", "similar": "Ayat mirip", "language": "Bahasa antarmuka", "menuOpen": "Buka menu", "menuClose": "Tutup menu", "methodology": "Sumber & metodologi",
 			"notFoundKicker": "KESALAHAN 404", "notFoundHeading": "Halaman tidak ditemukan", "notFoundMessage": "Alamat ini tidak tersedia. Periksa tautannya atau cari ayat lain.", "searchAnother": "Cari ayat lain", "privacy": "Privasi", "terms": "Ketentuan",
 			"storyLabel": "Kenapa gue membuat ini", "storyQuote": "Saat murojaah, kadang pikiranku berpindah ke ayat lain yang terdengar mirip. Aku ingin melihat hubungan itu dengan jelas, lalu segera ingat ayat mana yang sedang kubaca dan di mana lafaznya berbeda.", "storyBody": "Mutasyabihat adalah ayat-ayat dengan lafaz mirip yang mudah tertukar saat dihafal. HifzLink membantu menampilkan persamaan dan perbedaannya agar murojaah bisa lebih terarah.",
 			"eyebrow": "Hafalan Quran · Mutasyabihat", "titleFirst": "Ayat yang familiar.", "titleSecond": "Apa lanjutannya?",
@@ -166,7 +201,7 @@ func homeCopy(lang string) map[string]string {
 		}
 	}
 	return map[string]string{
-		"practice": "Practice", "browse": "Browse Quran", "similar": "Similar verses", "language": "Interface language", "menuOpen": "Open menu", "menuClose": "Close menu",
+		"practice": "Practice", "browse": "Browse Quran", "similar": "Similar verses", "language": "Interface language", "menuOpen": "Open menu", "menuClose": "Close menu", "methodology": "Sources & methodology",
 		"notFoundKicker": "ERROR 404", "notFoundHeading": "Page not found", "notFoundMessage": "This address isn't available. Check the link or search for another ayah.", "searchAnother": "Search another ayah", "privacy": "Privacy", "terms": "Terms",
 		"storyLabel": "Why I built this", "storyQuote": "When I'm reciting and my mind slips toward a similar ayah, I want to see that connection clearly. The next time I meet it, I can remember which verse sounds familiar and exactly where the wording changes.", "storyBody": "Mutashabihat are verses with similar wording that can be easy to mix up during memorization. HifzLink makes their shared words and differences easier to review.",
 		"eyebrow": "Quran memorization · Mutashabihat", "titleFirst": "A familiar ayah.", "titleSecond": "What follows?",

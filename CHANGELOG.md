@@ -8,6 +8,9 @@ The format is inspired by Keep a Changelog.
 
 ### Changed
 
+- Added a live catalog pair count to the homepage and a bilingual methodology
+  page describing the pair definition, labels, sources, review boundary, and
+  catalog limitations.
 - Redesigned the signed-in dashboard around a clear resume action, recent saved
   items, and compact collection management, with Indonesian and English copy.
 - Routed all pages through one shared footer component while preserving the

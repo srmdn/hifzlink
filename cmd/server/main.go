@@ -280,6 +280,7 @@ func main() {
 	mux.HandleFunc("/practice", s.handlePractice)
 	mux.HandleFunc("/privacy", s.handlePrivacy)
 	mux.HandleFunc("/terms", s.handleTerms)
+	mux.HandleFunc("/methodology", s.handleMethodology)
 	mux.HandleFunc("/auth/login", s.handleAuthLogin)
 	mux.HandleFunc("/auth/callback", s.handleAuthCallback)
 	mux.HandleFunc("/auth/logout", s.handleAuthLogout)
@@ -2010,7 +2011,7 @@ func (s *server) handleSitemap(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>`)
 	fmt.Fprint(w, "\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
 
-	static := []string{"/", "/surah", "/juz", "/search", "/privacy", "/terms"}
+	static := []string{"/", "/surah", "/juz", "/search", "/privacy", "/terms", "/methodology"}
 	for _, path := range static {
 		fmt.Fprintf(w, "  <url><loc>%s%s</loc></url>\n", base, path)
 	}
@@ -2037,6 +2038,7 @@ Update-Cadence: irregular
 
 ## Key Pages
 - /: Home - overview and entry point
+- /methodology: Pair definitions, categories, sources, and review process
 - /surah: Browse mutashabihat pairs organized by surah
 - /juz: Browse mutashabihat pairs organized by juz
 - /search: Search by ayah reference (60:8), surah number, or surah name
