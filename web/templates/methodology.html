@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="{{if eq .Lang "id"}}id{{else}}en{{end}}">
+{{template "head" .}}
+<body class="learning-page legal-page methodology-page">
+{{template "topbar" .}}
+
+<main class="legal-content">
+  <article class="legal-document">
+    {{if eq .Lang "id"}}
+    <h1>Sumber &amp; metodologi</h1>
+    <p class="methodology-count">{{if .HasRelationCount}}Katalog yang ditampilkan saat ini memuat <strong>{{.RelationCount}} pasangan ayat</strong>.{{else}}Jumlah pasangan ayat di katalog belum dapat dimuat.{{end}} Angka ini menghitung pasangan yang tercatat, bukan jumlah definitif seluruh ayat mutasyabihat dalam Al-Qur’an. Satu ayat dapat muncul dalam beberapa pasangan.</p>
+
+    <h2>Apa yang kami sebut pasangan mutasyabihat?</h2>
+    <p>Kami mencatat pasangan dua ayat ketika kemiripan lafaz Arabnya cukup kuat sehingga pembaca atau penghafal mungkin tertukar saat membaca atau murojaah. Kesamaan tema saja tidak cukup; hubungan yang kami tampilkan berfokus pada kemiripan lafaz.</p>
+
+    <h2>Bagaimana pasangan dikelompokkan?</h2>
+    <p>Jika label ditetapkan, label tersebut menunjukkan pola perbedaan utama di antara dua ayat:</p>
+    <ul>
+      <li><strong>Lafzi</strong> — lafaz hampir sama atau berulang.</li>
+      <li><strong>Perubahan kata</strong> — satu atau beberapa kata berbeda.</li>
+      <li><strong>Penambahan atau penghilangan</strong> — salah satu ayat memiliki kata atau frasa tambahan.</li>
+      <li><strong>Variasi akhir</strong> — bagian awal mirip, tetapi akhir ayat berbeda.</li>
+      <li><strong>Perubahan urutan</strong> — kata atau frasa yang sama muncul dalam susunan berbeda.</li>
+      <li><strong>Perubahan pronomina</strong> — pronomina atau kata ganti berbeda.</li>
+      <li><strong>Lainnya</strong> — pola tidak cocok dengan kategori di atas.</li>
+    </ul>
+    <p>Saat ini setiap pasangan memiliki paling banyak satu kategori utama, dan sebagian pasangan mungkin belum memiliki kategori. Label membantu penelusuran; label bukan penilaian atas makna atau tafsir ayat.</p>
+
+    <h2>Sumber data</h2>
+    <ul>
+      <li>Teks Arab Al-Qur’an dalam aplikasi bersumber dari <a href="https://tanzil.net/">Tanzil Project</a> dan disalin tanpa perubahan. Lihat <a href="https://tanzil.net/docs/Text_License">ketentuan penggunaan Tanzil</a>.</li>
+      <li>Data pasangan dikelola sebagai kurasi HifzLink. Dataset pasangan yang telah diterima tersedia di bawah <a href="https://creativecommons.org/licenses/by/4.0/">lisensi CC BY 4.0</a>. Lihat <a href="https://github.com/srmdn/quran-mutashabihat">dataset pasangan HifzLink</a> dan <a href="https://github.com/srmdn/hifzlink">kode sumber aplikasi</a>.</li>
+      <li>Daftar kandidat terpisah mencatat pasangan yang diturunkan dari dataset <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar Akram</a> untuk ditinjau. Kandidat yang masih menunggu review tidak masuk ke jumlah atau katalog publik.</li>
+    </ul>
+
+    <h2>Kurasi dan batasan</h2>
+    <p>Jumlah di halaman ini mengikuti pasangan aktif yang tersimpan di aplikasi dan dapat berubah ketika admin menambah, memperbarui, atau menghapus pasangan. Cakupan katalog juga bergantung pada definisi, sumber, dan kriteria yang digunakan; karena itu angka dari kurator atau metodologi lain bisa berbeda.</p>
+    <p>Kami dapat menggunakan pencarian otomatis untuk menemukan kandidat. Kandidat otomatis tetap terpisah dari katalog publik sampai ditinjau dan diterima oleh manusia. Daftar ini merupakan cakupan kerja HifzLink, bukan inventaris lengkap atau klaim bahwa tidak ada pasangan lain.</p>
+
+    <h2>Koreksi dan masukan</h2>
+    <p>Jika menemukan pasangan, rujukan, atau kategori yang perlu ditinjau, kirim masukan ke <a href="mailto:mail@srmdn.com">mail@srmdn.com</a>.</p>
+    {{else}}
+    <h1>Sources &amp; methodology</h1>
+    <p class="methodology-count">{{if .HasRelationCount}}The catalog currently lists <strong>{{.RelationCount}} verse pairs</strong>.{{else}}The catalog pair count is currently unavailable.{{end}} This counts recorded pairs, not a definitive total of all mutashabihat verses in the Quran. One verse may appear in multiple pairs.</p>
+
+    <h2>What counts as a mutashabihat pair?</h2>
+    <p>We record two verses as a pair when their Arabic wording is similar enough that a reader or memorizer might confuse them while reciting or reviewing. Shared subject matter alone is not enough; the catalog focuses on wording similarities.</p>
+
+    <h2>How are pairs grouped?</h2>
+    <p>When a label is assigned, it describes the primary difference pattern between the two verses:</p>
+    <ul>
+      <li><strong>Lafzi</strong> — wording is nearly identical or repeated.</li>
+      <li><strong>Word swap</strong> — one or more words differ.</li>
+      <li><strong>Addition or omission</strong> — one verse has an extra or missing word or phrase.</li>
+      <li><strong>Ending variation</strong> — the opening is similar but the verse ending differs.</li>
+      <li><strong>Order change</strong> — the same words or phrases appear in a different order.</li>
+      <li><strong>Pronoun shift</strong> — a pronoun changes.</li>
+      <li><strong>Other</strong> — the pattern does not fit the categories above.</li>
+    </ul>
+    <p>Each pair can currently have at most one primary category, and some pairs may not have a category yet. Labels help people browse; they are not judgments about a verse’s meaning or interpretation.</p>
+
+    <h2>Data sources</h2>
+    <ul>
+      <li>The Quran’s Arabic text in the app comes from the <a href="https://tanzil.net/">Tanzil Project</a> and is reproduced without modification. See the <a href="https://tanzil.net/docs/Text_License">Tanzil usage terms</a>.</li>
+      <li>Verse-pair data is maintained as HifzLink curation. The accepted pair dataset is available under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See the <a href="https://github.com/srmdn/quran-mutashabihat">HifzLink pair dataset</a> and the <a href="https://github.com/srmdn/hifzlink">application source</a>.</li>
+      <li>A separate candidate list records pairs derived from <a href="https://github.com/Waqar144/Quran_Mutashabihat_Data">Waqar Akram’s dataset</a> for review. Candidates awaiting review are not included in the public count or catalog.</li>
+    </ul>
+
+    <h2>Curation and limitations</h2>
+    <p>The count on this page follows the active pairs stored in the application. It can change when an admin adds, updates, or removes a pair. Catalog coverage also depends on the definitions, sources, and criteria used, so counts from other curators or methods may differ.</p>
+    <p>We may use automated search to find candidates. Automated candidates remain separate from the public catalog until a person reviews and accepts them. This list reflects HifzLink’s current scope; it is not a complete inventory or a claim that no other pairs exist.</p>
+
+    <h2>Corrections and feedback</h2>
+    <p>If a pair, reference, or category should be reviewed, send feedback to <a href="mailto:mail@srmdn.com">mail@srmdn.com</a>.</p>
+    {{end}}
+  </article>
+</main>
+
+{{template "site-footer" .}}
+</body>
+</html>

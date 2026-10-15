@@ -4,7 +4,7 @@
   --learning-serif: Georgia, "Times New Roman", serif;
   font-weight: 400;
 }
-.learning-page .topbar { position: static; background: var(--color-bg); backdrop-filter: none; border-color: var(--learning-rule); }
+.learning-page .topbar { position: sticky; top: 0; z-index: var(--z-sticky); background: var(--color-bg); backdrop-filter: none; border-color: var(--learning-rule); }
 .learning-page .topbar-inner { max-width: 1280px; padding: 23px 48px; min-height: 82px; }
 .learning-page .topbar-left { flex: 1; justify-content: space-between; gap: 24px; }
 .learning-page .primary-nav { margin: 0 auto; gap: 22px; }
@@ -66,6 +66,13 @@
 .home-story blockquote { margin: 0; padding-left: 19px; border-left: 2px solid #8aab81; }
 .home-story blockquote p { margin: 0; color: var(--color-text); font-family: var(--learning-serif); font-size: clamp(20px,2.5vw,27px); line-height: 1.55; letter-spacing: -.018em; }
 .home-story-body { max-width: 630px; margin: 17px 0 0 21px; color: var(--color-text-muted); font-size: 12px; line-height: 1.85; }
+.home-catalog { display: grid; grid-template-columns: minmax(190px,.75fr) minmax(0,1.25fr); gap: 9%; align-items: center; padding: 34px 0 38px; border-bottom: 1px solid var(--learning-rule); }
+.home-catalog-count { display: flex; align-items: baseline; gap: 12px; }
+.home-catalog-count strong { color: var(--color-accent); font-family: var(--learning-serif); font-size: clamp(40px,5vw,58px); line-height: 1; font-weight: 400; font-variant-numeric: tabular-nums; }
+.home-catalog-count span { color: var(--color-text-muted); font-size: 12px; }
+.home-catalog-copy h2 { margin: 0 0 8px; font-family: var(--learning-serif); font-size: 22px; font-weight: 400; }
+.home-catalog-copy p { max-width: 700px; margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.85; }
+.home-catalog-copy .home-link { margin-top: 5px; }
 .home-browse { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 30px 0 36px; border-top: 1px solid var(--learning-rule); }
 .home-browse h2 { font-size: 16px; font-weight: 400; margin: 0 0 7px; }
 .home-browse p { font-size: 12px; color: var(--color-text-muted); margin: 0; }
@@ -121,6 +128,8 @@
  .home-story blockquote { padding-left: 15px; }
  .home-story blockquote p { font-size: 22px; }
  .home-story-body { margin-left: 17px; }
+ .home-catalog { grid-template-columns: 1fr; gap: 20px; padding: 28px 0 30px; }
+ .home-catalog-count strong { font-size: 48px; }
  .home-browse { flex-direction: column; align-items: flex-start; gap: 15px; padding: 26px 0 30px; }
  .learning-footer { padding: 22px; gap: 12px 20px; }
  .learning-footer>span { width: calc(100% - 85px); font-size: 11px; }
