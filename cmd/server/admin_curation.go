@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/srmdn/hifzlink/internal/curation"
 	"github.com/srmdn/hifzlink/internal/db"
 	"github.com/srmdn/hifzlink/internal/relations"
 )
@@ -18,12 +20,14 @@ type adminCurationCandidateView struct {
 	ID                   int64
 	Ayah1                string
 	Ayah1Name            string
-	Ayah1Text            string
+	Ayah1Text            template.HTML
 	Ayah2                string
 	Ayah2Name            string
-	Ayah2Text            string
+	Ayah2Text            template.HTML
 	SuggestedCategory    string
 	SuggestedLabel       string
+	ActiveLabel          string
+	CoverageLabel        string
 	Confidence           string
 	BasisLabel           string
 	Priority             string
@@ -202,10 +206,11 @@ func (s *server) acceptAllPendingCuration() (int, error) {
 		if !ok1 || !ok2 {
 			return 0, fmt.Errorf("candidate %d references an unavailable ayah", candidate.ID)
 		}
-		highlights1, highlights2 := suggestedHighlightIndices(ayah1.TextAR, ayah2.TextAR)
+		analysis := curation.Analyze(ayah1.TextAR, ayah2.TextAR)
+		highlights1, highlights2 := analysis.Highlights.Ayah1, analysis.Highlights.Ayah2
 		items = append(items, db.AutomaticCurationAcceptance{
 			ID:         candidate.ID,
-			Category:   candidate.SuggestedCategory,
+			Category:   analysis.Category,
 			Highlights: buildHighlightsJSON(joinHighlightIndices(highlights1), joinHighlightIndices(highlights2)),
 		})
 	}
@@ -261,7 +266,7 @@ func (s *server) renderAdminCuration(w http.ResponseWriter, r *http.Request, adm
 		return
 	}
 
-	options := adminCategoryOptions()
+	options := adminCategoryOptionsForLang(pageLang(r))
 	labels := make(map[string]string, len(options))
 	for _, option := range options {
 		labels[option.Key] = option.Label
@@ -273,8 +278,9 @@ func (s *server) renderAdminCuration(w http.ResponseWriter, r *http.Request, adm
 		if !ok1 || !ok2 {
 			continue
 		}
-		highlights1, highlights2 := suggestedHighlightIndices(ayah1.TextAR, ayah2.TextAR)
-		category := candidate.SuggestedCategory
+		analysis := curation.Analyze(ayah1.TextAR, ayah2.TextAR)
+		highlights1, highlights2 := analysis.Highlights.Ayah1, analysis.Highlights.Ayah2
+		category := analysis.Category
 		if candidate.Status == "accepted" {
 			saved := parseHighlights(candidate.Highlights)
 			highlights1, highlights2 = saved.Ayah1, saved.Ayah2
@@ -283,14 +289,16 @@ func (s *server) renderAdminCuration(w http.ResponseWriter, r *http.Request, adm
 		views = append(views, adminCurationCandidateView{
 			ID:        candidate.ID,
 			Ayah1:     relations.FormatAyahRef(candidate.Ayah1Surah, candidate.Ayah1Ayah),
-			Ayah1Name: ayah1.SurahName, Ayah1Text: ayah1.TextAR,
+			Ayah1Name: ayah1.SurahName, Ayah1Text: applyHighlights(ayah1.TextAR, highlights1),
 			Ayah2:     relations.FormatAyahRef(candidate.Ayah2Surah, candidate.Ayah2Ayah),
-			Ayah2Name: ayah2.SurahName, Ayah2Text: ayah2.TextAR,
-			SuggestedCategory: candidate.SuggestedCategory,
-			SuggestedLabel:    labels[candidate.SuggestedCategory],
-			Confidence:        candidate.CategoryConfidence, BasisLabel: curationBasisLabel(candidate.CategoryBasis),
+			Ayah2Name: ayah2.SurahName, Ayah2Text: applyHighlights(ayah2.TextAR, highlights2),
+			ActiveLabel:       labels[category],
+			CoverageLabel:     fmt.Sprintf("%.0f%% / %.0f%%", analysis.Coverage1*100, analysis.Coverage2*100),
+			SuggestedCategory: analysis.Category,
+			SuggestedLabel:    labels[analysis.Category],
+			Confidence:        analysis.Confidence, BasisLabel: analysis.Basis,
 			Priority: candidate.ReviewPriority, MatchType: candidate.MatchType,
-			PhraseLen: candidate.PhraseLen, Jaccard: candidate.Jaccard,
+			PhraseLen: analysis.PhraseLen, Jaccard: candidate.Jaccard,
 			Ayah1Words: strings.Fields(ayah1.TextAR), Ayah2Words: strings.Fields(ayah2.TextAR),
 			SuggestedHighlights1: joinHighlightIndices(highlights1),
 			SuggestedHighlights2: joinHighlightIndices(highlights2),
@@ -329,6 +337,9 @@ func (s *server) renderAdminCuration(w http.ResponseWriter, r *http.Request, adm
 }
 
 func curationBasisLabel(basis string) string {
+	if strings.HasPrefix(basis, curation.Version+": ") {
+		return strings.TrimPrefix(basis, curation.Version+": ")
+	}
 	switch basis {
 	case "normalized_verses_identical":
 		return "Normalized verse wording is identical"

@@ -20,6 +20,14 @@
   </header>
   <p class="compare-share-status" role="status" aria-live="polite"></p>
 
+  {{if .RelationCategoryLabel}}
+  <section class="compare-category" aria-labelledby="compare-category-title">
+    <p class="compare-category-caption">{{if eq .Lang "id"}}Pola kemiripan{{else}}Similarity pattern{{end}}</p>
+    <h2 id="compare-category-title">{{.RelationCategoryLabel}}</h2>
+    {{if .RelationCategoryDescription}}<p class="compare-category-description">{{.RelationCategoryDescription}}</p>{{end}}
+  </section>
+  {{end}}
+
   <section class="compare-connections-prompt">
     <p>{{if eq .Lang "id"}}Ingin membandingkan lebih banyak koneksi?{{else}}Want to compare more connections?{{end}}</p>
     <span>{{if eq .Lang "id"}}Pilih ayat acuan:{{else}}Choose an anchor ayah:{{end}}</span>

@@ -1006,7 +1006,7 @@ func TestAdminCurationRendersEditableSuggestedHighlights(t *testing.T) {
 	response := httptest.NewRecorder()
 	s.handleAdminCuration(response, req)
 	body := response.Body.String()
-	if response.Code != http.StatusOK || !strings.Contains(body, "Suggested highlights") || !strings.Contains(body, `name="highlights_ayah1" value="0"`) {
+	if response.Code != http.StatusOK || !strings.Contains(body, "Suggested highlights") || !strings.Contains(body, `name="highlights_ayah1" value="0,1"`) {
 		t.Fatalf("GET /admin/curation did not render editable word suggestions: status=%d body has editor=%t", response.Code, strings.Contains(body, "Suggested highlights"))
 	}
 }

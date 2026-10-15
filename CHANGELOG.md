@@ -8,6 +8,15 @@ The format is inspired by Keep a Changelog.
 
 ### Changed
 
+- Displayed the saved similarity label and a reader-facing explanation on the
+  two-verse compare page, with clearer Indonesian and English reading guidance.
+- Narrowed automatic Lafzi classification to complete-verse similarity and added
+  shared-opening, shared-phrase, and shared-ending labels with bilingual guides.
+  The admin queue shows the active saved category and whole-verse coverage.
+- Unified automatic difference highlights across the admin and compare pages:
+  stop signs are ignored while meaningful vocalization differences are retained.
+  Curation refinement uses an explicit local plan and preserves human decisions.
+
 - Added a live catalog pair count to the homepage and a bilingual methodology
   page describing the pair definition, labels, sources, review boundary, and
   catalog limitations.
