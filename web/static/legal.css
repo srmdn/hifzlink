@@ -10,6 +10,8 @@
 .legal-document strong { color: var(--color-text); font-weight: 500; }
 .legal-document a { color: var(--color-accent); text-decoration-color: var(--learning-rule); text-underline-offset: 3px; }
 .legal-document a:hover { color: var(--color-accent-strong); }
+.methodology-count { margin: 22px 0 52px !important; padding: 18px 20px; border-left: 2px solid #8aab81; background: var(--color-surface); }
+.methodology-count strong { color: var(--color-accent); font-variant-numeric: tabular-nums; }
 @media(max-width:700px) {
  .legal-content { width: calc(100% - 44px); padding: 52px 0 68px; }
  .legal-updated { margin-bottom: 42px; }
