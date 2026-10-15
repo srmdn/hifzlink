@@ -12,7 +12,7 @@
         <h1>{{.Relation.Ayah1}} <span aria-hidden="true">↔</span> {{.Relation.Ayah2}}</h1>
         <p class="admin-page-lead">{{.Relation.Ayah1Name}} / {{.Relation.Ayah2Name}}{{if .RelationUpdatedAt}} · Last updated {{.RelationUpdatedAt}}{{end}}</p>
       </div>
-      <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations" aria-current="page">Relations</a></nav>
+      <nav class="admin-page-nav" aria-label="Admin pages"><a href="/admin/users">Users</a><a href="/admin/relations" aria-current="page">Relations</a><a href="/admin/curation">Curation</a></nav>
     </header>
 
     {{if or .DiffText1 .DiffText2}}

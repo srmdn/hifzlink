@@ -228,6 +228,22 @@
 
 .delete-dialog { width: min(92vw, 430px); padding: 0; border: 1px solid var(--learning-rule, #35473b); border-top: 2px solid #8aab81; border-radius: 3px 3px 10px 3px; background: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-md); }
 .delete-dialog::backdrop { background: rgba(7, 12, 9, .72); }
+
+.admin-candidate-list { margin-top: 18px; }
+.admin-candidate-item { padding: 20px 0; }
+.admin-candidate-verses { margin-top: 10px; }
+.admin-candidate-evidence { margin: 6px 0 12px; font-size: 10px; }
+.admin-candidate-review-form { margin-top: 12px; padding: 16px; border: 1px solid var(--learning-rule, #35473b); background: var(--color-surface-2); }
+.curation-highlight-editor { grid-column: 1 / -1; margin-top: 8px; }
+.curation-highlight-editor .word-picker-word { display: inline-block; }
+.curation-highlight-editor .clear-highlights-btn { min-height: 34px; padding: 6px 0; font-size: 11px; }
+.admin-candidate-review-form textarea { width: 100%; min-height: 76px; padding: 10px 12px; border: 1px solid var(--learning-rule, #35473b); border-radius: 3px; background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 12px; resize: vertical; }
+.admin-candidate-review-form .admin-edit-actions button { width: auto; flex: 1 1 210px; }
+.admin-internal-note { padding: 12px 14px; border-left: 2px solid var(--color-accent); background: var(--color-surface-2); font-size: 12px; line-height: 1.6; }
+.curation-mark-reviewed-form { margin: 14px 0; }
+.curation-mark-reviewed-form .btn { min-height: 40px; padding: 10px 16px; }
+.curation-edit-details { margin: 12px 0; }
+.curation-edit-details summary { cursor: pointer; color: var(--color-text-muted); font-size: 12px; }
 .delete-dialog-body { padding: 25px; }
 .delete-dialog-body h3 { margin: 0 0 8px; font-family: var(--learning-serif, Georgia, serif); font-size: 25px; font-weight: 400; }
 .delete-dialog-body .meta { color: var(--color-text-muted); font-size: 12px; }

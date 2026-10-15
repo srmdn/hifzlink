@@ -18,7 +18,7 @@ type Relation struct {
 	Category   string
 	Highlights string // JSON: {"ayah1":[0,2],"ayah2":[1,3]}
 	UpdatedAt  string
-	Source     string // "seed" or "manual"
+	Source     string // "seed", "manual", or "auto"
 	Reviewed   bool
 }
 
@@ -108,6 +108,32 @@ func Open(path string) (*Store, error) {
 	CREATE INDEX IF NOT EXISTS idx_relations_ayah1 ON relations (ayah1_surah, ayah1_ayah);
 	CREATE INDEX IF NOT EXISTS idx_relations_ayah2 ON relations (ayah2_surah, ayah2_ayah);
 
+	CREATE TABLE IF NOT EXISTS curation_candidates (
+		id INTEGER PRIMARY KEY,
+		ayah1_surah INTEGER NOT NULL,
+		ayah1_ayah INTEGER NOT NULL,
+		ayah2_surah INTEGER NOT NULL,
+		ayah2_ayah INTEGER NOT NULL,
+		suggested_category TEXT NOT NULL DEFAULT '',
+		category_confidence TEXT NOT NULL DEFAULT '',
+		category_basis TEXT NOT NULL DEFAULT '',
+		review_priority TEXT NOT NULL DEFAULT 'exploratory',
+		match_type TEXT NOT NULL DEFAULT '',
+		phrase_len INTEGER NOT NULL DEFAULT 0,
+		jaccard REAL NOT NULL DEFAULT 0,
+		status TEXT NOT NULL DEFAULT 'pending',
+		category TEXT NOT NULL DEFAULT '',
+		note TEXT NOT NULL DEFAULT '',
+		internal_note TEXT NOT NULL DEFAULT '',
+		relation_id INTEGER NOT NULL DEFAULT 0,
+		manually_reviewed_at TEXT NOT NULL DEFAULT '',
+		manually_reviewed_by TEXT NOT NULL DEFAULT '',
+		created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		reviewed_at TEXT,
+		UNIQUE(ayah1_surah, ayah1_ayah, ayah2_surah, ayah2_ayah)
+	);
+	CREATE INDEX IF NOT EXISTS idx_curation_candidates_status_priority ON curation_candidates (status, review_priority, ayah1_surah, ayah1_ayah);
+
 	CREATE TABLE IF NOT EXISTS collections (
 		id INTEGER PRIMARY KEY,
 		name TEXT NOT NULL UNIQUE,
@@ -183,6 +209,33 @@ func Open(path string) (*Store, error) {
 	if err := ensureColumn(db, "relations", "reviewed", "ALTER TABLE relations ADD COLUMN reviewed INTEGER NOT NULL DEFAULT 0"); err != nil {
 		_ = db.Close()
 		return nil, err
+	}
+	if err := ensureColumn(db, "curation_candidates", "internal_note", "ALTER TABLE curation_candidates ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''"); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+	for _, column := range []struct{ name, definition string }{
+		{"relation_id", "INTEGER NOT NULL DEFAULT 0"},
+		{"manually_reviewed_at", "TEXT NOT NULL DEFAULT ''"},
+		{"manually_reviewed_by", "TEXT NOT NULL DEFAULT ''"},
+	} {
+		if err := ensureColumn(db, "curation_candidates", column.name, "ALTER TABLE curation_candidates ADD COLUMN "+column.name+" "+column.definition); err != nil {
+			_ = db.Close()
+			return nil, err
+		}
+	}
+	// Link earlier acceptances without changing their review decisions or notes.
+	if _, err := db.Exec(`
+		UPDATE curation_candidates SET relation_id = COALESCE((
+			SELECT r.id FROM relations r
+			WHERE r.ayah1_surah = curation_candidates.ayah1_surah
+			AND r.ayah1_ayah = curation_candidates.ayah1_ayah
+			AND r.ayah2_surah = curation_candidates.ayah2_surah
+			AND r.ayah2_ayah = curation_candidates.ayah2_ayah
+		), 0) WHERE status = 'accepted' AND relation_id = 0
+	`); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("link accepted curation candidates: %w", err)
 	}
 	// Manual-sourced pairs are inherently reviewed; seed pairs start unreviewed.
 	if _, err := db.Exec(`UPDATE relations SET reviewed = 1 WHERE source = 'manual' AND reviewed = 0`); err != nil {
@@ -310,7 +363,17 @@ func (s *Store) CountRelations() (int, error) {
 }
 
 func (s *Store) DeleteByID(id int64) error {
-	res, err := s.db.Exec(`DELETE FROM relations WHERE id = ?`, id)
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("begin relation deletion: %w", err)
+	}
+	defer tx.Rollback()
+	// SQLite may reuse a deleted row ID. Detach its review history so a later
+	// unrelated relation cannot inherit the old candidate's private note.
+	if _, err := tx.Exec(`UPDATE curation_candidates SET relation_id = 0 WHERE relation_id = ?`, id); err != nil {
+		return fmt.Errorf("detach curation history: %w", err)
+	}
+	res, err := tx.Exec(`DELETE FROM relations WHERE id = ?`, id)
 	if err != nil {
 		return fmt.Errorf("delete relation: %w", err)
 	}
@@ -321,11 +384,16 @@ func (s *Store) DeleteByID(id int64) error {
 	if affected == 0 {
 		return sql.ErrNoRows
 	}
-	return nil
+	return tx.Commit()
 }
 
-func (s *Store) UpdateByID(rel Relation) error {
-	res, err := s.db.Exec(`
+func (s *Store) UpdateByID(rel Relation, reviewer ...string) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("begin relation update: %w", err)
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(`
 	UPDATE relations
 	SET ayah1_surah = ?, ayah1_ayah = ?, ayah2_surah = ?, ayah2_ayah = ?, note = ?, category = ?, highlights = ?, updated_at = CURRENT_TIMESTAMP, reviewed = 1
 	WHERE id = ?
@@ -340,15 +408,23 @@ func (s *Store) UpdateByID(rel Relation) error {
 	if affected == 0 {
 		return sql.ErrNoRows
 	}
-	return nil
+	if err := recordCurationManualReview(tx, rel.ID, true, reviewerName(reviewer)); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
-func (s *Store) SetReviewed(id int64, reviewed bool) error {
+func (s *Store) SetReviewed(id int64, reviewed bool, reviewer ...string) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("begin relation review: %w", err)
+	}
+	defer tx.Rollback()
 	val := 0
 	if reviewed {
 		val = 1
 	}
-	res, err := s.db.Exec(`UPDATE relations SET reviewed = ? WHERE id = ?`, val, id)
+	res, err := tx.Exec(`UPDATE relations SET reviewed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, val, id)
 	if err != nil {
 		return fmt.Errorf("set reviewed: %w", err)
 	}
@@ -359,7 +435,10 @@ func (s *Store) SetReviewed(id int64, reviewed bool) error {
 	if affected == 0 {
 		return sql.ErrNoRows
 	}
-	return nil
+	if err := recordCurationManualReview(tx, id, reviewed, reviewerName(reviewer)); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (s *Store) CreateCollection(name, description, userID string) (int64, error) {
