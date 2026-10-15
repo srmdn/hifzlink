@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 17774)
-Total output lines: 2317
-
 package main
 
 import (
@@ -625,7 +622,1016 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	…7774 tokens truncated…related, err := s.rels.RelatedAyahs(surah, ayah)
+	var diff1, diff2 template.HTML
+	rel, relFound, _ := s.db.ByPair(s1, y1, s2, y2)
+	if relFound && rel.Highlights != "" {
+		h := parseHighlights(rel.Highlights)
+		diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
+		diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
+	} else {
+		diff1, diff2 = diffHighlight(ayah1.TextAR, ayah2.TextAR)
+	}
+
+	type relatedPairView struct {
+		Ref1       string
+		Ref2       string
+		CompareURL string
+		Category   string
+	}
+
+	var relatedPairs []relatedPairView
+	lang := pageLang(r)
+	seen := map[string]bool{
+		fmt.Sprintf("%d:%d-%d:%d", s1, y1, s2, y2): true,
+		fmt.Sprintf("%d:%d-%d:%d", s2, y2, s1, y1): true,
+	}
+	addRelated := func(rels []db.Relation) {
+		for _, rel := range rels {
+			key := fmt.Sprintf("%d:%d-%d:%d", rel.Ayah1Surah, rel.Ayah1Ayah, rel.Ayah2Surah, rel.Ayah2Ayah)
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			ref1 := relations.FormatAyahRef(rel.Ayah1Surah, rel.Ayah1Ayah)
+			ref2 := relations.FormatAyahRef(rel.Ayah2Surah, rel.Ayah2Ayah)
+			relatedPairs = append(relatedPairs, relatedPairView{
+				Ref1:       ref1,
+				Ref2:       ref2,
+				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+				Category:   rel.Category,
+			})
+		}
+	}
+	if rels1, err := s.db.ByAyah(s1, y1); err == nil {
+		addRelated(rels1)
+	}
+	if rels2, err := s.db.ByAyah(s2, y2); err == nil {
+		addRelated(rels2)
+	}
+
+	ref1str := relations.FormatAyahRef(s1, y1)
+	ref2str := relations.FormatAyahRef(s2, y2)
+	compareData := map[string]any{
+		"Title":       fmt.Sprintf("Compare %s and %s | hifzlink", ref1str, ref2str),
+		"Description": fmt.Sprintf("Compare %s %s and %s %s to see what is shared and what changes.", ayah1.SurahName, ref1str, ayah2.SurahName, ref2str),
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: fmt.Sprintf("%s vs %s", ref1str, ref2str), Path: fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1str, ref2str)},
+		}),
+		"Ayah1":             ayah1,
+		"Ayah1Translation":  s.translationFor(pageLang(r), s1, y1),
+		"Ayah2":             ayah2,
+		"Ayah2Translation":  s.translationFor(pageLang(r), s2, y2),
+		"Ref1":              ref1str,
+		"Ref2":              ref2str,
+		"DiffText1":         diff1,
+		"DiffText2":         diff2,
+		"Collections":       collections,
+		"SaveStatus":        collectionStatusMessage(r.URL.Query().Get("saved")),
+		"RelatedPairs":      relatedPairs,
+		"SavedItemID":       savedItemID,
+		"SavedItemMastered": savedItemMastered,
+	}
+	if lang == "id" {
+		compareData["Title"] = fmt.Sprintf("Bandingkan ayat %s dan %s | hifzlink", ref1str, ref2str)
+		compareData["Description"] = fmt.Sprintf("Bandingkan %s %s dan %s %s. Temukan lafaz yang sama dan bagian yang berubah.", ayah1.SurahName, ref1str, ayah2.SurahName, ref2str)
+	}
+	if relFound {
+		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
+		compareData["RelationUpdatedAt"] = formatUpdatedAt(rel.UpdatedAt)
+		compareData["RelationNote"] = rel.Note
+	}
+	viewData := s.learningData(r, compareData)
+	sharePath := fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", neturl.QueryEscape(ref1str), neturl.QueryEscape(ref2str))
+	viewData["ShareURL"] = withLang(sharePath, lang)
+	viewData["CanonicalURL"] = "https://" + r.Host + withLang(sharePath, lang)
+	viewData["OGImageAlt"] = "HifzLink social card about reviewing similar Quran verses"
+	s.render(w, "compare.html", viewData)
+}
+
+type dashboardItemView struct {
+	ItemType     string
+	CollectionID int64
+	Collection   string
+	Ref1         string
+	Ref2         string
+	PrimaryURL   string
+	SecondaryURL string
+	CreatedAt    string
+	Mastered     bool
+	Note         string
+}
+
+func (s *server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	collections, err := s.db.RecentCollections(6, sess.UserID)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+	recentItems, err := s.db.RecentCollectionItems(6, sess.UserID)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	lang := pageLang(r)
+
+	items := make([]dashboardItemView, 0, len(recentItems))
+	var resumeItem dashboardItemView
+
+	for _, item := range recentItems {
+		ref1 := relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah)
+		view := dashboardItemView{
+			ItemType:     item.ItemType,
+			CollectionID: item.Collection,
+			Collection:   item.CollectionName,
+			Ref1:         ref1,
+			CreatedAt:    formatTimestamp(item.CreatedAt),
+			Note:         item.Note,
+			PrimaryURL:   withLang(fmt.Sprintf("/ayah/%d/%d", item.Ayah1Surah, item.Ayah1Ayah), lang),
+			Mastered:     item.Mastered,
+		}
+		if item.ItemType == "relation" {
+			ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
+			view.Ref2 = ref2
+			view.SecondaryURL = withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang)
+		}
+		items = append(items, view)
+	}
+	hasSavedItems := len(items) > 0
+	if hasSavedItems {
+		resumeItem = items[0]
+		items = items[1:]
+	}
+
+	allCollections, err := s.db.Collections(sess.UserID)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	savedPairsCount, err := s.db.CountSavedPairs(sess.UserID)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	s.render(w, "dashboard.html", s.learningData(r, map[string]any{
+		"Title":             "Dashboard",
+		"Description":       "Resume your Quran review and organize similar ayat.",
+		"NoIndex":           true,
+		"DashboardPage":     true,
+		"RecentCollections": toCollectionViews(collections),
+		"CollectionsCount":  len(allCollections),
+		"RecentItems":       items,
+		"ResumeItem":        resumeItem,
+		"HasSavedItems":     hasSavedItems,
+		"SavedPairsCount":   savedPairsCount,
+		"StatusNotice":      collectionStatusMessage(r.URL.Query().Get("status")),
+	}))
+}
+
+func (s *server) handleCollectionsPage(w http.ResponseWriter, r *http.Request) {
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		collections, err := s.db.Collections(sess.UserID)
+		if err != nil {
+			internalError(w, r, err)
+			return
+		}
+		s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
+			"Title":        "Collections",
+			"NoIndex":      true,
+			"Collections":  toCollectionViews(collections),
+			"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
+		}))
+		return
+	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
+			return
+		}
+		name := strings.TrimSpace(r.FormValue("name"))
+		description := strings.TrimSpace(r.FormValue("description"))
+		lang := sanitizeLang(r.FormValue("lang"))
+		if name == "" {
+			collections, _ := s.db.Collections(sess.UserID)
+			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
+				"Title":           "Collections",
+				"NoIndex":         true,
+				"Collections":     toCollectionViews(collections),
+				"StatusNotice":    "",
+				"CollectionError": "Collection name is required.",
+				"FormName":        name,
+				"FormDescription": description,
+			}))
+			return
+		}
+
+		_, err := s.db.CreateCollection(name, description, sess.UserID)
+		if err != nil {
+			collections, _ := s.db.Collections(sess.UserID)
+			s.render(w, "collections.html", s.withCommonViewData(r, map[string]any{
+				"Title":           "Collections",
+				"NoIndex":         true,
+				"Collections":     toCollectionViews(collections),
+				"CollectionError": "Collection name already exists or is invalid.",
+				"FormName":        name,
+				"FormDescription": description,
+			}))
+			return
+		}
+		http.Redirect(w, r, withLang("/dashboard?status=created", lang), http.StatusSeeOther)
+		return
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+type collectionItemView struct {
+	ID            int64
+	ItemType      string
+	ItemTypeLabel string
+	Surah1        int
+	Ayah1         int
+	Surah2        int
+	Ayah2         int
+	Ref1          string
+	Ref2          string
+	Surah1Name    string
+	Surah2Name    string
+	Arabic1       string
+	Arabic2       string
+	Translation1  string
+	Translation2  string
+	CompareURL    string
+	Note          string
+	CreatedAt     string
+}
+
+func (s *server) handleCollectionDetailPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	idPath := strings.Trim(strings.TrimPrefix(r.URL.Path, "/collections/"), "/")
+	if idPath == "" {
+		http.NotFound(w, r)
+		return
+	}
+	id, err := strconv.ParseInt(idPath, 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	collection, err := s.db.CollectionByID(id, sess.UserID)
+	if err != nil {
+		s.renderNotFound(w, r, "Collection not found", "This collection does not exist.")
+		return
+	}
+	items, err := s.db.CollectionItems(id)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	lang := pageLang(r)
+	viewItems := make([]collectionItemView, 0, len(items))
+	for _, item := range items {
+		if item.ItemType == "ayah" {
+			a1, ok := s.quran.Get(item.Ayah1Surah, item.Ayah1Ayah)
+			if !ok {
+				continue
+			}
+			viewItems = append(viewItems, collectionItemView{
+				ID:            item.ID,
+				ItemType:      item.ItemType,
+				ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
+				Surah1:        item.Ayah1Surah,
+				Ayah1:         item.Ayah1Ayah,
+				Ref1:          relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah),
+				Surah1Name:    a1.SurahName,
+				Arabic1:       a1.TextAR,
+				Translation1:  s.translationFor(lang, item.Ayah1Surah, item.Ayah1Ayah),
+				Note:          item.Note,
+				CreatedAt:     formatTimestamp(item.CreatedAt),
+			})
+			continue
+		}
+		a1, ok1 := s.quran.Get(item.Ayah1Surah, item.Ayah1Ayah)
+		a2, ok2 := s.quran.Get(item.Ayah2Surah, item.Ayah2Ayah)
+		if !ok1 || !ok2 {
+			continue
+		}
+		ref1 := relations.FormatAyahRef(item.Ayah1Surah, item.Ayah1Ayah)
+		ref2 := relations.FormatAyahRef(item.Ayah2Surah, item.Ayah2Ayah)
+		viewItems = append(viewItems, collectionItemView{
+			ID:            item.ID,
+			ItemType:      item.ItemType,
+			ItemTypeLabel: collectionItemTypeLabel(item.ItemType),
+			Surah1:        item.Ayah1Surah,
+			Ayah1:         item.Ayah1Ayah,
+			Surah2:        item.Ayah2Surah,
+			Ayah2:         item.Ayah2Ayah,
+			Ref1:          ref1,
+			Ref2:          ref2,
+			Surah1Name:    a1.SurahName,
+			Surah2Name:    a2.SurahName,
+			Arabic1:       a1.TextAR,
+			Arabic2:       a2.TextAR,
+			Translation1:  s.translationFor(lang, item.Ayah1Surah, item.Ayah1Ayah),
+			Translation2:  s.translationFor(lang, item.Ayah2Surah, item.Ayah2Ayah),
+			CompareURL:    withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
+			Note:          item.Note,
+			CreatedAt:     formatTimestamp(item.CreatedAt),
+		})
+	}
+
+	s.render(w, "collection-detail.html", s.withCommonViewData(r, map[string]any{
+		"Title":        collection.Name,
+		"NoIndex":      true,
+		"Collection":   toCollectionView(collection),
+		"Items":        viewItems,
+		"StatusNotice": collectionStatusMessage(r.URL.Query().Get("status")),
+	}))
+}
+
+func (s *server) handleCollectionItemsPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Error(w, "login required", http.StatusUnauthorized)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
+		return
+	}
+
+	collectionID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("collection_id")), 10, 64)
+	if err != nil || collectionID <= 0 {
+		http.Error(w, "invalid collection", http.StatusBadRequest)
+		return
+	}
+
+	// Verify the collection belongs to the current user.
+	if _, err := s.db.CollectionByID(collectionID, sess.UserID); err != nil {
+		http.Error(w, "collection not found", http.StatusNotFound)
+		return
+	}
+	itemType := strings.ToLower(strings.TrimSpace(r.FormValue("item_type")))
+	note := strings.TrimSpace(r.FormValue("note"))
+	lang := sanitizeLang(r.FormValue("lang"))
+
+	ayah1S, ayah1A, err := relations.ParseAyahRef(strings.TrimSpace(r.FormValue("ayah1")))
+	if err != nil {
+		http.Error(w, "invalid ayah1", http.StatusBadRequest)
+		return
+	}
+	if _, ok := s.quran.Get(ayah1S, ayah1A); !ok {
+		http.Error(w, "ayah1 not found", http.StatusBadRequest)
+		return
+	}
+
+	item := db.CollectionItem{
+		Collection: collectionID,
+		ItemType:   itemType,
+		Ayah1Surah: ayah1S,
+		Ayah1Ayah:  ayah1A,
+		Note:       note,
+	}
+	if itemType == "relation" {
+		ayah2S, ayah2A, err := relations.ParseAyahRef(strings.TrimSpace(r.FormValue("ayah2")))
+		if err != nil {
+			http.Error(w, "invalid ayah2", http.StatusBadRequest)
+			return
+		}
+		if _, ok := s.quran.Get(ayah2S, ayah2A); !ok {
+			http.Error(w, "ayah2 not found", http.StatusBadRequest)
+			return
+		}
+		if ayahComesAfter(ayah1S, ayah1A, ayah2S, ayah2A) {
+			ayah1S, ayah2S = ayah2S, ayah1S
+			ayah1A, ayah2A = ayah2A, ayah1A
+		}
+		item.Ayah1Surah = ayah1S
+		item.Ayah1Ayah = ayah1A
+		item.Ayah2Surah = ayah2S
+		item.Ayah2Ayah = ayah2A
+	} else if itemType != "ayah" {
+		http.Error(w, "invalid item type", http.StatusBadRequest)
+		return
+	}
+
+	inserted, err := s.db.AddCollectionItem(item)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	returnTo := strings.TrimSpace(r.FormValue("return_to"))
+	if returnTo == "" || !isSafeRedirect(returnTo) {
+		returnTo = fmt.Sprintf("/collections/%d", collectionID)
+	}
+	statusCode := "saved"
+	if !inserted {
+		statusCode = "duplicate"
+	}
+	redirectWithSaved := addQueryParam(returnTo, "saved", statusCode)
+	http.Redirect(w, r, withLang(redirectWithSaved, lang), http.StatusSeeOther)
+}
+
+func (s *server) handleCollectionItemsDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sess, loggedIn := s.currentSession(r)
+	if !loggedIn {
+		http.Error(w, "login required", http.StatusUnauthorized)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
+		return
+	}
+
+	itemID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("item_id")), 10, 64)
+	if err != nil || itemID <= 0 {
+		http.Error(w, "invalid item", http.StatusBadRequest)
+		return
+	}
+	collectionID, err := strconv.ParseInt(strings.TrimSpace(r.FormValue("collection_id")), 10, 64)
+	if err != nil || collectionID <= 0 {
+		http.Error(w, "invalid collection", http.StatusBadRequest)
+		return
+	}
+	lang := sanitizeLang(r.FormValue("lang"))
+	if err := s.db.DeleteCollectionItemForUser(itemID, sess.UserID); err != nil {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+	http.Redirect(w, r, withLang(fmt.Sprintf("/collections/%d?status=removed", collectionID), lang), http.StatusSeeOther)
+}
+
+type surahIndexItem struct {
+	Number        int
+	Name          string
+	RelationCount int
+}
+
+type juzIndexItem struct {
+	Number        int
+	RelationCount int
+}
+
+func (s *server) handleSurahIndexPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	counts, err := s.db.RelationCountBySurah()
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	items := make([]surahIndexItem, 114)
+	for i := 1; i <= 114; i++ {
+		items[i-1] = surahIndexItem{
+			Number:        i,
+			Name:          s.quran.SurahName(i),
+			RelationCount: counts[i],
+		}
+	}
+
+	s.render(w, "surah-index.html", s.learningData(r, map[string]any{
+		"Title":       "Browse by Surah",
+		"Description": "Browse all 114 surahs and their mutashabihat relations. Try it yourself at hifz.click.",
+		"Surahs":      items,
+		"JSONLD":      breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{{Name: "Home", Path: "/"}, {Name: "Surah", Path: "/surah"}}),
+	}))
+}
+
+func (s *server) handleJuzIndexPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Compute juz relation counts from all relations via quran store.
+	allRels, err := s.db.All()
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	counts := make(map[int]int)
+	seen := make(map[string]bool)
+	for _, rel := range allRels {
+		a1, ok1 := s.quran.Get(rel.Ayah1Surah, rel.Ayah1Ayah)
+		a2, ok2 := s.quran.Get(rel.Ayah2Surah, rel.Ayah2Ayah)
+		if !ok1 || !ok2 {
+			continue
+		}
+		key1 := fmt.Sprintf("%d:%d", rel.ID, a1.Juz)
+		if !seen[key1] {
+			counts[a1.Juz]++
+			seen[key1] = true
+		}
+		key2 := fmt.Sprintf("%d:%d", rel.ID, a2.Juz)
+		if !seen[key2] {
+			counts[a2.Juz]++
+			seen[key2] = true
+		}
+	}
+
+	items := make([]juzIndexItem, 30)
+	for i := 1; i <= 30; i++ {
+		items[i-1] = juzIndexItem{Number: i, RelationCount: counts[i]}
+	}
+
+	s.render(w, "juz-index.html", s.learningData(r, map[string]any{
+		"Title":       "Browse by Juz",
+		"Description": "Browse mutashabihat relations across all 30 juz of the Quran. Try it yourself at hifz.click.",
+		"Juzs":        items,
+		"JSONLD":      breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{{Name: "Home", Path: "/"}, {Name: "Juz", Path: "/juz"}}),
+	}))
+}
+
+func (s *server) handleSurahPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	surah, err := parseSingleIntPath(r.URL.Path, "/surah/", "")
+	if err != nil || surah < 1 || surah > 114 {
+		http.NotFound(w, r)
+		return
+	}
+
+	pairs, err := s.rels.PairsBySurah(surah)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	data := map[string]any{
+		"Title":           fmt.Sprintf("Surah %d (%s) Relations", surah, s.quran.SurahName(surah)),
+		"Description":     fmt.Sprintf("Browse mutashabihat relations in Surah %d: %s. Try it yourself at hifz.click.", surah, s.quran.SurahName(surah)),
+		"Surah":           surah,
+		"SurahName":       s.quran.SurahName(surah),
+		"SurahArabicName": s.quran.ArabicName(surah),
+		"AyahCount":       s.quran.AyahCount(surah),
+		"RevelationPlace": s.quran.RevelationPlace(surah),
+		"Pairs":           pairs,
+		"PairCount":       len(pairs),
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: "Surah", Path: "/surah"},
+			{Name: s.quran.SurahName(surah), Path: fmt.Sprintf("/surah/%d", surah)},
+		}),
+	}
+	if surah > 1 {
+		data["PrevSurah"] = surah - 1
+		data["PrevSurahName"] = s.quran.SurahName(surah - 1)
+	}
+	if surah < 114 {
+		data["NextSurah"] = surah + 1
+		data["NextSurahName"] = s.quran.SurahName(surah + 1)
+	}
+	s.render(w, "surah-detail.html", s.learningData(r, data))
+}
+
+func (s *server) handleJuzPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	juz, err := parseSingleIntPath(r.URL.Path, "/juz/", "")
+	if err != nil || juz < 1 || juz > 30 {
+		http.NotFound(w, r)
+		return
+	}
+
+	pairs, err := s.rels.PairsByJuz(juz)
+	if err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	juzStartSurah, juzStartAyah := s.quran.JuzFirstAyah(juz)
+	juzStartName := s.quran.SurahName(juzStartSurah)
+
+	s.render(w, "juz.html", s.learningData(r, map[string]any{
+		"Title":         fmt.Sprintf("Juz %d Relations", juz),
+		"Description":   fmt.Sprintf("Browse mutashabihat relations in Juz %d. Try it yourself at hifz.click.", juz),
+		"Juz":           juz,
+		"JuzStartSurah": juzStartSurah,
+		"JuzStartAyah":  juzStartAyah,
+		"JuzStartName":  juzStartName,
+		"Pairs":         pairs,
+		"JSONLD": breadcrumbJSONLD("https://"+r.Host, []breadcrumbItem{
+			{Name: "Home", Path: "/"},
+			{Name: "Juz", Path: "/juz"},
+			{Name: fmt.Sprintf("Juz %d", juz), Path: fmt.Sprintf("/juz/%d", juz)},
+		}),
+	}))
+}
+
+// handleToggleMastered handles POST /collections/items/mastered/{id}.
+func (s *server) handleToggleMastered(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	sess, ok := s.currentSession(r)
+	if !ok {
+		http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	if !s.validateCSRFToken(r, s.csrfTokenFor(sess.ID)) {
+		http.Error(w, "invalid CSRF token", http.StatusForbidden)
+		return
+	}
+
+	trimmed := strings.TrimPrefix(r.URL.Path, "/collections/items/mastered/")
+	itemID, err := strconv.ParseInt(strings.TrimSpace(trimmed), 10, 64)
+	if err != nil || itemID <= 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	if err := s.db.ToggleMastered(itemID, sess.UserID); err != nil {
+		internalError(w, r, err)
+		return
+	}
+
+	returnTo := r.FormValue("return_to")
+	if !isSafeRedirect(returnTo) {
+		returnTo = "/dashboard"
+	}
+	http.Redirect(w, r, returnTo, http.StatusSeeOther)
+}
+
+func (s *server) handleAdminRelations(w http.ResponseWriter, r *http.Request) {
+	if !s.requireAdmin(w, r) {
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		s.renderAdminRelationsPage(w, r, nil)
+		return
+	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(s.adminToken)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
+			return
+		}
+
+		lang := sanitizeLang(r.FormValue("lang"))
+		action := strings.ToLower(strings.TrimSpace(r.FormValue("action")))
+
+		switch action {
+		case "add":
+			ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+			note := strings.TrimSpace(r.FormValue("note"))
+			category := strings.TrimSpace(r.FormValue("category"))
+			if err := s.rels.AddWithCategory(ayah1, ayah2, note, category, "manual"); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError":   adminErrorMessage(err),
+					"FormAyah1":    ayah1,
+					"FormAyah2":    ayah2,
+					"FormNote":     note,
+					"FormCategory": category,
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=added", lang), http.StatusSeeOther)
+			return
+		case "edit":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": "invalid relation id",
+				})
+				return
+			}
+			ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+			ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+			note := strings.TrimSpace(r.FormValue("note"))
+			category := strings.TrimSpace(r.FormValue("category"))
+			// Only update highlights if the user interacted with the word picker.
+			// highlights_current carries the existing value as a fallback.
+			highlights := r.FormValue("highlights_current")
+			if r.FormValue("highlights_modified") == "1" {
+				highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+			}
+			if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": adminErrorMessage(err),
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=edited", lang), http.StatusSeeOther)
+			return
+		case "set_reviewed":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprint(w, `{"error":"invalid id"}`)
+				return
+			}
+			reviewed := r.FormValue("reviewed") == "1"
+			if err := s.rels.SetReviewed(id, reviewed); err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprint(w, `{"error":"update failed"}`)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"ok":true,"reviewed":%v}`, reviewed)
+			return
+		case "delete":
+			idValue := strings.TrimSpace(r.FormValue("id"))
+			id, err := strconv.ParseInt(idValue, 10, 64)
+			if err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": "invalid relation id",
+				})
+				return
+			}
+			if err := s.rels.DeleteByID(id); err != nil {
+				s.renderAdminRelationsPage(w, r, map[string]any{
+					"AdminError": adminErrorMessage(err),
+				})
+				return
+			}
+			http.Redirect(w, r, withLang("/admin/relations?status=deleted", lang), http.StatusSeeOther)
+			return
+		default:
+			s.renderAdminRelationsPage(w, r, map[string]any{
+				"AdminError": "invalid action",
+			})
+			return
+		}
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+// handleAdminRelationEdit handles GET /admin/relations/{id}/edit and POST /admin/relations/{id}/edit.
+func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request) {
+	if !s.requireAdmin(w, r) {
+		return
+	}
+
+	// Parse id from /admin/relations/{id}/edit
+	trimmed := strings.TrimPrefix(r.URL.Path, "/admin/relations/")
+	trimmed = strings.TrimSuffix(trimmed, "/edit")
+	id, err := strconv.ParseInt(strings.TrimSpace(trimmed), 10, 64)
+	if err != nil || id <= 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	returnCategory := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("return_category")))
+	lang := pageLang(r)
+
+	backURL := withLang("/admin/relations", lang)
+	if returnCategory != "" {
+		backURL = withLang("/admin/relations?category="+returnCategory, lang)
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		rel, ok, err := s.rels.RelationByID(id)
+		if err != nil {
+			internalError(w, r, err)
+			return
+		}
+		if !ok {
+			s.renderNotFound(w, r, "Relation not found", "This relation does not exist.")
+			return
+		}
+
+		var w1, w2 []string
+		var diff1, diff2 template.HTML
+		s1, y1, err1 := relations.ParseAyahRef(rel.Ayah1)
+		s2, y2, err2 := relations.ParseAyahRef(rel.Ayah2)
+		if err1 == nil && err2 == nil {
+			a1, ok1 := s.quran.Get(s1, y1)
+			a2, ok2 := s.quran.Get(s2, y2)
+			if ok1 {
+				w1 = strings.Fields(a1.TextAR)
+			}
+			if ok2 {
+				w2 = strings.Fields(a2.TextAR)
+			}
+			if ok1 && ok2 {
+				if rel.Highlights != "" {
+					h := parseHighlights(rel.Highlights)
+					diff1 = applyHighlights(a1.TextAR, h.Ayah1)
+					diff2 = applyHighlights(a2.TextAR, h.Ayah2)
+				} else {
+					diff1, diff2 = diffHighlight(a1.TextAR, a2.TextAR)
+				}
+			}
+		}
+
+		categoryOptions := adminCategoryOptions()
+		s.render(w, "admin-edit.html", s.learningData(r, map[string]any{
+			"Title":             "Edit Relation",
+			"NoIndex":           true,
+			"Relation":          rel,
+			"RelationUpdatedAt": formatUpdatedAt(rel.UpdatedAt),
+			"DiffText1":         diff1,
+			"DiffText2":         diff2,
+			"Ayah1Words":        w1,
+			"Ayah2Words":        w2,
+			"CategoryOptions":   categoryOptions,
+			"BackURL":           backURL,
+			"ReturnCategory":    returnCategory,
+			"AdminError":        "",
+		}))
+
+	case http.MethodPost:
+		r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
+		if !s.validateCSRFToken(r, s.csrfTokenFor(s.adminToken)) {
+			http.Error(w, "invalid CSRF token", http.StatusForbidden)
+			return
+		}
+
+		returnCat := strings.ToLower(strings.TrimSpace(r.FormValue("return_category")))
+		postLang := sanitizeLang(r.FormValue("lang"))
+
+		ayah1 := strings.TrimSpace(r.FormValue("ayah1"))
+		ayah2 := strings.TrimSpace(r.FormValue("ayah2"))
+		note := strings.TrimSpace(r.FormValue("note"))
+		category := strings.TrimSpace(r.FormValue("category"))
+		highlights := r.FormValue("highlights_current")
+		if r.FormValue("highlights_modified") == "1" {
+			highlights = buildHighlightsJSON(r.FormValue("highlights_ayah1"), r.FormValue("highlights_ayah2"))
+		}
+
+		if err := s.rels.UpdateByID(id, ayah1, ayah2, note, category, highlights); err != nil {
+			rel, _, _ := s.rels.RelationByID(id)
+			var w1, w2 []string
+			s1, y1, err1 := relations.ParseAyahRef(ayah1)
+			s2, y2, err2 := relations.ParseAyahRef(ayah2)
+			if err1 == nil && err2 == nil {
+				if a1, ok1 := s.quran.Get(s1, y1); ok1 {
+					w1 = strings.Fields(a1.TextAR)
+				}
+				if a2, ok2 := s.quran.Get(s2, y2); ok2 {
+					w2 = strings.Fields(a2.TextAR)
+				}
+			}
+			categoryOptions := adminCategoryOptions()
+			backURL := withLang("/admin/relations", postLang)
+			if returnCat != "" {
+				backURL = withLang("/admin/relations?category="+returnCat, postLang)
+			}
+			s.render(w, "admin-edit.html", s.learningData(r, map[string]any{
+				"Title":           "Edit Relation",
+				"NoIndex":         true,
+				"Relation":        rel,
+				"Ayah1Words":      w1,
+				"Ayah2Words":      w2,
+				"CategoryOptions": categoryOptions,
+				"BackURL":         backURL,
+				"ReturnCategory":  returnCat,
+				"AdminError":      adminErrorMessage(err),
+			}))
+			return
+		}
+
+		redirectURL := withLang("/admin/relations?status=edited", postLang)
+		if returnCat != "" {
+			redirectURL = withLang("/admin/relations?category="+returnCat+"&status=edited", postLang)
+		}
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (s *server) handleAPIAyah(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	trimmed := strings.TrimPrefix(r.URL.Path, "/api/ayah/")
+	parts := strings.Split(strings.Trim(trimmed, "/"), "/")
+	if len(parts) < 2 {
+		http.NotFound(w, r)
+		return
+	}
+
+	surah, err := strconv.Atoi(parts[0])
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	ayah, err := strconv.Atoi(parts[1])
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	if len(parts) == 2 {
+		a, ok := s.quran.Get(surah, ayah)
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		resp := map[string]any{
+			"surah":      a.Surah,
+			"surah_name": a.SurahName,
+			"ayah":       a.Ayah,
+			"text":       a.TextAR,
+			"juz":        a.Juz,
+		}
+		lang := pageLang(r)
+		if tr := s.translationFor(lang, surah, ayah); tr != "" {
+			resp["translation_lang"] = lang
+			resp["translation_text"] = tr
+		}
+		writeJSON(w, http.StatusOK, resp)
+		return
+	}
+
+	if len(parts) == 3 && parts[2] == "relations" {
+		related, err := s.rels.RelatedAyahs(surah, ayah)
 		if err != nil {
 			internalError(w, r, err)
 			return
