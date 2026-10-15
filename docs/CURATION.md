@@ -4,7 +4,7 @@ This document explains how to add, verify, and submit mutashabihat pairs to `dat
 
 ## What Is a Mutashabihat Pair?
 
-A mutashabihat pair is two Quran verses that are nearly identical in wording, making them easy to confuse during recitation or memorization. The confusion is linguistic, not thematic — the verses must share enough wording that a memorizer could plausibly mix them up.
+A mutashabihat pair consists of two Quran verses with shared wording that may cause confusion during recitation or memorization. Similarity may cover the complete verses or a recurring phrase. The confusion is linguistic, not thematic — the verses must share enough wording that a memorizer could plausibly mix them up.
 
 A pair is a good candidate if:
 - A memorizer who knows one verse could accidentally recite the other
@@ -32,21 +32,90 @@ Fields:
 
 Ordering: put the lower surah number first (`ayah1`). If same surah, put the lower ayah number first.
 
-## Confusion-Pattern Categories
+## Wording categories
 
-Pick the single category that best describes the difference between the two verses:
+Use one primary category. These labels describe observable wording patterns,
+not a judgment about tafsir or the scholarly completeness of the catalog.
 
-| Category | Description | Example |
-|---|---|---|
-| `lafzi` | Near-identical wording, almost word-for-word | 94:5 and 94:6 (verbatim repeat) |
-| `word_swap` | One or more words differ between otherwise identical verses | 60:8 and 60:9 (ruling changes with one verb) |
-| `addition_omission` | One verse has an extra word or phrase the other lacks | 17:23 and 29:8 (wa by al-walidayn) |
-| `ending_variation` | Verses identical except for the final word or phrase | Many Al-Rahman pairs end differently |
-| `order_change` | Same words appear in different sequence | 4:135 and 5:8 (subject order swapped) |
-| `pronoun_shift` | Differs only in pronoun (هو/هم, كم/كن, etc.) | 23:5 and 70:29 (pronoun change) |
-| `other` | Does not fit cleanly into any above pattern | Use sparingly |
+| Key | Meaning |
+|---|---|
+| `lafzi` | Identical or nearly identical **complete verses**, not just a shared phrase |
+| `addition_omission` | One complete sequence retained with a small addition |
+| `word_swap` | A few word substitutions in otherwise matching verses |
+| `ending_variation` | Matching opening, differing final phrase |
+| `order_change` | Same complete word multiset, different order |
+| `pronoun_shift` | Pronoun change identified by a human reviewer |
+| `shared_opening` | A common phrase starts both verses; other wording differs |
+| `shared_phrase` | Common phrase in the middle or at different positions |
+| `shared_ending` | Common closing phrase; other wording differs (2:114 ↔ 5:41) |
+| `structural` | Sentence-pattern resemblance identified by a human reviewer |
+| `other` | No clear pattern; assess whether the pair helps memorization |
 
-When the difference spans more than one category, pick the dominant one. If unsure, use `other` and explain in the note.
+### Automatic rules (`wording-v2`)
+
+The single analyzer is `internal/curation`, also used by the dashboard and the
+`scripts/analyze_curation` command. It reads the versioned Arabic without editing
+it. It ignores stop signs and folds common alif/mark variants for word alignment.
+The separate highlight comparison retains vocalization and spelling differences.
+
+Apply these rules in order:
+
+1. Full normalized word sequences match → `lafzi` (strong evidence only if the
+   vocalization/spelling also matches after ignoring stop signs and tatweel).
+2. One entire ordered sequence is contained in the other and covers at least 80%
+   of **both** verses → `addition_omission`.
+3. Complete word multisets match → `order_change`.
+4. Equal lengths, at most two substitutions, at least 80% identical positions →
+   `word_swap`.
+5. At least 90% of each complete verse aligns in order → `lafzi`.
+6. An identical prefix of at least four words covers 80% of each verse →
+   `ending_variation`.
+7. Longest contiguous shared phrase has at least four words → `shared_opening`
+   if it starts both, `shared_ending` if it ends both, otherwise `shared_phrase`.
+8. Otherwise → `other`. The analyzer does not infer grammatical structure or
+   pronoun meaning from overlap alone.
+
+The phrase search reads full verses; the detector's former nine-word cap does
+not constrain classification. Coverage means the proportion of normalized word
+**occurrences** aligned in sequence, not semantic similarity or a confidence
+probability. Repeated formulaic phrases can still be poor memorization examples;
+automatic labels remain provisional.
+
+### Highlight editing
+
+Maintain one set of selected differing words in one color. Matching wording is
+unmarked. Waqaf/section signs alone are never automatically highlighted;
+vocalization differences remain visible. All saved indices address the original
+whitespace-separated words, including original stop-sign positions. Arabic text
+and diacritics are never rewritten. An explicit empty selection means no highlights.
+
+### Reclassifying existing automatic relations
+
+The companion dataset repository provides `refine_hifzlink_curation.py`. Use
+an explicitly scoped, consistent curation snapshot outside Git. Build the analyzer:
+
+```sh
+go build -o /tmp/hifzlink-analyze ./scripts/analyze_curation
+```
+
+Use the dataset script's `plan --help`, then inspect its private before/after plan.
+The plan includes all eligible rows, category transitions, full-verse coverage,
+human-decision conflicts, and original values. Apply it only to an explicit local
+copy. `apply` first saves a SQLite backup, checks a fingerprint of every table,
+and uses one transaction. A stale database fails closed.
+
+Only accepted relations with automatic source, reviewed=false, and **no past human
+review metadata** are eligible. Existing manual/seed relations and human-reviewed
+or reopened candidates are preserved. Highlights differing from the previous
+automatic algorithm are preserved as possible manual edits. Only public category,
+automatic highlights, modification time, and private suggestion/automation notes
+are changed. Public notes, review flags, IDs, origins, and account state are retained.
+
+`export` regenerates versioned candidate suggestion JSON from the same analyzer,
+without private notes or human review metadata. Startup imports only new candidate
+pairs; changing that JSON does **not** reclassify existing runtime relations.
+Publishing a later refinement requires a fresh production snapshot and a separately
+approved, guarded data update. Never replace the live database with a preview copy.
 
 ## Verification Checklist
 
@@ -64,7 +133,7 @@ If you are running hifzlink locally, you can also add pairs through the admin in
 
 1. Add the pair via the admin UI to test it
 2. Once verified, add the same pair to `data/relations.seed.json` manually
-3. Delete it from the DB and re-run `go run ./scripts/seed_relations` to reload from the seed file
+3. Validate the seed separately. Preserve runtime relations and review history; a seed difference does not authorize deletion or replacement.
 
 ## Common Mistakes
 

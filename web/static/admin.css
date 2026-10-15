@@ -292,3 +292,10 @@
   .admin-edit-surface .admin-form { grid-template-columns: minmax(0, 1fr); }
   .admin-diff-preview .compare-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
 }
+
+/* Match the one-color difference convention in public comparisons. */
+.admin-dashboard .highlight-legend { display: flex; align-items: center; gap: .6rem; }
+.admin-dashboard .difference-swatch { display: inline-block; width: 15px; height: 8px; background: var(--color-diff-bg); border-bottom: 2px solid var(--color-diff-line); flex-shrink: 0; }
+.admin-category-guide { margin-bottom: 1.5rem; }
+.admin-category-guide summary { cursor: pointer; }
+.admin-category-guide li { margin-block: .6rem; }

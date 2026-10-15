@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/srmdn/hifzlink/internal/curation"
 	"github.com/srmdn/hifzlink/internal/db"
 	"github.com/srmdn/hifzlink/internal/qfclient"
 	"github.com/srmdn/hifzlink/internal/relations"
@@ -387,7 +388,7 @@ func (s *server) handleSearch(w http.ResponseWriter, r *http.Request) {
 		CompareURL    string
 	}
 
-	categoryOptions := adminCategoryOptions()
+	categoryOptions := adminCategoryOptionsForLang(pageLang(r))
 	categoryLabelMap := make(map[string]string, len(categoryOptions))
 	for _, opt := range categoryOptions {
 		categoryLabelMap[opt.Key] = opt.Label
@@ -647,6 +648,9 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 	rel, relFound, _ := s.db.ByPair(s1, y1, s2, y2)
 	if relFound && rel.Highlights != "" {
 		h := parseHighlights(rel.Highlights)
+		if rel.Ayah1Surah != s1 || rel.Ayah1Ayah != y1 {
+			h.Ayah1, h.Ayah2 = h.Ayah2, h.Ayah1
+		}
 		diff1 = applyHighlights(ayah1.TextAR, h.Ayah1)
 		diff2 = applyHighlights(ayah2.TextAR, h.Ayah2)
 	} else {
@@ -679,7 +683,7 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 				Ref1:       ref1,
 				Ref2:       ref2,
 				CompareURL: withLang(fmt.Sprintf("/compare?ayah1=%s&ayah2=%s", ref1, ref2), lang),
-				Category:   rel.Category,
+				Category:   categoryDisplayLabel(rel.Category, lang),
 			})
 		}
 	}
@@ -718,6 +722,8 @@ func (s *server) handleComparePage(w http.ResponseWriter, r *http.Request) {
 		compareData["Description"] = fmt.Sprintf("Bandingkan %s %s dan %s %s. Temukan lafaz yang sama dan bagian yang berubah.", ayah1.SurahName, ref1str, ayah2.SurahName, ref2str)
 	}
 	if relFound {
+		compareData["RelationCategoryLabel"] = categoryDisplayLabel(rel.Category, lang)
+		compareData["RelationCategoryDescription"] = categoryDescription(rel.Category, lang)
 		compareData["AdminEditURL"] = fmt.Sprintf("/admin/relations/%d/edit", rel.ID)
 		compareData["RelationUpdatedAt"] = formatUpdatedAt(rel.UpdatedAt)
 		compareData["RelationNote"] = rel.Note
@@ -1523,7 +1529,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 			}
 		}
 
-		categoryOptions := adminCategoryOptions()
+		categoryOptions := adminCategoryOptionsForLang(pageLang(r))
 		s.render(w, "admin-edit.html", s.learningData(r, map[string]any{
 			"Title":             "Edit Relation",
 			"NoIndex":           true,
@@ -1575,7 +1581,7 @@ func (s *server) handleAdminRelationEdit(w http.ResponseWriter, r *http.Request)
 					w2 = strings.Fields(a2.TextAR)
 				}
 			}
-			categoryOptions := adminCategoryOptions()
+			categoryOptions := adminCategoryOptionsForLang(pageLang(r))
 			backURL := withLang("/admin/relations", postLang)
 			if returnCat != "" {
 				backURL = withLang("/admin/relations?category="+returnCat, postLang)
@@ -2128,7 +2134,7 @@ func (s *server) renderAdminRelationsPage(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	categoryOptions := adminCategoryOptions()
+	categoryOptions := adminCategoryOptionsForLang(pageLang(r))
 	categoryLabelMap := make(map[string]string, len(categoryOptions))
 	for _, option := range categoryOptions {
 		categoryLabelMap[option.Key] = option.Label
@@ -2215,6 +2221,7 @@ func importCurationCandidates(store *db.Store, quran *search.Store, path string)
 		"lafzi": true, "addition_omission": true, "word_swap": true,
 		"ending_variation": true, "order_change": true, "pronoun_shift": true,
 		"structural": true, "other": true,
+		"shared_opening": true, "shared_phrase": true, "shared_ending": true,
 	}
 	candidates := make([]db.CurationCandidate, 0, len(inputs))
 	seen := make(map[[4]int]struct{}, len(inputs))
@@ -2247,13 +2254,14 @@ func importCurationCandidates(store *db.Store, quran *search.Store, path string)
 			return 0, fmt.Errorf("candidate %d duplicates an earlier canonical pair", i+1)
 		}
 		seen[key] = struct{}{}
+		analysis := curation.Analyze(quranText(quran, s1, a1), quranText(quran, s2, a2))
 		candidates = append(candidates, db.CurationCandidate{
 			Ayah1Surah: s1, Ayah1Ayah: a1, Ayah2Surah: s2, Ayah2Ayah: a2,
-			SuggestedCategory:  input.SuggestedCategory,
-			CategoryConfidence: input.CategorySuggestionConfidence,
-			CategoryBasis:      input.CategorySuggestionBasis,
+			SuggestedCategory:  analysis.Category,
+			CategoryConfidence: analysis.Confidence,
+			CategoryBasis:      analysis.Version + ": " + analysis.Basis,
 			ReviewPriority:     input.ReviewPriority, MatchType: input.Type,
-			PhraseLen: input.PhraseLen, Jaccard: input.Jaccard,
+			PhraseLen: analysis.PhraseLen, Jaccard: input.Jaccard,
 		})
 	}
 	return store.ImportCurationCandidates(candidates)
@@ -2360,16 +2368,24 @@ func addQueryParam(path, key, value string) string {
 	return u.String()
 }
 
+func quranText(quran *search.Store, surah, ayah int) string {
+	verse, _ := quran.Get(surah, ayah)
+	return verse.TextAR
+}
+
 func adminCategoryOptions() []adminCategoryOption {
 	return []adminCategoryOption{
-		{Key: "lafzi", Label: "Lafzi (near-identical wording)", Hint: "Verses are almost the same word-for-word — very small differences."},
-		{Key: "addition_omission", Label: "Addition / omission", Hint: "One verse adds or drops a word compared to the other."},
-		{Key: "word_swap", Label: "Word swap", Hint: "A word is replaced by a similar or related one."},
-		{Key: "ending_variation", Label: "Ending variation", Hint: "Same opening, but the ending differs."},
-		{Key: "order_change", Label: "Order change", Hint: "Same words, different sequence."},
-		{Key: "pronoun_shift", Label: "Pronoun shift", Hint: "A pronoun changes — e.g. هُوَ vs هُمْ, or كُمْ vs هُمْ."},
-		{Key: "structural", Label: "Structural", Hint: "Similar grammatical or rhetorical pattern with different wording."},
-		{Key: "other", Label: "Other", Hint: "Use only when none of the patterns fit clearly."},
+		{Key: "lafzi", Label: "Lafzi · whole verse", Hint: "The complete wording is identical or at least 90% of both verses aligns. A shared phrase alone is insufficient."},
+		{Key: "addition_omission", Label: "Addition / omission", Hint: "One full sequence is retained with extra words; the shorter verse covers at least 80% of the longer."},
+		{Key: "word_swap", Label: "Word substitution", Hint: "Otherwise matching verses contain a few substituted words. Automatic suggestions require equal lengths and at least 80% identical positions."},
+		{Key: "ending_variation", Label: "Different ending", Hint: "The same opening covers at least 80% of both verses; only the final phrase changes. This does not mean a shared ending."},
+		{Key: "order_change", Label: "Changed word order", Hint: "The same complete set of words appears in a different order."},
+		{Key: "pronoun_shift", Label: "Changed pronoun", Hint: "A change in pronoun is the main distinction. Assign manually after reading the Arabic."},
+		{Key: "shared_opening", Label: "Shared opening phrase", Hint: "A shared phrase starts both verses, but substantial wording differs elsewhere."},
+		{Key: "shared_phrase", Label: "Shared phrase · middle or mixed position", Hint: "A phrase is shared within the verses or at different positions; the complete verses are not near-identical."},
+		{Key: "shared_ending", Label: "Shared ending phrase", Hint: "Both verses end with the same phrase, while substantial wording differs earlier. Example: 2:114 ↔ 5:41."},
+		{Key: "structural", Label: "Similar sentence structure", Hint: "Similar grammatical pattern with different wording. Requires human judgment; word overlap alone is insufficient."},
+		{Key: "other", Label: "Other · needs assessment", Hint: "No clear wording pattern. Review usefulness for memorization; this label does not establish a meaningful connection."},
 	}
 }
 

@@ -66,7 +66,7 @@
         <div class="word-picker-section">
           <input type="hidden" name="highlights_current" value="{{.Relation.Highlights}}" />
           <input type="hidden" name="highlights_modified" value="0" class="highlights-modified" />
-          <p class="word-picker-label">Click words to highlight (shown on compare page)</p>
+          <p class="word-picker-label">Select differing words to highlight (shown on compare page). One color marks differences; stop signs alone do not count.</p>
           <div class="word-picker" data-ayah="1" data-highlights="{{.Relation.Highlights}}">
             {{range $i, $w := .Ayah1Words}}<span class="word-picker-word" data-idx="{{$i}}">{{$w}}</span> {{end}}
           </div>

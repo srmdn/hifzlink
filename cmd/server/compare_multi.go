@@ -143,25 +143,5 @@ func (s *server) handleMultiComparePage(w http.ResponseWriter, r *http.Request, 
 }
 
 func unmatchedWordIndices(a, b string) ([]int, []int) {
-	wordsA, wordsB := strings.Fields(a), strings.Fields(b)
-	sharedA, sharedB := lcsIndices(wordsA, wordsB)
-	matchedA, matchedB := map[int]bool{}, map[int]bool{}
-	for _, index := range sharedA {
-		matchedA[index] = true
-	}
-	for _, index := range sharedB {
-		matchedB[index] = true
-	}
-	var unmatchedA, unmatchedB []int
-	for index := range wordsA {
-		if !matchedA[index] {
-			unmatchedA = append(unmatchedA, index)
-		}
-	}
-	for index := range wordsB {
-		if !matchedB[index] {
-			unmatchedB = append(unmatchedB, index)
-		}
-	}
-	return unmatchedA, unmatchedB
+	return suggestedHighlightIndices(a, b)
 }

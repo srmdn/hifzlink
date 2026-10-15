@@ -71,10 +71,10 @@ func TestLCSIndices_basic(t *testing.T) {
 	}
 }
 
-func TestSuggestedHighlightIndicesIgnoresDiacriticsAndAlifVariants(t *testing.T) {
+func TestSuggestedHighlightIndicesRetainsVocalizationAndSpellingDifferences(t *testing.T) {
 	a, b := suggestedHighlightIndices("إِنَّ اللَّهَ غَفُورٌ", "ان الله رَحِيمٌ")
-	if len(a) != 1 || a[0] != 2 || len(b) != 1 || b[0] != 2 {
-		t.Fatalf("suggested highlights = %v / %v, want [2] / [2]", a, b)
+	if joinHighlightIndices(a) != "0,1,2" || joinHighlightIndices(b) != "0,1,2" {
+		t.Fatalf("suggested highlights = %v / %v, want [0 1 2] / [0 1 2]", a, b)
 	}
 }
 
