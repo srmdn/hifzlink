@@ -264,7 +264,7 @@
   })();
 </script>
 {{if .LearningUI}}
-<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><span>{{.UI.free}}</span>{{if and (not .NoIndex) (not .ShareURL)}}<button class="learning-footer-share" type="button" data-share-page data-share-text="{{.UI.sharePageText}}">{{.UI.sharePage}}</button><span class="learning-footer-share-status" data-share-page-status role="status" aria-live="polite"></span>{{end}}<a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.source}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
+<footer class="learning-footer"><a href="{{.HomeURL}}">hifzlink</a><span>{{.UI.footer}}</span><span>{{.UI.free}}</span>{{if and (not .NoIndex) (not .ShareURL)}}<button class="learning-footer-share" type="button" data-share-page data-share-text="{{.UI.sharePageText}}">{{.UI.sharePage}}</button><span class="learning-footer-share-status" data-share-page-status role="status" aria-live="polite"></span>{{end}}<a class="learning-footer-end" href="https://github.com/srmdn/hifzlink" target="_blank" rel="noopener noreferrer">{{.UI.source}}</a><a href="{{.MethodologyURL}}">{{.UI.methodology}}</a><a href="/privacy?lang={{.Lang}}">{{.UI.privacy}}</a><a href="/terms?lang={{.Lang}}">{{.UI.terms}}</a></footer>
 {{if and (not .NoIndex) (not .ShareURL)}}
 <script>
 (() => {
