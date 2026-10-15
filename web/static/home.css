@@ -4,7 +4,7 @@
   --learning-serif: Georgia, "Times New Roman", serif;
   font-weight: 400;
 }
-.learning-page .topbar { position: static; background: var(--color-bg); backdrop-filter: none; border-color: var(--learning-rule); }
+.learning-page .topbar { position: sticky; top: 0; z-index: var(--z-sticky); background: var(--color-bg); backdrop-filter: none; border-color: var(--learning-rule); }
 .learning-page .topbar-inner { max-width: 1280px; padding: 23px 48px; min-height: 82px; }
 .learning-page .topbar-left { flex: 1; justify-content: space-between; gap: 24px; }
 .learning-page .primary-nav { margin: 0 auto; gap: 22px; }
